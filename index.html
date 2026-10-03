@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>O Rei do PPF</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,100..125,100..900&display=swap">
+<style>
+/* Layout: topo cinematográfico (Lucid) com o vídeo do carro preso à rolagem; o resto em seções claras de marca de película (XPEL): títulos largos em caixa alta, cartões, faixas escuras de impacto. */
+:root{
+  --black:#0a0a0a;
+  --ink:#121212;
+  --paper:#f3f3f1;
+  --white:#ffffff;
+  --line:#e2e2de;
+  --muted:#6a6a64;
+  --soft:#a3a39c;
+  --gold:#c9a432;
+  --gold-hi:#e3c15a;
+  --gold-ink:#7d6310;
+  --font:'Archivo','Helvetica Neue',Arial,sans-serif;
+  --gutter:max(16px,5vw);
+  --ease:cubic-bezier(.2,.7,.2,1);
+  color-scheme:light;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--white);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.55;overflow-x:hidden}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+img{max-width:100%;display:block}
+h1,h2,h3{text-wrap:balance;font-weight:800}
+.wide{font-stretch:125%;text-transform:uppercase;letter-spacing:.01em}
+.wrap{max-width:1280px;margin-inline:auto;padding-inline:var(--gutter)}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.22em;text-transform:uppercase}
+section[id]{scroll-margin-top:64px}
+
+/* ── Botões ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:15px 28px;border-radius:999px;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;border:1px solid transparent;cursor:pointer;transition:background .25s,color .25s,border-color .25s,transform .25s}
+.btn:hover{transform:translateY(-1px)}
+.btn-gold{background:var(--gold);color:var(--black)}
+.btn-gold:hover{background:var(--gold-hi)}
+.btn-ghost{background:transparent;color:var(--white);border-color:rgba(255,255,255,.4)}
+.btn-ghost:hover{border-color:var(--white)}
+.btn-dark{background:var(--black);color:var(--white)}
+.btn-dark:hover{background:#2a2a2a}
+.btn-line{background:transparent;color:var(--ink);border-color:var(--ink)}
+.btn-line:hover{background:var(--ink);color:var(--white)}
+.arrow{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;display:inline-flex;gap:8px;align-items:center;background:none;border:0;cursor:pointer;padding:0}
+.arrow::after{content:"→";transition:transform .25s}
+.arrow:hover::after{transform:translateX(4px)}
+
+/* ── Navegação ── */
+.nav{position:fixed;inset:0 0 auto 0;z-index:50;height:calc(68px + env(safe-area-inset-top,0px));padding:env(safe-area-inset-top,0px) var(--gutter) 0;display:flex;align-items:center;gap:28px;color:var(--white);transition:background .35s,color .35s,border-color .35s;border-bottom:1px solid transparent}
+.nav.solid{background:rgba(255,255,255,.96);color:var(--ink);border-color:var(--line);backdrop-filter:blur(10px)}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0}
+.brand svg{width:28px;height:24px}
+.brand b{font-weight:800;font-stretch:125%;font-size:15px;letter-spacing:.06em;text-transform:uppercase}
+.nav ul{list-style:none;display:flex;gap:28px;margin-left:auto}
+.nav ul a{text-decoration:none;font-size:13px;font-weight:500;letter-spacing:.04em;opacity:.85}
+.nav ul a:hover{opacity:1}
+.nav .btn{padding:10px 18px;font-size:12px}
+.nav:not(.solid) .btn{background:var(--white);color:var(--black)}
+@media (max-width:860px){.nav ul{display:none}.nav .btn{margin-left:auto}}
+
+/* ── Topo com vídeo preso à rolagem ── */
+#topo{position:relative;height:420vh;background:#000;color:var(--white)}
+.stage{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;background:#000}
+#film{position:absolute;inset:0;width:100%;height:100%;display:block}
+.shade{position:absolute;inset:0;pointer-events:none;background:linear-gradient(to top,rgba(0,0,0,.75) 0%,rgba(0,0,0,0) 38%),linear-gradient(to bottom,rgba(0,0,0,.55) 0%,rgba(0,0,0,0) 22%)}
+.beat{position:absolute;padding-inline:var(--gutter);transition:opacity .5s var(--ease),transform .7s var(--ease)}
+.beat.off{opacity:0;transform:translateY(24px);pointer-events:none}
+.beat-1{left:0;right:0;bottom:calc(64px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:20px;max-width:880px}
+.beat-1 .eyebrow{color:var(--gold-hi)}
+.beat-1 h1{font-weight:250;font-size:clamp(40px,6.4vw,92px);line-height:1;letter-spacing:-.02em}
+.beat-1 h1 b{font-weight:700}
+.beat-1 .row{display:flex;flex-wrap:wrap;gap:12px}
+.fact{display:flex;flex-direction:column;gap:10px;max-width:380px}
+.fact strong{font-size:clamp(56px,8vw,120px);font-weight:200;line-height:.9;letter-spacing:-.03em}
+.fact strong small{font-size:.35em;font-weight:400;letter-spacing:0;margin-left:.15em}
+.fact span{font-size:clamp(15px,1.4vw,19px);color:#d9d9d4;font-weight:300}
+.fact::before{content:"";width:40px;height:2px;background:var(--gold)}
+.beat-2{left:0;top:14%}
+.beat-3{right:0;top:14%;text-align:right}
+.beat-3.fact{align-items:flex-end}
+.beat-4{left:0;right:0;bottom:calc(64px + env(safe-area-inset-bottom,0px));text-align:center;display:flex;flex-direction:column;align-items:center;gap:18px}
+.beat-4 h2{font-weight:250;font-size:clamp(32px,4.6vw,64px);line-height:1.05;letter-spacing:-.02em}
+.beat-4 h2 b{font-weight:700;color:var(--gold-hi)}
+.progress{position:absolute;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:120px;height:2px;background:rgba(255,255,255,.18);overflow:hidden}
+.progress i{position:absolute;inset:0;background:var(--white);transform-origin:left;transform:scaleX(var(--p,0))}
+.loading{position:absolute;right:var(--gutter);top:calc(84px + env(safe-area-inset-top,0px));font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--soft)}
+.provisorio{position:absolute;left:var(--gutter);top:calc(84px + env(safe-area-inset-top,0px));font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);border:1px solid rgba(255,255,255,.2);padding:6px 10px;border-radius:999px}
+@media (max-width:760px){
+  .beat-2,.beat-3{top:auto;bottom:calc(96px + env(safe-area-inset-bottom,0px));left:0;right:0;text-align:left}
+  .beat-3.fact{align-items:flex-start}
+  .beat-1 .btn-ghost{display:none}
+}
+
+/* ── Seções claras ── */
+.block{padding-block:112px}
+.head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:24px 48px;margin-bottom:48px}
+.head > div{display:flex;flex-direction:column;gap:16px;max-width:760px;min-width:0}
+.head .eyebrow{color:var(--gold-ink)}
+.head h2{font-size:clamp(30px,4.2vw,58px);line-height:1}
+.head p{color:var(--muted);font-size:17px;max-width:58ch}
+
+/* Serviços */
+.svc-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+.svc{display:flex;flex-direction:column;background:var(--paper);border-radius:6px;overflow:hidden;min-width:0}
+.svc-img{aspect-ratio:16/10;background:#000;overflow:hidden;position:relative}
+.svc-img img{width:100%;height:100%;object-fit:cover;transition:transform .8s var(--ease)}
+.svc:hover .svc-img img{transform:scale(1.05)}
+.svc-img .badge{position:absolute;left:14px;top:14px;background:var(--gold);color:var(--black);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:6px 10px;border-radius:999px}
+.svc-body{padding:28px 26px 30px;display:flex;flex-direction:column;gap:14px;flex:1}
+.svc h3{font-size:24px;font-stretch:125%;text-transform:uppercase;line-height:1.05}
+.svc p{color:var(--muted);font-size:15px}
+.svc ul{list-style:none;display:flex;flex-direction:column;gap:7px;font-size:14px;margin-bottom:6px}
+.svc li{display:flex;gap:10px;align-items:baseline}
+.svc li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0;transform:translateY(-2px)}
+.svc .arrow{margin-top:auto}
+@media (max-width:900px){.svc-grid{grid-template-columns:minmax(0,1fr)}}
+
+/* Faixa escura */
+.band{background:var(--black);color:var(--white);padding-block:104px;position:relative;overflow:hidden}
+.band .eyebrow{color:var(--gold-hi)}
+.band h2{font-size:clamp(30px,4.2vw,58px);line-height:1;max-width:16ch;margin-top:16px}
+.specs{margin-top:56px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid rgba(255,255,255,.14)}
+.spec{padding:28px 24px 0 0;display:flex;flex-direction:column;gap:10px}
+.spec + .spec{padding-left:24px;border-left:1px solid rgba(255,255,255,.14)}
+.spec b{font-size:clamp(34px,3.6vw,52px);font-weight:200;line-height:1;letter-spacing:-.02em}
+.spec b small{font-size:.45em;font-weight:400;margin-left:.15em}
+.spec span{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-hi);font-weight:600}
+.spec p{color:#bdbdb6;font-size:15px}
+@media (max-width:900px){.specs{grid-template-columns:repeat(2,minmax(0,1fr))}.spec:nth-child(3){padding-left:0;border-left:0}.spec{padding-bottom:28px}}
+@media (max-width:520px){.specs{grid-template-columns:minmax(0,1fr)}.spec + .spec{padding-left:0;border-left:0;border-top:1px solid rgba(255,255,255,.14)}}
+
+/* Diário */
+#diario{background:var(--paper)}
+.bar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:14px;margin-bottom:32px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--white);padding:9px 16px;border-radius:999px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.chip:hover{border-color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--white)}
+.posts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+.post{all:unset;cursor:pointer;display:flex;flex-direction:column;background:var(--white);border-radius:6px;overflow:hidden;min-width:0;transition:box-shadow .3s,transform .3s}
+.post:hover{box-shadow:0 18px 40px -20px rgba(0,0,0,.35);transform:translateY(-3px)}
+.post:focus-visible{outline:2px solid var(--gold);outline-offset:4px}
+.post.featured{grid-column:span 2;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr)}
+.post.featured .post-img{aspect-ratio:auto;min-height:360px}
+.post.featured h3{font-size:30px}
+.post-img{position:relative;aspect-ratio:4/3;background:#e7e7e3;overflow:hidden}
+.post-img img{width:100%;height:100%;object-fit:cover}
+.ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#9b9b94;text-align:center;padding:16px}
+.ph svg{width:36px;height:36px}
+.ph strong{font-size:18px;font-weight:700;color:#5d5d57;font-stretch:110%}
+.ph span{font-size:11px;letter-spacing:.16em;text-transform:uppercase}
+.post-tag{position:absolute;left:14px;top:14px;background:var(--black);color:var(--white);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:6px 10px;border-radius:999px}
+.post-ex{position:absolute;right:14px;top:14px;background:var(--white);color:var(--muted);font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:6px 10px;border-radius:999px}
+.post-body{padding:24px 24px 28px;display:flex;flex-direction:column;gap:10px;min-width:0;justify-content:center}
+.meta{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-ink)}
+.meta span+span{color:var(--muted)}
+.post h3{font-size:21px;line-height:1.15;font-weight:700}
+.post p{color:var(--muted);font-size:15px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:48px 0}
+@media (max-width:1000px){.posts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:640px){.posts{grid-template-columns:minmax(0,1fr)}.post.featured{grid-column:auto;display:flex}.post.featured .post-img{min-height:0;aspect-ratio:4/3}.post.featured h3{font-size:24px}}
+
+/* História */
+.story{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:64px;align-items:center}
+.story-img{border-radius:6px;overflow:hidden;background:#000;aspect-ratio:4/3}
+.story-img img{width:100%;height:100%;object-fit:cover}
+.story-text{display:flex;flex-direction:column;gap:18px;min-width:0}
+.story-text .eyebrow{color:var(--gold-ink)}
+.story-text h2{font-size:clamp(30px,4vw,52px);line-height:1}
+.story-text > p{color:var(--muted);font-size:17px}
+.note{align-self:flex-start;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);border:1px dashed var(--soft);padding:6px 10px;border-radius:999px}
+.timeline{list-style:none;display:flex;flex-direction:column;margin-top:8px}
+.timeline li{display:grid;grid-template-columns:80px minmax(0,1fr);gap:16px;padding:16px 0;border-top:1px solid var(--line)}
+.timeline time{font-weight:700;font-stretch:125%;color:var(--gold-ink)}
+.timeline b{display:block;font-size:16px;margin-bottom:2px}
+.timeline span{color:var(--muted);font-size:14px}
+@media (max-width:900px){.story{grid-template-columns:minmax(0,1fr);gap:40px}}
+
+/* Processo */
+#processo{background:var(--paper)}
+.steps{list-style:none;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:24px;counter-reset:s}
+.step{counter-increment:s;display:flex;flex-direction:column;gap:12px;border-top:2px solid var(--ink);padding-top:20px}
+.step::before{content:"0" counter(s);font-size:13px;font-weight:700;letter-spacing:.12em;color:var(--gold-ink)}
+.step h3{font-size:18px}
+.step p{color:var(--muted);font-size:14px}
+@media (max-width:1000px){.steps{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.steps{grid-template-columns:minmax(0,1fr)}}
+
+/* Avaliações */
+.reviews{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+.review{border:1px solid var(--line);border-radius:6px;padding:28px;display:flex;flex-direction:column;gap:16px}
+.stars{color:var(--gold);letter-spacing:3px}
+.review blockquote{font-size:16px;line-height:1.65;flex:1}
+.review figcaption{display:flex;flex-direction:column;font-size:14px}
+.review figcaption b{font-weight:700}
+.review figcaption span{color:var(--muted)}
+.reviews-note{margin-top:20px;font-size:12px;color:var(--muted)}
+@media (max-width:900px){.reviews{grid-template-columns:minmax(0,1fr)}}
+
+/* Contato */
+.contact{background:var(--black);color:var(--white);padding-block:112px}
+.contact-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:64px;align-items:start}
+.contact .eyebrow{color:var(--gold-hi)}
+.contact h2{font-size:clamp(30px,4.2vw,58px);line-height:1;margin-block:16px 20px}
+.contact-info{display:flex;flex-direction:column;gap:6px;min-width:0}
+.contact-info > p{color:#bdbdb6;font-size:17px;max-width:46ch}
+.contact-lines{display:flex;flex-direction:column;margin-top:28px;border-top:1px solid rgba(255,255,255,.14)}
+.contact-lines div{display:flex;justify-content:space-between;gap:16px;align-items:center;padding:16px 0;border-bottom:1px solid rgba(255,255,255,.14);flex-wrap:wrap}
+.contact-lines span{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--soft)}
+.contact-lines b{font-weight:600}
+.copy{background:none;border:1px solid rgba(255,255,255,.3);color:var(--white);border-radius:999px;font-size:11px;padding:4px 10px;cursor:pointer;margin-left:8px}
+form.quote{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;background:#151515;border-radius:6px;padding:32px}
+.field{display:flex;flex-direction:column;gap:8px;min-width:0}
+.field.full{grid-column:1/-1}
+.field label{font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--soft)}
+.input{width:100%;background:#0d0d0d;border:1px solid #2c2c2c;border-radius:4px;padding:13px 14px;font-size:15px;color:var(--white);transition:border-color .2s}
+.input:focus{outline:none;border-color:var(--gold)}
+.input::placeholder{color:#6e6e68}
+select.input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23c9a432' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
+textarea.input{min-height:96px;resize:vertical}
+form.quote .btn{grid-column:1/-1;margin-top:6px}
+.small{grid-column:1/-1;font-size:12px;color:#86867f;text-align:center}
+@media (max-width:900px){.contact-grid{grid-template-columns:minmax(0,1fr);gap:40px}}
+@media (max-width:520px){form.quote{grid-template-columns:minmax(0,1fr);padding:22px}}
+
+footer{background:var(--black);color:#9a9a93;border-top:1px solid #1f1f1f;padding-block:56px calc(40px + env(safe-area-inset-bottom,0px));font-size:14px}
+.foot{display:grid;grid-template-columns:2fr 1fr 1fr;gap:40px}
+.foot h4{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--white);margin-bottom:14px;font-weight:600}
+.foot ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.foot a{text-decoration:none}
+.foot a:hover{color:var(--white)}
+.foot .brand{color:var(--white);margin-bottom:14px}
+.legal{margin-top:40px;padding-top:24px;border-top:1px solid #1f1f1f;display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;font-size:12px}
+@media (max-width:760px){.foot{grid-template-columns:minmax(0,1fr)}}
+
+.wa{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:40;width:56px;height:56px;border-radius:50%;background:#25D366;display:grid;place-items:center;box-shadow:0 8px 24px rgba(0,0,0,.3);transition:transform .25s}
+.wa:hover{transform:scale(1.07)}
+.wa svg{width:28px;height:28px}
+
+/* Janelas */
+dialog{border:0;border-radius:8px;padding:0;width:min(860px,calc(100vw - 32px));max-height:calc(100svh - 32px);margin:auto;background:var(--white);color:var(--ink)}
+dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
+.dlg{display:flex;flex-direction:column;max-height:calc(100svh - 34px);overflow:auto}
+.dlg-head{position:sticky;top:0;z-index:2;background:var(--white);display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--line)}
+.dlg-head .eyebrow{color:var(--gold-ink)}
+.x{background:none;border:0;width:38px;height:38px;border-radius:50%;font-size:22px;cursor:pointer;color:var(--muted)}
+.x:hover{background:var(--paper);color:var(--ink)}
+.dlg-body{padding:24px 24px 30px;display:flex;flex-direction:column;gap:18px}
+.dlg-body h2{font-size:clamp(26px,4vw,38px);line-height:1.08}
+.dlg-text{color:#3a3a36;white-space:pre-line;max-width:65ch;font-size:16px}
+.dlg-photos{display:grid;gap:8px}
+.dlg-photos.many{grid-template-columns:repeat(2,minmax(0,1fr))}
+.dlg-photos.many img:first-child{grid-column:1/-1}
+.dlg-photos img{width:100%;aspect-ratio:16/10;object-fit:cover;border-radius:4px}
+.dlg-cover{position:relative;aspect-ratio:16/9;background:#e7e7e3;border-radius:4px}
+.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.pub{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.pub .field label{color:var(--muted)}
+.pub .input{background:var(--white);border-color:var(--line);color:var(--ink)}
+.pub .input::placeholder{color:#a5a59e}
+.drop{grid-column:1/-1;display:block;border:1px dashed var(--soft);border-radius:6px;padding:20px;text-align:center;color:var(--muted);font-size:14px;cursor:pointer}
+.drop:hover,.drop.over{border-color:var(--ink);color:var(--ink)}
+.drop input{display:none}
+.thumbs{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px}
+.thumbs:empty{display:none}
+.thumbs img{width:84px;height:60px;object-fit:cover;border-radius:4px}
+@media (max-width:520px){.pub{grid-template-columns:minmax(0,1fr)}}
+.toast{position:fixed;z-index:90;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;pointer-events:none;background:var(--black);color:var(--white);font-size:14px;font-weight:600;padding:12px 18px;border-radius:999px;transition:all .35s var(--ease);max-width:calc(100vw - 32px)}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<nav class="nav" id="nav" aria-label="Principal">
+  <a class="brand" href="#topo" aria-label="O Rei do PPF, início">
+    <svg viewBox="0 0 28 24" aria-hidden="true"><path d="M2 18L3.5 5l6 6L14 2l4.5 9 6-6L26 18z" fill="#c9a432"/><rect x="2" y="20" width="24" height="3" fill="#c9a432"/></svg>
+    <b>O Rei do PPF</b>
+  </a>
+  <ul>
+    <li><a href="#servicos">Serviços</a></li>
+    <li><a href="#diario">Trabalhos</a></li>
+    <li><a href="#historia">Nossa história</a></li>
+    <li><a href="#avaliacoes">Avaliações</a></li>
+  </ul>
+  <a class="btn btn-gold" href="#contato">Orçamento</a>
+</nav>
+
+<main>
+<section id="topo" aria-label="Apresentação">
+  <div class="stage">
+    <canvas id="film" aria-label="Vídeo do carro girando conforme a rolagem"></canvas>
+    <div class="shade"></div>
+    <span class="provisorio">Vídeo provisório · trocar pelo carro real</span>
+    <span class="loading" id="loading">Carregando vídeo 0%</span>
+    <div class="beat beat-1" data-from="0" data-to=".2">
+      <span class="eyebrow">Proteção de pintura automotiva</span>
+      <h1>Proteção que <b>você não vê.</b></h1>
+      <div class="row"><a class="btn btn-gold" href="#contato">Solicitar orçamento</a><a class="btn btn-ghost" href="#diario">Ver trabalhos</a></div>
+    </div>
+    <div class="beat beat-2 fact off" data-from=".26" data-to=".5"><strong>190<small>µm</small></strong><span>de película entre a sua pintura e a estrada. Pedra, risco e sol ficam nela.</span></div>
+    <div class="beat beat-3 fact off" data-from=".54" data-to=".78"><strong>Autocura</strong><span>Riscos leves somem sozinhos com o calor do sol.</span></div>
+    <div class="beat beat-4 off" data-from=".84" data-to="1.01"><h2>Seu carro, <b>protegido como rei.</b></h2><a class="btn btn-gold" href="#contato">Quero proteger o meu</a></div>
+    <div class="progress" aria-hidden="true"><i id="prog"></i></div>
+  </div>
+</section>
+
+<section id="servicos" class="block">
+  <div class="wrap">
+    <div class="head">
+      <div>
+        <span class="eyebrow">Serviços</span>
+        <h2 class="wide">Armadura para o seu carro</h2>
+        <p>Película de poliuretano transparente, aplicada peça por peça, que segura o impacto no lugar da pintura original.</p>
+      </div>
+      <a class="btn btn-line" href="#contato">Pedir orçamento</a>
+    </div>
+    <div class="svc-grid">
+      <article class="svc">
+        <div class="svc-img"><img src="seq/f010.jpg" alt="Carro preto com PPF full body, vista frontal"><span class="badge">Mais pedido</span></div>
+        <div class="svc-body">
+          <h3>Full Body</h3>
+          <p>A lataria inteira coberta. Para quem quer preservar 100% da pintura de fábrica.</p>
+          <ul><li>Todas as peças pintadas</li><li>Autocura com calor</li><li>Proteção UV</li><li>Garantia estendida</li></ul>
+          <button class="arrow" type="button" data-svc="PPF Full Body">Quero esse</button>
+        </div>
+      </article>
+      <article class="svc">
+        <div class="svc-img"><img src="seq/f045.jpg" alt="Lateral do carro, áreas de impacto"></div>
+        <div class="svc-body">
+          <h3>Parcial</h3>
+          <p>Capô, para-lamas, para-choque e retrovisores, onde mais bate pedra na estrada.</p>
+          <ul><li>Áreas de maior impacto</li><li>Instalação mais rápida</li><li>Ótimo custo-benefício</li><li>Dá para completar depois</li></ul>
+          <button class="arrow" type="button" data-svc="PPF Parcial">Quero esse</button>
+        </div>
+      </article>
+      <article class="svc">
+        <div class="svc-img"><img src="seq/f090.jpg" alt="Traseira do carro, pontos de desgaste"></div>
+        <div class="svc-body">
+          <h3>Pontual</h3>
+          <p>Soleiras, maçanetas e borda do porta-malas, os pontos que sofrem no uso diário.</p>
+          <ul><li>Precisão na aplicação</li><li>Sem alterar o visual</li><li>Entrega no mesmo dia</li><li>Reforço onde mais gasta</li></ul>
+          <button class="arrow" type="button" data-svc="PPF Pontual">Quero esse</button>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="band" aria-label="Por que PPF">
+  <div class="wrap">
+    <span class="eyebrow">Por que PPF</span>
+    <h2 class="wide">Invisível por fora. Imbatível por dentro.</h2>
+    <div class="specs">
+      <div class="spec"><span>Espessura</span><b>190<small>µm</small></b><p>Camada de poliuretano que absorve o impacto de pedras e cascalho.</p></div>
+      <div class="spec"><span>Autocura</span><b>60<small>°C</small></b><p>Com calor, riscos leves da película se fecham sozinhos.</p></div>
+      <div class="spec"><span>Proteção UV</span><b>99<small>%</small></b><p>Segura o desbotamento e o amarelado da pintura.</p></div>
+      <div class="spec"><span>Garantia</span><b>10<small>anos</small></b><p>Contra amarelar, trincar e descolar, por escrito.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="diario" class="block">
+  <div class="wrap">
+    <div class="head">
+      <div>
+        <span class="eyebrow">Diário da oficina</span>
+        <h2 class="wide">Trabalhos recentes</h2>
+        <p>Todo carro que sai daqui vira um post com as fotos, o serviço feito e o que o cliente queria.</p>
+      </div>
+      <button class="btn btn-dark" type="button" id="openPublish">+ Publicar trabalho</button>
+    </div>
+    <div class="bar"><div class="chips" id="filters" role="group" aria-label="Filtrar por serviço"></div></div>
+    <div class="posts" id="posts"></div>
+  </div>
+</section>
+
+<section id="historia" class="block">
+  <div class="wrap story">
+    <div class="story-img"><img src="seq/f119.jpg" alt="Carro preto de perfil no estúdio"></div>
+    <div class="story-text">
+      <span class="eyebrow">Nossa história</span>
+      <h2 class="wide">Da garagem de casa ao trono</h2>
+      <p>Uma oficina que nasceu da paixão por carro bem cuidado. Cada veículo que entra aqui é tratado como se fosse nosso, e cada trabalho entregue vai para o diário.</p>
+      <span class="note">Texto de exemplo · trocar pela história real</span>
+      <ol class="timeline">
+        <li><time>2021</time><div><b>O primeiro carro</b><span>A primeira película aplicada, na garagem de casa.</span></div></li>
+        <li><time>2022</time><div><b>Espaço próprio</b><span>Curso de aplicação, o primeiro box e os clientes vindos de indicação.</span></div></li>
+        <li><time>2024</time><div><b>Mais de 250 carros</b><span>Sala de aplicação fechada e garantia por escrito em tudo.</span></div></li>
+        <li><time>Hoje</time><div><b>O Rei do PPF</b><span>Full body, parcial e pontual, com cada resultado publicado.</span></div></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section id="processo" class="block">
+  <div class="wrap">
+    <div class="head"><div><span class="eyebrow">Como funciona</span><h2 class="wide">Do contato à entrega</h2></div></div>
+    <ol class="steps">
+      <li class="step"><h3>Orçamento</h3><p>Você chama no WhatsApp, a gente avalia o carro e manda o valor sem compromisso.</p></li>
+      <li class="step"><h3>Agendamento</h3><p>Escolhemos juntos o dia, com tempo para um resultado impecável.</p></li>
+      <li class="step"><h3>Preparação</h3><p>Lavagem técnica e descontaminação antes de qualquer aplicação.</p></li>
+      <li class="step"><h3>Aplicação</h3><p>Peça por peça, sem bolhas e com as bordas dobradas para dentro.</p></li>
+      <li class="step"><h3>Entrega</h3><p>Inspeção final, orientações de cuidado e garantia por escrito.</p></li>
+    </ol>
+  </div>
+</section>
+
+<section id="avaliacoes" class="block">
+  <div class="wrap">
+    <div class="head"><div><span class="eyebrow">Avaliações</span><h2 class="wide">Quem protegeu, recomenda</h2></div></div>
+    <div class="reviews">
+      <figure class="review"><div class="stars">★★★★★</div><blockquote>O PPF ficou completamente invisível. Você não percebe que tem película. Superou o que eu esperava.</blockquote><figcaption><b>Rafael M.</b><span>BMW M3 Competition</span></figcaption></figure>
+      <figure class="review"><div class="stars">★★★★★</div><blockquote>Fiz o full body no meu SUV. Ambiente organizado, explicaram cada etapa e o resultado ficou perfeito.</blockquote><figcaption><b>Carla S.</b><span>Range Rover Velar</span></figcaption></figure>
+      <figure class="review"><div class="stars">★★★★★</div><blockquote>Entrega no prazo e o PPF encaixado como se fosse de fábrica. Recomendo demais.</blockquote><figcaption><b>Felipe M.</b><span>Porsche Cayenne</span></figcaption></figure>
+    </div>
+    <p class="reviews-note">Avaliações de exemplo · trocar pelas avaliações do Google</p>
+  </div>
+</section>
+
+<section id="contato" class="contact">
+  <div class="wrap contact-grid">
+    <div class="contact-info">
+      <span class="eyebrow">Orçamento</span>
+      <h2 class="wide">Fale com o Rei</h2>
+      <p>Preencha ao lado e a conversa abre no WhatsApp já com os dados do seu carro.</p>
+      <div class="contact-lines">
+        <div><span>WhatsApp</span><b><span id="phoneText" style="font-size:inherit;letter-spacing:0;text-transform:none;color:inherit">(11) 99999-9999</span><button class="copy" type="button" id="copyPhone">Copiar</button></b></div>
+        <div><span>Instagram</span><b><a href="https://instagram.com/oreidoppf" target="_blank" rel="noopener">@oreidoppf</a></b></div>
+        <div><span>Atendimento</span><b>Seg a sáb, com hora marcada</b></div>
+      </div>
+      <p style="font-size:12px;color:#86867f;margin-top:12px">Número de exemplo</p>
+    </div>
+    <form class="quote" id="quote" novalidate>
+      <div class="field"><label for="q-nome">Nome</label><input class="input" id="q-nome" autocomplete="name" placeholder="Seu nome"></div>
+      <div class="field"><label for="q-carro">Carro e ano</label><input class="input" id="q-carro" placeholder="Ex.: Civic 2023"></div>
+      <div class="field full"><label for="q-servico">Serviço</label><select class="input" id="q-servico"><option>PPF Full Body</option><option>PPF Parcial</option><option>PPF Pontual</option><option>Não sei, quero orientação</option></select></div>
+      <div class="field full"><label for="q-msg">Mensagem</label><textarea class="input" id="q-msg" placeholder="Conte o que precisa"></textarea></div>
+      <a class="btn btn-gold" id="waLink" href="#" target="_blank" rel="noopener">Abrir conversa no WhatsApp</a>
+      <p class="small">O WhatsApp abre em outra aba com a mensagem pronta para enviar.</p>
+    </form>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot">
+      <div><a class="brand" href="#topo"><svg viewBox="0 0 28 24" aria-hidden="true" style="width:28px;height:24px"><path d="M2 18L3.5 5l6 6L14 2l4.5 9 6-6L26 18z" fill="#c9a432"/><rect x="2" y="20" width="24" height="3" fill="#c9a432"/></svg><b>O Rei do PPF</b></a><p>Proteção de pintura automotiva. Full body, parcial e pontual.</p></div>
+      <div><h4>Site</h4><ul><li><a href="#servicos">Serviços</a></li><li><a href="#diario">Trabalhos</a></li><li><a href="#historia">Nossa história</a></li><li><a href="#contato">Orçamento</a></li></ul></div>
+      <div><h4>Contato</h4><ul><li><a href="https://instagram.com/oreidoppf" target="_blank" rel="noopener">Instagram</a></li><li><a href="#contato">WhatsApp</a></li></ul></div>
+    </div>
+    <div class="legal"><span>© 2026 O Rei do PPF · Protótipo</span><span>Vídeo provisório feito com o modelo 3D “Ferrari 458 Italia” de vicent091036, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a></span></div>
+  </div>
+</footer>
+
+<a class="wa" id="waFloat" href="#" target="_blank" rel="noopener" aria-label="Falar pelo WhatsApp"><svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.8.9-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6l.4-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.7.6.7.2 1.3.2 1.8.1.6-.1 1.7-.7 1.9-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3zM12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2z"/></svg></a>
+
+<dialog id="postDlg" aria-labelledby="postTitle">
+  <div class="dlg">
+    <div class="dlg-head"><span class="eyebrow" id="postKicker">Trabalho</span><button class="x" type="button" data-close aria-label="Fechar">×</button></div>
+    <div class="dlg-body" id="postBody"></div>
+  </div>
+</dialog>
+
+<dialog id="pubDlg" aria-labelledby="pubTitle">
+  <div class="dlg">
+    <div class="dlg-head"><span class="eyebrow" id="pubTitle">Publicar trabalho</span><button class="x" type="button" data-close aria-label="Fechar">×</button></div>
+    <div class="dlg-body">
+      <form class="pub" id="pubForm" novalidate>
+        <div class="field"><label for="p-carro">Carro</label><input class="input" id="p-carro" placeholder="Ex.: Porsche Macan 2024"></div>
+        <div class="field"><label for="p-servico">Serviço</label><select class="input" id="p-servico"><option value="full">PPF Full Body</option><option value="parcial">PPF Parcial</option><option value="pontual">PPF Pontual</option></select></div>
+        <div class="field full"><label for="p-titulo">Título do post</label><input class="input" id="p-titulo" placeholder="Ex.: Macan grafite com full body"></div>
+        <div class="field full"><label for="p-texto">Conte o trabalho</label><textarea class="input" id="p-texto" placeholder="O que foi feito, quanto tempo levou, o que o cliente queria"></textarea></div>
+        <label class="drop" id="drop" for="p-fotos">Toque para escolher as fotos ou arraste aqui<input id="p-fotos" type="file" accept="image/*" multiple></label>
+        <div class="thumbs" id="thumbs"></div>
+        <div class="actions" style="grid-column:1/-1"><button class="btn btn-dark" type="submit">Publicar</button><span id="pubErr" style="color:#a3121b;font-size:14px"></span></div>
+        <p class="small" style="color:var(--muted);text-align:left">No protótipo o post fica salvo só neste navegador. No site final ele aparece para todos os visitantes.</p>
+      </form>
+    </div>
+  </div>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+'use strict';
+const $=s=>document.querySelector(s);
+const WA='5511999999999';
+const FRAMES=120;
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const nav=$('#nav'),topo=$('#topo'),canvas=$('#film'),ctx=canvas.getContext('2d');
+const beats=[...document.querySelectorAll('.beat')];
+
+/* ── Vídeo em quadros: avança e volta com a rolagem ── */
+const imgs=new Array(FRAMES);let loaded=0,current=-1,wanted=0;
+const src=i=>'seq/f'+String(i).padStart(3,'0')+'.jpg';
+function load(i){
+  if(imgs[i])return;
+  const im=new Image();im.decoding='async';
+  im.onload=()=>{loaded++;$('#loading').textContent='Carregando vídeo '+Math.round(loaded/FRAMES*100)+'%';if(loaded===FRAMES)$('#loading').hidden=true;if(i===wanted||current<0)draw(true)};
+  im.src=src(i);imgs[i]=im;
+}
+// primeiro o quadro inicial, depois um a cada 8, depois o resto: a rolagem já funciona enquanto carrega
+load(0);for(let s=8;s>=1;s=s>>1)for(let i=0;i<FRAMES;i+=s)load(i);
+function nearest(i){for(let d=0;d<FRAMES;d++){const a=imgs[i-d],b=imgs[i+d];if(a&&a.complete&&a.naturalWidth)return a;if(b&&b.complete&&b.naturalWidth)return b}return null}
+let cw=0,ch=0;
+function size(){
+  const r=canvas.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);
+  const w=Math.round(r.width*dpr),h=Math.round(r.height*dpr);
+  if(w!==cw||h!==ch){cw=canvas.width=w;ch=canvas.height=h;current=-1}
+}
+function draw(force){
+  size();
+  if(!force&&wanted===current)return;
+  const im=nearest(wanted);if(!im)return;
+  const iw=im.naturalWidth,ih=im.naturalHeight;
+  // paisagem: cobre a tela; retrato: o carro ocupa a largura e o preto completa o resto
+  const s=cw/ch>=1?Math.max(cw/iw,ch/ih):cw/(iw*.78);
+  const dw=iw*s,dh=ih*s;
+  ctx.fillStyle='#000';ctx.fillRect(0,0,cw,ch);
+  ctx.drawImage(im,(cw-dw)/2,(ch-dh)/2-(cw/ch<1?ch*.06:0),dw,dh);
+  current=wanted;
+}
+let ticking=false;
+function onScroll(){
+  if(ticking)return;ticking=true;
+  requestAnimationFrame(()=>{
+    ticking=false;
+    const r=topo.getBoundingClientRect(),span=Math.max(1,r.height-innerHeight);
+    const p=Math.min(1,Math.max(0,-r.top/span));
+    wanted=Math.min(FRAMES-1,Math.round(p*(FRAMES-1)));
+    draw(false);
+    beats.forEach(b=>b.classList.toggle('off',!(p>=+b.dataset.from&&p<+b.dataset.to)));
+    $('#prog').style.setProperty('--p',p.toFixed(3));
+    nav.classList.toggle('solid',r.bottom<=70);
+  });
+}
+addEventListener('scroll',onScroll,{passive:true});
+addEventListener('resize',()=>{current=-1;onScroll()});
+onScroll();
+
+/* ── Diário ── */
+const SVC={full:'PPF Full Body',parcial:'PPF Parcial',pontual:'PPF Pontual'};
+const SEED=[
+  {id:'s1',date:'2026-10-01',carro:'Porsche 911 Carrera',servico:'full',titulo:'911 prata com full body fosco',texto:'O cliente queria o visual fosco sem mexer na pintura original. A solução foi o PPF matte na lataria inteira.\n\nForam três dias de carro na oficina: um de lavagem técnica e descontaminação, dois de aplicação peça por peça, com as bordas dobradas para dentro para a película não aparecer.\n\nSe um dia ele quiser o brilho de volta, é só remover a película e a pintura está lá, intacta.'},
+  {id:'s2',date:'2026-09-29',carro:'BMW M3 Competition',servico:'parcial',titulo:'Frente completa no M3 antes da viagem para a serra',texto:'Estrada de serra é pedrinha no capô na certa. Protegemos capô, para-lamas, para-choque e retrovisores, que é onde mais acontece estrago.\n\nA película cristal mantém o azul exatamente como saiu de fábrica.'},
+  {id:'s3',date:'2026-09-26',carro:'Jeep Compass',servico:'pontual',titulo:'Soleiras e maçanetas: o desgaste que ninguém vê',texto:'Unha na maçaneta e sapato na soleira marcam a pintura aos poucos. Com o PPF pontual esses pontos ficam protegidos, e o carro foi entregue no mesmo dia.'},
+  {id:'s4',date:'2026-09-22',carro:'Toyota Corolla Cross',servico:'full',titulo:'Preto piano sem micro-riscos',texto:'Carro preto mostra qualquer risco de lavagem. Com o full body cristal os micro-riscos ficam na película, e a autocura faz eles sumirem com o calor do sol.'},
+  {id:'s5',date:'2026-09-18',carro:'Honda Civic Si',servico:'parcial',titulo:'Capô do Civic protegido aos 40 mil km',texto:'Primeiro o polimento para tirar as marcas que já existiam, depois o PPF na frente. Agora o vermelho fica do jeito que está.'},
+  {id:'s6',date:'2026-09-15',carro:'Mercedes-AMG GLA 35',servico:'full',titulo:'GLA cinza com acabamento acetinado',texto:'O meio-termo entre o brilho e o fosco: o PPF acetinado deixa o cinza com cara de carro de exposição e protege a lataria inteira.'},
+  {id:'s7',date:'2026-09-11',carro:'Volkswagen Nivus',servico:'pontual',titulo:'Borda do porta-malas sem marca de mala',texto:'Quem viaja muito arrasta mala na borda do porta-malas. Uma faixa de PPF resolve e ninguém percebe que está ali.'}
+];
+SEED.forEach(p=>p.exemplo=true);
+let local=[];
+try{local=JSON.parse(localStorage.getItem('reiPPF.v4.posts')||'[]')}catch(e){local=[]}
+const saveLocal=()=>{try{localStorage.setItem('reiPPF.v4.posts',JSON.stringify(local));return true}catch(e){return false}};
+const allPosts=()=>[...local,...SEED].sort((a,b)=>b.date.localeCompare(a.date)||(b.ts||0)-(a.ts||0));
+const MESES=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+const fmt=d=>{const [y,m,dd]=d.split('-');return dd+' '+MESES[+m-1]+' '+y};
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const CAM='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M3 8h4l2-3h6l2 3h4v11H3z"/><circle cx="12" cy="13" r="4"/></svg>';
+const ph=p=>'<div class="ph">'+CAM+'<strong>'+esc(p.carro)+'</strong><span>Foto do trabalho</span></div>';
+let filter='todos';
+[['todos','Todos'],['full','Full Body'],['parcial','Parcial'],['pontual','Pontual']].forEach(([id,name],i)=>{
+  const b=document.createElement('button');b.type='button';b.className='chip';b.textContent=name;b.setAttribute('aria-pressed',i===0);
+  b.onclick=()=>{filter=id;document.querySelectorAll('#filters .chip').forEach(x=>x.setAttribute('aria-pressed',x===b));renderPosts()};
+  $('#filters').appendChild(b);
+});
+function renderPosts(){
+  const list=allPosts().filter(p=>filter==='todos'||p.servico===filter);
+  const box=$('#posts');box.innerHTML='';
+  if(!list.length){box.innerHTML='<p class="empty">Ainda não há trabalhos com esse serviço.</p>';return}
+  list.forEach((p,i)=>{
+    const b=document.createElement('button');b.type='button';b.className='post'+(i===0&&list.length>2?' featured':'');
+    b.innerHTML='<div class="post-img">'+(p.fotos&&p.fotos.length?'<img alt="" src="'+p.fotos[0]+'">':ph(p))+'<span class="post-tag">'+SVC[p.servico]+'</span>'+(p.exemplo?'<span class="post-ex">Exemplo</span>':'')+'</div>'+
+      '<div class="post-body"><div class="meta"><span>'+fmt(p.date)+'</span><span>'+esc(p.carro)+'</span></div><h3>'+esc(p.titulo)+'</h3><p>'+esc(p.texto)+'</p><span class="arrow">Ler post</span></div>';
+    b.onclick=()=>openPost(p);box.appendChild(b);
+  });
+}
+const waUrl=t=>'https://wa.me/'+WA+'?text='+encodeURIComponent(t);
+function openPost(p){
+  $('#postKicker').textContent=SVC[p.servico]+(p.exemplo?' · post de exemplo':'');
+  const photos=p.fotos&&p.fotos.length?'<div class="dlg-photos'+(p.fotos.length>1?' many':'')+'">'+p.fotos.map(s=>'<img alt="Foto do trabalho" src="'+s+'">').join('')+'</div>':'<div class="dlg-cover">'+ph(p)+'</div>';
+  $('#postBody').innerHTML=photos+'<div class="meta"><span>'+fmt(p.date)+'</span><span>'+esc(p.carro)+'</span></div><h2 id="postTitle">'+esc(p.titulo)+'</h2><p class="dlg-text">'+esc(p.texto)+'</p>'+
+    '<div class="actions"><a class="btn btn-gold" target="_blank" rel="noopener" href="'+waUrl('Olá! Vi o post "'+p.titulo+'" e quero um orçamento de '+SVC[p.servico]+'.')+'">Quero um orçamento assim</a>'+(p.exemplo?'':'<button class="btn btn-line" type="button" id="delPost">Apagar post</button>')+'</div>';
+  const del=$('#delPost');
+  if(del)del.onclick=()=>{if(del.dataset.armed){local=local.filter(x=>x.id!==p.id);saveLocal();$('#postDlg').close();renderPosts();toast('Post apagado')}else{del.dataset.armed='1';del.textContent='Toque de novo para apagar'}};
+  $('#postDlg').showModal();
+}
+document.querySelectorAll('dialog').forEach(d=>d.addEventListener('click',e=>{if(e.target===d||e.target.closest('[data-close]'))d.close()}));
+
+/* ── Publicar ── */
+let pending=[];
+$('#openPublish').onclick=()=>{$('#pubErr').textContent='';$('#pubDlg').showModal()};
+function shrink(file){return new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>{const img=new Image();img.onload=()=>{const s=Math.min(1,1200/Math.max(img.width,img.height));const c=document.createElement('canvas');c.width=Math.round(img.width*s);c.height=Math.round(img.height*s);c.getContext('2d').drawImage(img,0,0,c.width,c.height);res(c.toDataURL('image/jpeg',.8))};img.onerror=rej;img.src=fr.result};fr.onerror=rej;fr.readAsDataURL(file)})}
+async function addFiles(files){for(const f of [...files].filter(f=>f.type.startsWith('image/')).slice(0,Math.max(0,6-pending.length))){try{pending.push(await shrink(f))}catch(e){}}$('#thumbs').innerHTML=pending.map(s=>'<img alt="" src="'+s+'">').join('')}
+$('#p-fotos').addEventListener('change',e=>addFiles(e.target.files));
+const drop=$('#drop');
+['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('over')}));
+['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('over')}));
+drop.addEventListener('drop',e=>addFiles(e.dataTransfer.files));
+$('#pubForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const carro=$('#p-carro').value.trim(),titulo=$('#p-titulo').value.trim();
+  if(!carro||!titulo){$('#pubErr').textContent='Preencha o carro e o título.';return}
+  const now=new Date(),pad=n=>String(n).padStart(2,'0');
+  local.unshift({id:'l'+now.getTime(),ts:now.getTime(),date:now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate()),carro,titulo,servico:$('#p-servico').value,texto:$('#p-texto').value.trim()||'Mais um carro protegido pela equipe.',fotos:pending.slice()});
+  if(!saveLocal()){local[0].fotos=local[0].fotos.slice(0,1);if(!saveLocal())toast('Publicado, mas as fotos são grandes demais para ficar salvas neste navegador')}
+  pending=[];$('#thumbs').innerHTML='';$('#pubForm').reset();$('#pubDlg').close();
+  filter='todos';document.querySelectorAll('#filters .chip').forEach((x,i)=>x.setAttribute('aria-pressed',i===0));
+  renderPosts();toast('Publicado no diário');$('#diario').scrollIntoView({behavior:reduce?'auto':'smooth'});
+});
+
+/* ── Orçamento ── */
+function updateWa(){
+  const v=id=>$(id).value.trim();
+  $('#waLink').href=waUrl('Olá, Rei do PPF!'+(v('#q-nome')?' Sou '+v('#q-nome')+'.':'')+' Quero orçamento de '+$('#q-servico').value+(v('#q-carro')?' para '+v('#q-carro'):'')+'.'+(v('#q-msg')?' '+v('#q-msg'):''));
+}
+['input','change'].forEach(ev=>$('#quote').addEventListener(ev,updateWa));updateWa();
+$('#quote').addEventListener('submit',e=>e.preventDefault());
+$('#waFloat').href=waUrl('Olá, Rei do PPF! Quero um orçamento.');
+document.querySelectorAll('[data-svc]').forEach(b=>b.addEventListener('click',()=>{$('#q-servico').value=b.dataset.svc;updateWa();$('#contato').scrollIntoView({behavior:reduce?'auto':'smooth'})}));
+$('#copyPhone').onclick=()=>{const el=$('#phoneText');const sel=()=>{const r=document.createRange();r.selectNodeContents(el);const s=getSelection();s.removeAllRanges();s.addRange(r)};try{navigator.clipboard.writeText(el.textContent).then(()=>toast('Número copiado'),sel)}catch(e){sel()}};
+let tt;function toast(m){const el=$('#toast');el.textContent=m;el.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('on'),2600)}
+
+renderPosts();
+})();
+</script>
+</body>
+</html>
