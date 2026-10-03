@@ -15,6 +15,18 @@ ffmpeg -i video.mp4 -vf "fps=120/DURACAO,scale=1600:900:force_original_aspect_ra
 for f in seq/f*.jpg; do ffmpeg -y -i $f -vf scale=1024:576 -q:v 5 seq/m/$(basename $f); done
 ```
 
+## Vídeo provisório (render 3D)
+
+Enquanto não chega o vídeo real, os quadros de `seq/` saem de `tools/render_topo.py`: Blender Cycles, estúdio com softboxes, piso preto espelhado e câmera orbitando o carro. Para refazer (cerca de 1h em 4 CPUs):
+
+```
+pip install bpy==4.5.4
+curl -LO https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/models/gltf/ferrari.glb
+mv ferrari.glb tools/three-ferrari.glb
+python3 tools/render_topo.py 0 119 1280 720 24 render
+for f in render/f*.jpg; do ffmpeg -y -i $f -vf "scale=1600:900:flags=lanczos,unsharp=3:3:0.4" -q:v 4 seq/$(basename $f); ffmpeg -y -i $f -vf scale=1024:576 -q:v 5 seq/m/$(basename $f); done
+```
+
 ## Aviso
 
 Telefone, posts do diário, história e avaliações são conteúdo de exemplo. Os posts publicados pelo botão "+ Publicar trabalho" ficam só no navegador (localStorage).
