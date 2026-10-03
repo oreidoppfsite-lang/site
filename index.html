@@ -503,7 +503,9 @@ const beats=[...document.querySelectorAll('.beat')];
 
 /* ── Vídeo em quadros: avança e volta com a rolagem ── */
 const imgs=new Array(FRAMES);let loaded=0,current=-1,wanted=0;
-const src=i=>'seq/f'+String(i).padStart(3,'0')+'.jpg';
+// celular baixa os quadros de 1024px (seq/m/), menos da metade do peso
+const DIR=Math.min(screen.width,screen.height)<700?'seq/m/f':'seq/f';
+const src=i=>DIR+String(i).padStart(3,'0')+'.jpg';
 function load(i){
   if(imgs[i])return;
   const im=new Image();im.decoding='async';
