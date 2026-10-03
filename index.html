@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>O Rei do PPF</title>
+<meta name="description" content="Proteção de pintura automotiva com PPF: full body, parcial e pontual. Veja os trabalhos recentes e peça seu orçamento pelo WhatsApp.">
+<meta name="theme-color" content="#000000">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,100..125,100..900&display=swap">
@@ -29,6 +31,9 @@
 html{scroll-behavior:smooth}
 body{font-family:var(--font);background:var(--white);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.55;overflow-x:hidden}
 button,input,select,textarea{font:inherit;color:inherit}
+a,button,label,select{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.skip{position:fixed;left:16px;top:-60px;z-index:100;background:var(--gold);color:var(--black);padding:10px 16px;border-radius:999px;font-weight:700;text-decoration:none;transition:top .2s}
+.skip:focus{top:calc(12px + env(safe-area-inset-top,0px))}
 a{color:inherit}
 :focus-visible{outline:2px solid var(--gold);outline-offset:3px}
 img{max-width:100%;display:block}
@@ -141,7 +146,7 @@ section[id]{scroll-margin-top:64px}
 #diario{background:var(--paper)}
 .bar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:14px;margin-bottom:32px}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{border:1px solid var(--line);background:var(--white);padding:9px 16px;border-radius:999px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.chip{border:1px solid var(--line);background:var(--white);padding:9px 16px;border-radius:999px;font-size:13px;font-weight:600;cursor:pointer;transition:background-color .2s,border-color .2s,color .2s}
 .chip:hover{border-color:var(--ink)}
 .chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--white)}
 .posts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
@@ -216,7 +221,8 @@ section[id]{scroll-margin-top:64px}
 .contact-lines div{display:flex;justify-content:space-between;gap:16px;align-items:center;padding:16px 0;border-bottom:1px solid rgba(255,255,255,.14);flex-wrap:wrap}
 .contact-lines span{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--soft)}
 .contact-lines b{font-weight:600}
-.copy{background:none;border:1px solid rgba(255,255,255,.3);color:var(--white);border-radius:999px;font-size:11px;padding:4px 10px;cursor:pointer;margin-left:8px}
+.copy{background:none;border:1px solid rgba(255,255,255,.3);color:var(--white);border-radius:999px;font-size:11px;padding:6px 12px;cursor:pointer;margin-left:8px;transition:border-color .2s,background-color .2s}
+.copy:hover{border-color:var(--gold-hi);background:rgba(201,164,50,.12)}
 form.quote{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;background:#151515;border-radius:6px;padding:32px}
 .field{display:flex;flex-direction:column;gap:8px;min-width:0}
 .field.full{grid-column:1/-1}
@@ -248,7 +254,7 @@ footer{background:var(--black);color:#9a9a93;border-top:1px solid #1f1f1f;paddin
 /* Janelas */
 dialog{border:0;border-radius:8px;padding:0;width:min(860px,calc(100vw - 32px));max-height:calc(100svh - 32px);margin:auto;background:var(--white);color:var(--ink)}
 dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
-.dlg{display:flex;flex-direction:column;max-height:calc(100svh - 34px);overflow:auto}
+.dlg{display:flex;flex-direction:column;max-height:calc(100svh - 34px);overflow:auto;overscroll-behavior:contain}
 .dlg-head{position:sticky;top:0;z-index:2;background:var(--white);display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--line)}
 .dlg-head .eyebrow{color:var(--gold-ink)}
 .x{background:none;border:0;width:38px;height:38px;border-radius:50%;font-size:22px;cursor:pointer;color:var(--muted)}
@@ -273,21 +279,86 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
 .thumbs:empty{display:none}
 .thumbs img{width:84px;height:60px;object-fit:cover;border-radius:4px}
 @media (max-width:520px){.pub{grid-template-columns:minmax(0,1fr)}}
-.toast{position:fixed;z-index:90;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;pointer-events:none;background:var(--black);color:var(--white);font-size:14px;font-weight:600;padding:12px 18px;border-radius:999px;transition:all .35s var(--ease);max-width:calc(100vw - 32px)}
+.toast{position:fixed;z-index:90;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;pointer-events:none;background:var(--black);color:var(--white);font-size:14px;font-weight:600;padding:12px 18px;border-radius:999px;transition:opacity .35s var(--ease),transform .35s var(--ease);max-width:calc(100vw - 32px)}
 .toast.on{opacity:1;transform:translate(-50%,0)}
+/* Instagram */
+#insta{background:var(--black);color:var(--white);position:relative;overflow:hidden;background:radial-gradient(50% 70% at 90% 0%,rgba(201,164,50,.14),transparent 65%),var(--black)}
+#insta .head p{color:#bdbdb6}
+#insta .eyebrow{color:var(--gold-hi)}
+.reels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;align-items:start}
+.reels .instagram-media{min-width:0!important;width:100%!important;margin:0!important;border-radius:var(--r)!important}
+.ig-cta{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px;padding:32px;border-radius:var(--r);border:1px solid transparent;background:linear-gradient(180deg,#171717,#121212) padding-box,linear-gradient(140deg,rgba(227,193,90,.6),rgba(255,255,255,.08) 40%,rgba(227,193,90,.3)) border-box}
+.ig-cta b{font-size:clamp(22px,2.6vw,30px);font-stretch:115%}
+.ig-cta p{color:#bdbdb6;margin-top:6px;max-width:52ch}
+@media (max-width:900px){.reels{grid-template-columns:minmax(0,1fr)}}
+/* ── Acabamento: bordas, luz e profundidade ── */
+:root{--r:10px;--edge:rgba(0,0,0,.07);--gold-glow:rgba(227,193,90,.55)}
+/* botões com reflexo */
+.btn-gold{background:linear-gradient(180deg,#ecd07a 0%,var(--gold) 52%,#b08c1e 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -1px 0 rgba(0,0,0,.18),0 6px 18px -10px var(--gold-glow);transition:box-shadow .3s,transform .25s,filter .25s}
+.btn-gold:hover{background:linear-gradient(180deg,#f2da8e 0%,var(--gold-hi) 52%,#bf9a26 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.6),inset 0 -1px 0 rgba(0,0,0,.18),0 10px 30px -8px var(--gold-glow)}
+.btn-ghost{background:rgba(255,255,255,.04);backdrop-filter:blur(6px);box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}
+.btn-dark{box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 8px 20px -12px rgba(0,0,0,.6)}
+/* topo: luz de estúdio, vinheta e grão de filme sobre o carro */
+.stage::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(70% 45% at 50% 62%,rgba(227,193,90,.10),transparent 70%),radial-gradient(120% 90% at 50% 50%,transparent 55%,rgba(0,0,0,.65) 100%)}
+.stage::after{content:"";position:absolute;inset:-50%;z-index:1;pointer-events:none;opacity:.09;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");animation:grain 1s steps(4) infinite}
+@keyframes grain{0%{transform:translate(0,0)}25%{transform:translate(-3%,2%)}50%{transform:translate(2%,-3%)}75%{transform:translate(-2%,-1%)}100%{transform:translate(0,0)}}
+.shade,.beat,.progress,.loading,.provisorio{z-index:2}
+.provisorio{background:rgba(0,0,0,.35);backdrop-filter:blur(6px)}
+.progress i{background:linear-gradient(90deg,var(--gold),var(--gold-hi));box-shadow:0 0 12px var(--gold-glow)}
+.fact::before{background:linear-gradient(90deg,var(--gold-hi),transparent);box-shadow:0 0 10px var(--gold-glow)}
+/* navegação */
+.nav.solid{box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 10px 30px -22px rgba(0,0,0,.35)}
+/* cartões com borda fina, luz no topo e sombra em camadas */
+.svc,.post,.review{border-radius:var(--r);border:1px solid var(--edge);box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 1px 2px rgba(0,0,0,.04),0 18px 40px -28px rgba(0,0,0,.28);transition:box-shadow .35s var(--ease),transform .35s var(--ease),border-color .35s}
+.svc{background:linear-gradient(180deg,#fafaf8,var(--paper))}
+.svc:hover,.post:hover,.review:hover{border-color:rgba(201,164,50,.55);box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 0 0 1px rgba(201,164,50,.18),0 26px 50px -26px rgba(0,0,0,.38);transform:translateY(-3px)}
+.post{border:1px solid var(--edge)}
+.svc-img,.post-img{box-shadow:inset 0 -1px 0 var(--edge)}
+.svc-img::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(255,255,255,.08),transparent 30%,transparent 65%,rgba(0,0,0,.35))}
+.svc-img .badge{z-index:1;background:linear-gradient(180deg,#ecd07a,var(--gold));box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 4px 14px -6px var(--gold-glow)}
+.chip{box-shadow:inset 0 1px 0 rgba(255,255,255,.9)}
+.review{background:linear-gradient(180deg,#fff,#fbfbf9)}
+.stars{text-shadow:0 0 12px var(--gold-glow)}
+.story-img{border-radius:var(--r);border:1px solid var(--edge);box-shadow:0 30px 60px -34px rgba(0,0,0,.5);position:relative}
+.story-img::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);background:linear-gradient(180deg,rgba(255,255,255,.06),transparent 35%)}
+.step{border-top:0;position:relative}
+.step::after{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,var(--ink),var(--ink) 30%,rgba(18,18,18,.15))}
+/* faixas escuras com luz dourada */
+.band,.contact{background:radial-gradient(55% 70% at 12% 0%,rgba(201,164,50,.16),transparent 65%),radial-gradient(45% 60% at 95% 100%,rgba(255,255,255,.05),transparent 70%),var(--black)}
+.band::before,.contact::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:linear-gradient(90deg,transparent,rgba(227,193,90,.5),transparent)}
+.contact{position:relative;overflow:hidden}
+.specs{border-top:0;position:relative}
+.specs::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:linear-gradient(90deg,var(--gold),rgba(255,255,255,.14) 35%,rgba(255,255,255,.14))}
+.spec b{background:linear-gradient(180deg,#fff 30%,#bdbdb6);-webkit-background-clip:text;background-clip:text;color:transparent}
+/* formulário com borda em degradê dourado */
+form.quote{border:1px solid transparent;border-radius:var(--r);background:linear-gradient(180deg,#171717,#121212) padding-box,linear-gradient(140deg,rgba(227,193,90,.6),rgba(255,255,255,.08) 35%,rgba(255,255,255,.04) 70%,rgba(227,193,90,.3)) border-box;box-shadow:0 30px 70px -40px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.05)}
+.input{border-radius:6px;box-shadow:inset 0 1px 2px rgba(0,0,0,.5);transition:border-color .2s,box-shadow .2s}
+.input:hover{border-color:#3a3a3a}
+.input:focus{border-color:var(--gold);box-shadow:inset 0 1px 2px rgba(0,0,0,.5),0 0 0 3px rgba(201,164,50,.22)}
+.pub .input{box-shadow:none}
+.pub .input:focus{box-shadow:0 0 0 3px rgba(201,164,50,.22)}
+/* botão flutuante e janelas */
+.wa{box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 10px 28px -6px rgba(37,211,102,.55),0 4px 12px rgba(0,0,0,.25)}
+dialog{border-radius:14px;box-shadow:0 40px 90px -30px rgba(0,0,0,.6)}
+.toast{box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 12px 30px -12px rgba(0,0,0,.5);border:1px solid rgba(227,193,90,.3)}
+footer{border-top:0;position:relative}
+footer::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent)}
+@media (prefers-reduced-motion:reduce){.stage::after{animation:none}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
 </style>
 </head>
 <body>
+<a class="skip" href="#servicos">Pular para o conteúdo</a>
 
 <nav class="nav" id="nav" aria-label="Principal">
   <a class="brand" href="#topo" aria-label="O Rei do PPF, início">
     <svg viewBox="0 0 28 24" aria-hidden="true"><path d="M2 18L3.5 5l6 6L14 2l4.5 9 6-6L26 18z" fill="#c9a432"/><rect x="2" y="20" width="24" height="3" fill="#c9a432"/></svg>
-    <b>O Rei do PPF</b>
+    <b translate="no">O Rei do PPF</b>
   </a>
   <ul>
     <li><a href="#servicos">Serviços</a></li>
     <li><a href="#diario">Trabalhos</a></li>
+    <li><a href="#insta">Vídeos</a></li>
     <li><a href="#historia">Nossa história</a></li>
     <li><a href="#avaliacoes">Avaliações</a></li>
   </ul>
@@ -297,10 +368,10 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
 <main>
 <section id="topo" aria-label="Apresentação">
   <div class="stage">
-    <canvas id="film" aria-label="Vídeo do carro girando conforme a rolagem"></canvas>
+    <canvas id="film" role="img" aria-label="Vídeo do carro girando conforme a rolagem"></canvas>
     <div class="shade"></div>
     <span class="provisorio">Vídeo provisório · trocar pelo carro real</span>
-    <span class="loading" id="loading">Carregando vídeo 0%</span>
+    <span class="loading" id="loading">Carregando vídeo… 0%</span>
     <div class="beat beat-1" data-from="0" data-to=".2">
       <span class="eyebrow">Proteção de pintura automotiva</span>
       <h1>Proteção que <b>você não vê.</b></h1>
@@ -325,7 +396,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
     </div>
     <div class="svc-grid">
       <article class="svc">
-        <div class="svc-img"><img src="seq/f010.jpg" alt="Carro preto com PPF full body, vista frontal"><span class="badge">Mais pedido</span></div>
+        <div class="svc-img"><img src="seq/m/f010.jpg" alt="Carro preto com PPF full body, vista frontal" width="1024" height="576" loading="lazy" decoding="async"><span class="badge">Mais pedido</span></div>
         <div class="svc-body">
           <h3>Full Body</h3>
           <p>A lataria inteira coberta. Para quem quer preservar 100% da pintura de fábrica.</p>
@@ -334,7 +405,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
         </div>
       </article>
       <article class="svc">
-        <div class="svc-img"><img src="seq/f045.jpg" alt="Lateral do carro, áreas de impacto"></div>
+        <div class="svc-img"><img src="seq/m/f045.jpg" alt="Lateral do carro, áreas de impacto" width="1024" height="576" loading="lazy" decoding="async"></div>
         <div class="svc-body">
           <h3>Parcial</h3>
           <p>Capô, para-lamas, para-choque e retrovisores, onde mais bate pedra na estrada.</p>
@@ -343,7 +414,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
         </div>
       </article>
       <article class="svc">
-        <div class="svc-img"><img src="seq/f090.jpg" alt="Traseira do carro, pontos de desgaste"></div>
+        <div class="svc-img"><img src="seq/m/f090.jpg" alt="Traseira do carro, pontos de desgaste" width="1024" height="576" loading="lazy" decoding="async"></div>
         <div class="svc-body">
           <h3>Pontual</h3>
           <p>Soleiras, maçanetas e borda do porta-malas, os pontos que sofrem no uso diário.</p>
@@ -383,9 +454,23 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
   </div>
 </section>
 
+<section id="insta" class="block" aria-label="Instagram">
+  <div class="wrap">
+    <div class="head">
+      <div>
+        <span class="eyebrow">No Instagram</span>
+        <h2 class="wide">A oficina em vídeo</h2>
+        <p>Aplicações, antes e depois e os bastidores, direto do <span translate="no">@reido_ppf</span>.</p>
+      </div>
+      <a class="btn btn-ghost" href="https://www.instagram.com/reido_ppf/" target="_blank" rel="noopener">Seguir @reido_ppf</a>
+    </div>
+    <div class="reels" id="reels"></div>
+  </div>
+</section>
+
 <section id="historia" class="block">
   <div class="wrap story">
-    <div class="story-img"><img src="seq/f119.jpg" alt="Carro preto de perfil no estúdio"></div>
+    <div class="story-img"><img src="seq/m/f119.jpg" alt="Carro preto de perfil no estúdio" width="1024" height="576" loading="lazy" decoding="async"></div>
     <div class="story-text">
       <span class="eyebrow">Nossa história</span>
       <h2 class="wide">Da garagem de casa ao trono</h2>
@@ -395,7 +480,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
         <li><time>2021</time><div><b>O primeiro carro</b><span>A primeira película aplicada, na garagem de casa.</span></div></li>
         <li><time>2022</time><div><b>Espaço próprio</b><span>Curso de aplicação, o primeiro box e os clientes vindos de indicação.</span></div></li>
         <li><time>2024</time><div><b>Mais de 250 carros</b><span>Sala de aplicação fechada e garantia por escrito em tudo.</span></div></li>
-        <li><time>Hoje</time><div><b>O Rei do PPF</b><span>Full body, parcial e pontual, com cada resultado publicado.</span></div></li>
+        <li><time>Hoje</time><div><b translate="no">O Rei do PPF</b><span>Full body, parcial e pontual, com cada resultado publicado.</span></div></li>
       </ol>
     </div>
   </div>
@@ -433,17 +518,16 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
       <h2 class="wide">Fale com o Rei</h2>
       <p>Preencha ao lado e a conversa abre no WhatsApp já com os dados do seu carro.</p>
       <div class="contact-lines">
-        <div><span>WhatsApp</span><b><span id="phoneText" style="font-size:inherit;letter-spacing:0;text-transform:none;color:inherit">(11) 99999-9999</span><button class="copy" type="button" id="copyPhone">Copiar</button></b></div>
-        <div><span>Instagram</span><b><a href="https://instagram.com/oreidoppf" target="_blank" rel="noopener">@oreidoppf</a></b></div>
+        <div><span>WhatsApp</span><b><span id="phoneText" style="font-size:inherit;letter-spacing:0;text-transform:none;color:inherit">(62) 99341-1237</span><button class="copy" type="button" id="copyPhone">Copiar</button></b></div>
+        <div><span>Instagram</span><b><a href="https://www.instagram.com/reido_ppf/" target="_blank" rel="noopener">@reido_ppf</a></b></div>
         <div><span>Atendimento</span><b>Seg a sáb, com hora marcada</b></div>
       </div>
-      <p style="font-size:12px;color:#86867f;margin-top:12px">Número de exemplo</p>
     </div>
     <form class="quote" id="quote" novalidate>
-      <div class="field"><label for="q-nome">Nome</label><input class="input" id="q-nome" autocomplete="name" placeholder="Seu nome"></div>
-      <div class="field"><label for="q-carro">Carro e ano</label><input class="input" id="q-carro" placeholder="Ex.: Civic 2023"></div>
-      <div class="field full"><label for="q-servico">Serviço</label><select class="input" id="q-servico"><option>PPF Full Body</option><option>PPF Parcial</option><option>PPF Pontual</option><option>Não sei, quero orientação</option></select></div>
-      <div class="field full"><label for="q-msg">Mensagem</label><textarea class="input" id="q-msg" placeholder="Conte o que precisa"></textarea></div>
+      <div class="field"><label for="q-nome">Nome</label><input class="input" id="q-nome" name="nome" autocomplete="name" placeholder="Seu nome…"></div>
+      <div class="field"><label for="q-carro">Carro e ano</label><input class="input" id="q-carro" name="carro" autocomplete="off" placeholder="Ex.: Civic 2023…"></div>
+      <div class="field full"><label for="q-servico">Serviço</label><select class="input" id="q-servico" name="servico"><option>PPF Full Body</option><option>PPF Parcial</option><option>PPF Pontual</option><option>Não sei, quero orientação</option></select></div>
+      <div class="field full"><label for="q-msg">Mensagem</label><textarea class="input" id="q-msg" name="mensagem" autocomplete="off" placeholder="Conte o que precisa…"></textarea></div>
       <a class="btn btn-gold" id="waLink" href="#" target="_blank" rel="noopener">Abrir conversa no WhatsApp</a>
       <p class="small">O WhatsApp abre em outra aba com a mensagem pronta para enviar.</p>
     </form>
@@ -454,9 +538,9 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
 <footer>
   <div class="wrap">
     <div class="foot">
-      <div><a class="brand" href="#topo"><svg viewBox="0 0 28 24" aria-hidden="true" style="width:28px;height:24px"><path d="M2 18L3.5 5l6 6L14 2l4.5 9 6-6L26 18z" fill="#c9a432"/><rect x="2" y="20" width="24" height="3" fill="#c9a432"/></svg><b>O Rei do PPF</b></a><p>Proteção de pintura automotiva. Full body, parcial e pontual.</p></div>
+      <div><a class="brand" href="#topo"><svg viewBox="0 0 28 24" aria-hidden="true" style="width:28px;height:24px"><path d="M2 18L3.5 5l6 6L14 2l4.5 9 6-6L26 18z" fill="#c9a432"/><rect x="2" y="20" width="24" height="3" fill="#c9a432"/></svg><b translate="no">O Rei do PPF</b></a><p>Proteção de pintura automotiva. Full body, parcial e pontual.</p></div>
       <div><h4>Site</h4><ul><li><a href="#servicos">Serviços</a></li><li><a href="#diario">Trabalhos</a></li><li><a href="#historia">Nossa história</a></li><li><a href="#contato">Orçamento</a></li></ul></div>
-      <div><h4>Contato</h4><ul><li><a href="https://instagram.com/oreidoppf" target="_blank" rel="noopener">Instagram</a></li><li><a href="#contato">WhatsApp</a></li></ul></div>
+      <div><h4>Contato</h4><ul><li><a href="https://www.instagram.com/reido_ppf/" target="_blank" rel="noopener">Instagram</a></li><li><a href="#contato">WhatsApp</a></li></ul></div>
     </div>
     <div class="legal"><span>© 2026 O Rei do PPF · Protótipo</span><span>Vídeo provisório feito com o modelo 3D “Ferrari 458 Italia” de vicent091036, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a></span></div>
   </div>
@@ -476,13 +560,13 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
     <div class="dlg-head"><span class="eyebrow" id="pubTitle">Publicar trabalho</span><button class="x" type="button" data-close aria-label="Fechar">×</button></div>
     <div class="dlg-body">
       <form class="pub" id="pubForm" novalidate>
-        <div class="field"><label for="p-carro">Carro</label><input class="input" id="p-carro" placeholder="Ex.: Porsche Macan 2024"></div>
+        <div class="field"><label for="p-carro">Carro</label><input class="input" id="p-carro" name="carro" autocomplete="off" placeholder="Ex.: Porsche Macan 2024…"></div>
         <div class="field"><label for="p-servico">Serviço</label><select class="input" id="p-servico"><option value="full">PPF Full Body</option><option value="parcial">PPF Parcial</option><option value="pontual">PPF Pontual</option></select></div>
-        <div class="field full"><label for="p-titulo">Título do post</label><input class="input" id="p-titulo" placeholder="Ex.: Macan grafite com full body"></div>
-        <div class="field full"><label for="p-texto">Conte o trabalho</label><textarea class="input" id="p-texto" placeholder="O que foi feito, quanto tempo levou, o que o cliente queria"></textarea></div>
+        <div class="field full"><label for="p-titulo">Título do post</label><input class="input" id="p-titulo" name="titulo" autocomplete="off" placeholder="Ex.: Macan grafite com full body…"></div>
+        <div class="field full"><label for="p-texto">Conte o trabalho</label><textarea class="input" id="p-texto" name="texto" autocomplete="off" placeholder="O que foi feito, quanto tempo levou, o que o cliente queria…"></textarea></div>
         <label class="drop" id="drop" for="p-fotos">Toque para escolher as fotos ou arraste aqui<input id="p-fotos" type="file" accept="image/*" multiple></label>
         <div class="thumbs" id="thumbs"></div>
-        <div class="actions" style="grid-column:1/-1"><button class="btn btn-dark" type="submit">Publicar</button><span id="pubErr" style="color:#a3121b;font-size:14px"></span></div>
+        <div class="actions" style="grid-column:1/-1"><button class="btn btn-dark" type="submit">Publicar</button><span id="pubErr" role="alert" style="color:#a3121b;font-size:14px"></span></div>
         <p class="small" style="color:var(--muted);text-align:left">No protótipo o post fica salvo só neste navegador. No site final ele aparece para todos os visitantes.</p>
       </form>
     </div>
@@ -495,7 +579,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
 (function(){
 'use strict';
 const $=s=>document.querySelector(s);
-const WA='5511999999999';
+const WA='5562993411237';
 const FRAMES=120;
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const nav=$('#nav'),topo=$('#topo'),canvas=$('#film'),ctx=canvas.getContext('2d');
@@ -509,7 +593,7 @@ const src=i=>DIR+String(i).padStart(3,'0')+'.jpg';
 function load(i){
   if(imgs[i])return;
   const im=new Image();im.decoding='async';
-  im.onload=()=>{loaded++;$('#loading').textContent='Carregando vídeo '+Math.round(loaded/FRAMES*100)+'%';if(loaded===FRAMES)$('#loading').hidden=true;if(i===wanted||current<0)draw(true)};
+  im.onload=()=>{loaded++;$('#loading').textContent='Carregando vídeo… '+Math.round(loaded/FRAMES*100)+'%';if(loaded===FRAMES)$('#loading').hidden=true;if(i===wanted||current<0)draw(true)};
   im.src=src(i);imgs[i]=im;
 }
 // primeiro o quadro inicial, depois um a cada 8, depois o resto: a rolagem já funciona enquanto carrega
@@ -567,8 +651,8 @@ let local=[];
 try{local=JSON.parse(localStorage.getItem('reiPPF.v4.posts')||'[]')}catch(e){local=[]}
 const saveLocal=()=>{try{localStorage.setItem('reiPPF.v4.posts',JSON.stringify(local));return true}catch(e){return false}};
 const allPosts=()=>[...local,...SEED].sort((a,b)=>b.date.localeCompare(a.date)||(b.ts||0)-(a.ts||0));
-const MESES=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
-const fmt=d=>{const [y,m,dd]=d.split('-');return dd+' '+MESES[+m-1]+' '+y};
+const DF=new Intl.DateTimeFormat('pt-BR',{day:'2-digit',month:'short',year:'numeric',timeZone:'UTC'});
+const fmt=d=>DF.format(new Date(d+'T00:00:00Z')).replace(/\./g,'').replace(/ de /g,' ');
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const CAM='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M3 8h4l2-3h6l2 3h4v11H3z"/><circle cx="12" cy="13" r="4"/></svg>';
 const ph=p=>'<div class="ph">'+CAM+'<strong>'+esc(p.carro)+'</strong><span>Foto do trabalho</span></div>';
@@ -614,7 +698,7 @@ drop.addEventListener('drop',e=>addFiles(e.dataTransfer.files));
 $('#pubForm').addEventListener('submit',e=>{
   e.preventDefault();
   const carro=$('#p-carro').value.trim(),titulo=$('#p-titulo').value.trim();
-  if(!carro||!titulo){$('#pubErr').textContent='Preencha o carro e o título.';return}
+  if(!carro||!titulo){$('#pubErr').textContent='Preencha o carro e o título para publicar.';$(carro?'#p-titulo':'#p-carro').focus();return}
   const now=new Date(),pad=n=>String(n).padStart(2,'0');
   local.unshift({id:'l'+now.getTime(),ts:now.getTime(),date:now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate()),carro,titulo,servico:$('#p-servico').value,texto:$('#p-texto').value.trim()||'Mais um carro protegido pela equipe.',fotos:pending.slice()});
   if(!saveLocal()){local[0].fotos=local[0].fotos.slice(0,1);if(!saveLocal())toast('Publicado, mas as fotos são grandes demais para ficar salvas neste navegador')}
@@ -634,6 +718,17 @@ $('#waFloat').href=waUrl('Olá, Rei do PPF! Quero um orçamento.');
 document.querySelectorAll('[data-svc]').forEach(b=>b.addEventListener('click',()=>{$('#q-servico').value=b.dataset.svc;updateWa();$('#contato').scrollIntoView({behavior:reduce?'auto':'smooth'})}));
 $('#copyPhone').onclick=()=>{const el=$('#phoneText');const sel=()=>{const r=document.createRange();r.selectNodeContents(el);const s=getSelection();s.removeAllRanges();s.addRange(r)};try{navigator.clipboard.writeText(el.textContent).then(()=>toast('Número copiado'),sel)}catch(e){sel()}};
 let tt;function toast(m){const el=$('#toast');el.textContent=m;el.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('on'),2600)}
+
+/* ── Instagram: cole aqui os links dos reels/posts que devem aparecer ── */
+const REELS=[
+  // 'https://www.instagram.com/reel/XXXXXXXXX/',
+];
+if(REELS.length){
+  $('#reels').innerHTML=REELS.slice(0,6).map(u=>'<blockquote class="instagram-media" data-instgrm-permalink="'+esc(u)+'" data-instgrm-version="14"><a href="'+esc(u)+'" target="_blank" rel="noopener">Ver no Instagram</a></blockquote>').join('');
+  const sc=document.createElement('script');sc.async=true;sc.src='https://www.instagram.com/embed.js';document.body.appendChild(sc);
+}else{
+  $('#reels').innerHTML='<div class="ig-cta"><div><b>Siga @reido_ppf</b><p>Todo dia tem carro novo recebendo película. Os vídeos mais recentes aparecem aqui.</p></div><a class="btn btn-gold" href="https://www.instagram.com/reido_ppf/" target="_blank" rel="noopener">Abrir o Instagram</a></div>';
+}
 
 renderPosts();
 })();
