@@ -44,19 +44,20 @@ h1,h2,h3{text-wrap:balance;font-weight:800}
 section[id]{scroll-margin-top:64px}
 
 /* ── Botões ── */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:15px 28px;border-radius:999px;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;border:1px solid transparent;cursor:pointer;transition:background .25s,color .25s,border-color .25s,transform .25s}
-.btn:hover{transform:translateY(-1px)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:48px;padding:0 22px;border-radius:4px;font-size:15px;font-weight:600;letter-spacing:0;text-decoration:none;border:1px solid transparent;cursor:pointer;transition:background-color .16s ease-out,color .16s ease-out,border-color .16s ease-out,transform .12s ease-out}
+.btn:active{transform:scale(.97)}
 .btn-gold{background:var(--gold);color:var(--black)}
-.btn-gold:hover{background:var(--gold-hi)}
-.btn-ghost{background:transparent;color:var(--white);border-color:rgba(255,255,255,.4)}
-.btn-ghost:hover{border-color:var(--white)}
-.btn-dark{background:var(--black);color:var(--white)}
-.btn-dark:hover{background:#2a2a2a}
-.btn-line{background:transparent;color:var(--ink);border-color:var(--ink)}
-.btn-line:hover{background:var(--ink);color:var(--white)}
-.arrow{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;display:inline-flex;gap:8px;align-items:center;background:none;border:0;cursor:pointer;padding:0}
-.arrow::after{content:"→";transition:transform .25s}
-.arrow:hover::after{transform:translateX(4px)}
+.btn-dark{background:var(--ink);color:var(--white)}
+.btn-line{background:transparent;color:var(--ink);border-color:rgba(18,18,18,.25)}
+.btn-gold::after,.btn-dark::after,.arrow::after,.link::after{content:"→";display:inline-block;font-weight:400;transition:transform .2s var(--ease)}
+.arrow,.link{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0;background:none;border:0;cursor:pointer;color:inherit;font-size:15px;font-weight:600;text-decoration:underline;text-underline-offset:6px;text-decoration-thickness:1px;text-decoration-color:color-mix(in srgb,currentColor 35%,transparent);transition:text-decoration-color .16s ease-out}
+@media (hover:hover) and (pointer:fine){
+  .btn-gold:hover{background:var(--gold-hi)}
+  .btn-dark:hover{background:#262626}
+  .btn-line:hover{border-color:var(--ink)}
+  .arrow:hover,.link:hover{text-decoration-color:currentColor}
+  .btn-gold:hover::after,.btn-dark:hover::after,.arrow:hover::after,.link:hover::after{transform:translateX(3px)}
+}
 
 /* ── Navegação ── */
 .nav{position:fixed;inset:0 0 auto 0;z-index:50;height:calc(68px + env(safe-area-inset-top,0px));padding:env(safe-area-inset-top,0px) var(--gutter) 0;display:flex;align-items:center;gap:28px;color:var(--white);transition:background .35s,color .35s,border-color .35s;border-bottom:1px solid transparent}
@@ -67,7 +68,8 @@ section[id]{scroll-margin-top:64px}
 .nav ul{list-style:none;display:flex;gap:28px;margin-left:auto}
 .nav ul a{text-decoration:none;font-size:13px;font-weight:500;letter-spacing:.04em;opacity:.85}
 .nav ul a:hover{opacity:1}
-.nav .btn{padding:10px 18px;font-size:12px}
+.nav .btn{min-height:38px;padding:0 14px;font-size:14px}
+.nav .btn::after{content:none}
 .nav:not(.solid) .btn{background:var(--white);color:var(--black)}
 @media (max-width:860px){.nav ul{display:none}.nav .btn{margin-left:auto}}
 
@@ -82,7 +84,7 @@ section[id]{scroll-margin-top:64px}
 .beat-1 .eyebrow{color:var(--gold-hi)}
 .beat-1 h1{font-weight:250;font-size:clamp(40px,6.4vw,92px);line-height:1;letter-spacing:-.02em}
 .beat-1 h1 b{font-weight:700}
-.beat-1 .row{display:flex;flex-wrap:wrap;gap:12px}
+.beat-1 .row{display:flex;flex-wrap:wrap;align-items:center;gap:12px 28px}
 .fact{display:flex;flex-direction:column;gap:10px;max-width:380px}
 .fact strong{font-size:clamp(56px,8vw,120px);font-weight:200;line-height:.9;letter-spacing:-.03em}
 .fact strong small{font-size:.35em;font-weight:400;letter-spacing:0;margin-left:.15em}
@@ -101,7 +103,6 @@ section[id]{scroll-margin-top:64px}
 @media (max-width:760px){
   .beat-2,.beat-3{top:auto;bottom:calc(96px + env(safe-area-inset-bottom,0px));left:0;right:0;text-align:left}
   .beat-3.fact{align-items:flex-start}
-  .beat-1 .btn-ghost{display:none}
 }
 
 /* ── Seções claras ── */
@@ -118,7 +119,7 @@ section[id]{scroll-margin-top:64px}
 .svc-img{aspect-ratio:16/10;background:#000;overflow:hidden;position:relative}
 .svc-img img{width:100%;height:100%;object-fit:cover;transition:transform .8s var(--ease)}
 .svc:hover .svc-img img{transform:scale(1.05)}
-.svc-img .badge{position:absolute;left:14px;top:14px;background:var(--gold);color:var(--black);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:6px 10px;border-radius:999px}
+.tag{font-size:13px;font-weight:600;color:var(--gold-ink);margin-bottom:-6px}
 .svc-body{padding:28px 26px 30px;display:flex;flex-direction:column;gap:14px;flex:1}
 .svc h3{font-size:24px;font-stretch:125%;text-transform:uppercase;line-height:1.05}
 .svc p{color:var(--muted);font-size:15px}
@@ -145,13 +146,14 @@ section[id]{scroll-margin-top:64px}
 /* Diário */
 #diario{background:var(--paper)}
 .bar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:14px;margin-bottom:32px}
-.chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{border:1px solid var(--line);background:var(--white);padding:9px 16px;border-radius:999px;font-size:13px;font-weight:600;cursor:pointer;transition:background-color .2s,border-color .2s,color .2s}
-.chip:hover{border-color:var(--ink)}
-.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--white)}
+.chips{display:flex;flex-wrap:wrap;border-bottom:1px solid var(--line)}
+.chip{position:relative;border:0;background:none;padding:12px 14px;border-radius:0;font-size:15px;font-weight:600;color:var(--muted);cursor:pointer;transition:color .16s ease-out}
+.chip::after{content:"";position:absolute;left:14px;right:14px;bottom:-1px;height:2px;background:var(--ink);transform:scaleX(0);transition:transform .2s var(--ease)}
+@media (hover:hover) and (pointer:fine){.chip:hover{color:var(--ink)}}
+.chip[aria-pressed="true"]{color:var(--ink)}
+.chip[aria-pressed="true"]::after{transform:scaleX(1)}
 .posts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
 .post{all:unset;cursor:pointer;display:flex;flex-direction:column;background:var(--white);border-radius:6px;overflow:hidden;min-width:0;transition:box-shadow .3s,transform .3s}
-.post:hover{box-shadow:0 18px 40px -20px rgba(0,0,0,.35);transform:translateY(-3px)}
 .post:focus-visible{outline:2px solid var(--gold);outline-offset:4px}
 .post.featured{grid-column:span 2;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr)}
 .post.featured .post-img{aspect-ratio:auto;min-height:360px}
@@ -162,8 +164,6 @@ section[id]{scroll-margin-top:64px}
 .ph svg{width:36px;height:36px}
 .ph strong{font-size:18px;font-weight:700;color:#5d5d57;font-stretch:110%}
 .ph span{font-size:11px;letter-spacing:.16em;text-transform:uppercase}
-.post-tag{position:absolute;left:14px;top:14px;background:var(--black);color:var(--white);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:6px 10px;border-radius:999px}
-.post-ex{position:absolute;right:14px;top:14px;background:var(--white);color:var(--muted);font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:6px 10px;border-radius:999px}
 .post-body{padding:24px 24px 28px;display:flex;flex-direction:column;gap:10px;min-width:0;justify-content:center}
 .meta{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-ink)}
 .meta span+span{color:var(--muted)}
@@ -221,8 +221,8 @@ section[id]{scroll-margin-top:64px}
 .contact-lines div{display:flex;justify-content:space-between;gap:16px;align-items:center;padding:16px 0;border-bottom:1px solid rgba(255,255,255,.14);flex-wrap:wrap}
 .contact-lines span{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--soft)}
 .contact-lines b{font-weight:600}
-.copy{background:none;border:1px solid rgba(255,255,255,.3);color:var(--white);border-radius:999px;font-size:11px;padding:6px 12px;cursor:pointer;margin-left:8px;transition:border-color .2s,background-color .2s}
-.copy:hover{border-color:var(--gold-hi);background:rgba(201,164,50,.12)}
+.copy{background:none;border:0;color:var(--soft);font-size:13px;font-weight:600;text-decoration:underline;text-underline-offset:4px;padding:6px 0;margin-left:14px;cursor:pointer;transition:color .16s ease-out}
+@media (hover:hover) and (pointer:fine){.copy:hover{color:var(--white)}}
 form.quote{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;background:#151515;border-radius:6px;padding:32px}
 .field{display:flex;flex-direction:column;gap:8px;min-width:0}
 .field.full{grid-column:1/-1}
@@ -248,7 +248,8 @@ footer{background:var(--black);color:#9a9a93;border-top:1px solid #1f1f1f;paddin
 @media (max-width:760px){.foot{grid-template-columns:minmax(0,1fr)}}
 
 .wa{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:40;width:56px;height:56px;border-radius:50%;background:#25D366;display:grid;place-items:center;box-shadow:0 8px 24px rgba(0,0,0,.3);transition:transform .25s}
-.wa:hover{transform:scale(1.07)}
+@media (hover:hover) and (pointer:fine){.wa:hover{transform:scale(1.04)}}
+.wa:active{transform:scale(.96)}
 .wa svg{width:28px;height:28px}
 
 /* Janelas */
@@ -288,10 +289,10 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
 .reels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;align-items:start}
 .reels .instagram-media{min-width:0!important;width:100%!important;margin:0!important;border-radius:var(--r)!important}
 .reels blockquote.instagram-media{aspect-ratio:9/16;max-height:640px;border:1px solid transparent!important;background:radial-gradient(80% 50% at 50% 40%,rgba(201,164,50,.18),transparent 70%) padding-box,linear-gradient(#141414,#0c0c0c) padding-box,linear-gradient(140deg,rgba(227,193,90,.55),rgba(255,255,255,.08) 40%,rgba(227,193,90,.25)) border-box!important}
-.reels blockquote.instagram-media a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;height:100%;text-decoration:none;color:var(--white);font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:13px}
-.reels .play{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(180deg,#ecd07a,var(--gold));box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 0 30px var(--gold-glow);transition:transform .25s}
+.reels blockquote.instagram-media a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;height:100%;text-decoration:none;color:var(--white);font-weight:600;font-size:15px}
+.reels .play{width:60px;height:60px;border-radius:50%;display:grid;place-items:center;background:var(--gold);transition:transform .16s ease-out}
 .reels .play svg{width:22px;height:22px;margin-left:3px}
-.reels blockquote.instagram-media a:hover .play{transform:scale(1.08)}
+@media (hover:hover) and (pointer:fine){.reels blockquote.instagram-media a:hover .play{transform:scale(1.05)}}
 .ig-cta{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px;padding:32px;border-radius:var(--r);border:1px solid transparent;background:linear-gradient(180deg,#171717,#121212) padding-box,linear-gradient(140deg,rgba(227,193,90,.6),rgba(255,255,255,.08) 40%,rgba(227,193,90,.3)) border-box}
 .ig-cta b{font-size:clamp(22px,2.6vw,30px);font-stretch:115%}
 .ig-cta p{color:#bdbdb6;margin-top:6px;max-width:52ch}
@@ -299,31 +300,23 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
 /* ── Acabamento: bordas, luz e profundidade ── */
 :root{--r:10px;--edge:rgba(0,0,0,.07);--gold-glow:rgba(227,193,90,.55)}
 /* botões com reflexo */
-.btn-gold{background:linear-gradient(180deg,#ecd07a 0%,var(--gold) 52%,#b08c1e 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -1px 0 rgba(0,0,0,.18),0 6px 18px -10px var(--gold-glow);transition:box-shadow .3s,transform .25s,filter .25s}
-.btn-gold:hover{background:linear-gradient(180deg,#f2da8e 0%,var(--gold-hi) 52%,#bf9a26 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.6),inset 0 -1px 0 rgba(0,0,0,.18),0 10px 30px -8px var(--gold-glow)}
-.btn-ghost{background:rgba(255,255,255,.04);backdrop-filter:blur(6px);box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}
-.btn-dark{box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 8px 20px -12px rgba(0,0,0,.6)}
 /* topo: luz de estúdio, vinheta e grão de filme sobre o carro */
 .stage::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(70% 45% at 50% 62%,rgba(227,193,90,.10),transparent 70%),radial-gradient(120% 90% at 50% 50%,transparent 55%,rgba(0,0,0,.65) 100%)}
 .stage::after{content:"";position:absolute;inset:-50%;z-index:1;pointer-events:none;opacity:.09;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");animation:grain 1s steps(4) infinite}
 @keyframes grain{0%{transform:translate(0,0)}25%{transform:translate(-3%,2%)}50%{transform:translate(2%,-3%)}75%{transform:translate(-2%,-1%)}100%{transform:translate(0,0)}}
 .shade,.beat,.progress,.loading,.provisorio{z-index:2}
 .provisorio{background:rgba(0,0,0,.35);backdrop-filter:blur(6px)}
-.progress i{background:linear-gradient(90deg,var(--gold),var(--gold-hi));box-shadow:0 0 12px var(--gold-glow)}
-.fact::before{background:linear-gradient(90deg,var(--gold-hi),transparent);box-shadow:0 0 10px var(--gold-glow)}
+.progress i{background:var(--gold)}
 /* navegação */
 .nav.solid{box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 10px 30px -22px rgba(0,0,0,.35)}
 /* cartões com borda fina, luz no topo e sombra em camadas */
 .svc,.post,.review{border-radius:var(--r);border:1px solid var(--edge);box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 1px 2px rgba(0,0,0,.04),0 18px 40px -28px rgba(0,0,0,.28);transition:box-shadow .35s var(--ease),transform .35s var(--ease),border-color .35s}
 .svc{background:linear-gradient(180deg,#fafaf8,var(--paper))}
-.svc:hover,.post:hover,.review:hover{border-color:rgba(201,164,50,.55);box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 0 0 1px rgba(201,164,50,.18),0 26px 50px -26px rgba(0,0,0,.38);transform:translateY(-3px)}
+@media (hover:hover) and (pointer:fine){.svc:hover,.post:hover,.review:hover{border-color:rgba(201,164,50,.5);box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 26px 50px -26px rgba(0,0,0,.38);transform:translateY(-3px)}}
 .post{border:1px solid var(--edge)}
 .svc-img,.post-img{box-shadow:inset 0 -1px 0 var(--edge)}
 .svc-img::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(255,255,255,.08),transparent 30%,transparent 65%,rgba(0,0,0,.35))}
-.svc-img .badge{z-index:1;background:linear-gradient(180deg,#ecd07a,var(--gold));box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 4px 14px -6px var(--gold-glow)}
-.chip{box-shadow:inset 0 1px 0 rgba(255,255,255,.9)}
 .review{background:linear-gradient(180deg,#fff,#fbfbf9)}
-.stars{text-shadow:0 0 12px var(--gold-glow)}
 .story-img{border-radius:var(--r);border:1px solid var(--edge);box-shadow:0 30px 60px -34px rgba(0,0,0,.5);position:relative}
 .story-img::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);background:linear-gradient(180deg,rgba(255,255,255,.06),transparent 35%)}
 .step{border-top:0;position:relative}
@@ -334,7 +327,6 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
 .contact{position:relative;overflow:hidden}
 .specs{border-top:0;position:relative}
 .specs::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:linear-gradient(90deg,var(--gold),rgba(255,255,255,.14) 35%,rgba(255,255,255,.14))}
-.spec b{background:linear-gradient(180deg,#fff 30%,#bdbdb6);-webkit-background-clip:text;background-clip:text;color:transparent}
 /* formulário com borda em degradê dourado */
 form.quote{border:1px solid transparent;border-radius:var(--r);background:linear-gradient(180deg,#171717,#121212) padding-box,linear-gradient(140deg,rgba(227,193,90,.6),rgba(255,255,255,.08) 35%,rgba(255,255,255,.04) 70%,rgba(227,193,90,.3)) border-box;box-shadow:0 30px 70px -40px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.05)}
 .input{border-radius:6px;box-shadow:inset 0 1px 2px rgba(0,0,0,.5);transition:border-color .2s,box-shadow .2s}
@@ -343,7 +335,7 @@ form.quote{border:1px solid transparent;border-radius:var(--r);background:linear
 .pub .input{box-shadow:none}
 .pub .input:focus{box-shadow:0 0 0 3px rgba(201,164,50,.22)}
 /* botão flutuante e janelas */
-.wa{box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 10px 28px -6px rgba(37,211,102,.55),0 4px 12px rgba(0,0,0,.25)}
+.wa{box-shadow:0 6px 16px rgba(0,0,0,.28)}
 dialog{border-radius:14px;box-shadow:0 40px 90px -30px rgba(0,0,0,.6)}
 .toast{box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 12px 30px -12px rgba(0,0,0,.5);border:1px solid rgba(227,193,90,.3)}
 footer{border-top:0;position:relative}
@@ -380,11 +372,11 @@ footer::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;back
     <div class="beat beat-1" data-from="0" data-to=".2">
       <span class="eyebrow">Proteção de pintura automotiva</span>
       <h1>Proteção que <b>você não vê.</b></h1>
-      <div class="row"><a class="btn btn-gold" href="#contato">Solicitar orçamento</a><a class="btn btn-ghost" href="#diario">Ver trabalhos</a></div>
+      <div class="row"><a class="btn btn-gold" href="#contato">Pedir orçamento</a><a class="link" href="#diario">Ver trabalhos</a></div>
     </div>
     <div class="beat beat-2 fact off" data-from=".26" data-to=".5"><strong>190<small>µm</small></strong><span>de película entre a sua pintura e a estrada. Pedra, risco e sol ficam nela.</span></div>
     <div class="beat beat-3 fact off" data-from=".54" data-to=".78"><strong>Autocura</strong><span>Riscos leves somem sozinhos com o calor do sol.</span></div>
-    <div class="beat beat-4 off" data-from=".84" data-to="1.01"><h2>Seu carro, <b>protegido como rei.</b></h2><a class="btn btn-gold" href="#contato">Quero proteger o meu</a></div>
+    <div class="beat beat-4 off" data-from=".84" data-to="1.01"><h2>Seu carro, <b>protegido como rei.</b></h2></div>
     <div class="progress" aria-hidden="true"><i id="prog"></i></div>
   </div>
 </section>
@@ -397,25 +389,25 @@ footer::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;back
         <h2 class="wide">Armadura para o seu carro</h2>
         <p>Película de poliuretano transparente, aplicada peça por peça, que segura o impacto no lugar da pintura original.</p>
       </div>
-      <a class="btn btn-line" href="#contato">Pedir orçamento</a>
     </div>
     <div class="svc-grid">
       <article class="svc">
-        <div class="svc-img"><img src="seq/m/f010.jpg" alt="Carro preto com PPF full body, vista frontal" width="1024" height="576" loading="lazy" decoding="async"><span class="badge">Mais pedido</span></div>
+        <div class="svc-img"><img src="seq/m/f010.jpg" alt="Carro preto com PPF full body, vista frontal" width="1024" height="576" loading="lazy" decoding="async"></div>
         <div class="svc-body">
+          <span class="tag">Mais pedido</span>
           <h3>Full Body</h3>
           <p>A lataria inteira coberta. Para quem quer preservar 100% da pintura de fábrica.</p>
           <ul><li>Todas as peças pintadas</li><li>Autocura com calor</li><li>Proteção UV</li><li>Garantia estendida</li></ul>
-          <button class="arrow" type="button" data-svc="PPF Full Body">Quero esse</button>
+          <button class="arrow" type="button" data-svc="PPF Full Body">Orçar este serviço</button>
         </div>
       </article>
       <article class="svc">
-        <div class="svc-img"><img src="seq/m/f045.jpg" alt="Lateral do carro, áreas de impacto" width="1024" height="576" loading="lazy" decoding="async"></div>
+        <div class="svc-img"><img src="seq/m/f060.jpg" alt="Lateral do carro, áreas de impacto" width="1024" height="576" loading="lazy" decoding="async"></div>
         <div class="svc-body">
           <h3>Parcial</h3>
           <p>Capô, para-lamas, para-choque e retrovisores, onde mais bate pedra na estrada.</p>
           <ul><li>Áreas de maior impacto</li><li>Instalação mais rápida</li><li>Ótimo custo-benefício</li><li>Dá para completar depois</li></ul>
-          <button class="arrow" type="button" data-svc="PPF Parcial">Quero esse</button>
+          <button class="arrow" type="button" data-svc="PPF Parcial">Orçar este serviço</button>
         </div>
       </article>
       <article class="svc">
@@ -424,7 +416,7 @@ footer::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;back
           <h3>Pontual</h3>
           <p>Soleiras, maçanetas e borda do porta-malas, os pontos que sofrem no uso diário.</p>
           <ul><li>Precisão na aplicação</li><li>Sem alterar o visual</li><li>Entrega no mesmo dia</li><li>Reforço onde mais gasta</li></ul>
-          <button class="arrow" type="button" data-svc="PPF Pontual">Quero esse</button>
+          <button class="arrow" type="button" data-svc="PPF Pontual">Orçar este serviço</button>
         </div>
       </article>
     </div>
@@ -452,7 +444,7 @@ footer::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;back
         <h2 class="wide">Trabalhos recentes</h2>
         <p>Todo carro que sai daqui vira um post com as fotos, o serviço feito e o que o cliente queria.</p>
       </div>
-      <button class="btn btn-dark" type="button" id="openPublish">+ Publicar trabalho</button>
+      <button class="btn btn-dark" type="button" id="openPublish">Publicar trabalho</button>
     </div>
     <div class="bar"><div class="chips" id="filters" role="group" aria-label="Filtrar por serviço"></div></div>
     <div class="posts" id="posts"></div>
@@ -467,7 +459,7 @@ footer::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;back
         <h2 class="wide">A oficina em vídeo</h2>
         <p>Aplicações, antes e depois e os bastidores, direto do <span translate="no">@reido_ppf</span>.</p>
       </div>
-      <a class="btn btn-ghost" href="https://www.instagram.com/reido_ppf/" target="_blank" rel="noopener">Seguir @reido_ppf</a>
+      <a class="link" href="https://www.instagram.com/reido_ppf/" target="_blank" rel="noopener">Seguir @reido_ppf</a>
     </div>
     <div class="reels" id="reels"></div>
   </div>
@@ -475,7 +467,7 @@ footer::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;back
 
 <section id="historia" class="block">
   <div class="wrap story">
-    <div class="story-img"><img src="seq/m/f119.jpg" alt="Carro preto de perfil no estúdio" width="1024" height="576" loading="lazy" decoding="async"></div>
+    <div class="story-img"><img src="seq/m/f119.jpg" alt="Traseira do carro preto no estúdio" width="1024" height="576" loading="lazy" decoding="async"></div>
     <div class="story-text">
       <span class="eyebrow">Nossa história</span>
       <h2 class="wide">Da garagem de casa ao trono</h2>
@@ -533,7 +525,7 @@ footer::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;back
       <div class="field"><label for="q-carro">Carro e ano</label><input class="input" id="q-carro" name="carro" autocomplete="off" placeholder="Ex.: Civic 2023…"></div>
       <div class="field full"><label for="q-servico">Serviço</label><select class="input" id="q-servico" name="servico"><option>PPF Full Body</option><option>PPF Parcial</option><option>PPF Pontual</option><option>Não sei, quero orientação</option></select></div>
       <div class="field full"><label for="q-msg">Mensagem</label><textarea class="input" id="q-msg" name="mensagem" autocomplete="off" placeholder="Conte o que precisa…"></textarea></div>
-      <a class="btn btn-gold" id="waLink" href="#" target="_blank" rel="noopener">Abrir conversa no WhatsApp</a>
+      <a class="btn btn-gold" id="waLink" href="#" target="_blank" rel="noopener">Continuar no WhatsApp</a>
       <p class="small">O WhatsApp abre em outra aba com a mensagem pronta para enviar.</p>
     </form>
   </div>
@@ -673,8 +665,8 @@ function renderPosts(){
   if(!list.length){box.innerHTML='<p class="empty">Ainda não há trabalhos com esse serviço.</p>';return}
   list.forEach((p,i)=>{
     const b=document.createElement('button');b.type='button';b.className='post'+(i===0&&list.length>2?' featured':'');
-    b.innerHTML='<div class="post-img">'+(p.fotos&&p.fotos.length?'<img alt="" src="'+p.fotos[0]+'">':ph(p))+'<span class="post-tag">'+SVC[p.servico]+'</span>'+(p.exemplo?'<span class="post-ex">Exemplo</span>':'')+'</div>'+
-      '<div class="post-body"><div class="meta"><span>'+fmt(p.date)+'</span><span>'+esc(p.carro)+'</span></div><h3>'+esc(p.titulo)+'</h3><p>'+esc(p.texto)+'</p><span class="arrow">Ler post</span></div>';
+    b.innerHTML='<div class="post-img">'+(p.fotos&&p.fotos.length?'<img alt="" src="'+p.fotos[0]+'">':ph(p))+'</div>'+
+      '<div class="post-body"><div class="meta"><span>'+SVC[p.servico]+'</span><span>'+fmt(p.date)+(p.exemplo?' · exemplo':'')+'</span></div><h3>'+esc(p.titulo)+'</h3><p>'+esc(p.texto)+'</p><span class="arrow">Ler post</span></div>';
     b.onclick=()=>openPost(p);box.appendChild(b);
   });
 }
@@ -734,7 +726,7 @@ if(REELS.length){
   $('#reels').innerHTML=REELS.slice(0,6).map(u=>'<blockquote class="instagram-media" data-instgrm-permalink="'+esc(u)+'" data-instgrm-version="14"><a href="'+esc(u)+'" target="_blank" rel="noopener"><span class="play"><svg viewBox="0 0 24 24" fill="#0a0a0a" aria-hidden="true"><path d="M6 4l14 8-14 8z"/></svg></span>Ver vídeo no Instagram</a></blockquote>').join('');
   const sc=document.createElement('script');sc.async=true;sc.src='https://www.instagram.com/embed.js';document.body.appendChild(sc);
 }else{
-  $('#reels').innerHTML='<div class="ig-cta"><div><b>Siga @reido_ppf</b><p>Todo dia tem carro novo recebendo película. Os vídeos mais recentes aparecem aqui.</p></div><a class="btn btn-gold" href="https://www.instagram.com/reido_ppf/" target="_blank" rel="noopener">Abrir o Instagram</a></div>';
+  $('#reels').innerHTML='<div class="ig-cta"><div><b>Siga @reido_ppf</b><p>Todo dia tem carro novo recebendo película. Os vídeos mais recentes aparecem aqui.</p></div><a class="link" href="https://www.instagram.com/reido_ppf/" target="_blank" rel="noopener">Abrir o Instagram</a></div>';
 }
 
 renderPosts();
