@@ -4,7 +4,7 @@ Protótipo do site-blog da O Rei do PPF (película de proteção de pintura).
 
 - `index.html`: página única (serviços, diário de trabalhos, história, processo, avaliações e contato pelo WhatsApp).
 - `video/`: vídeo do topo, que toca sozinho, sem som, em loop. `topo-v.mp4` é o recorte vertical para celular em pé, `topo-hd.mp4` (1080p) vai para telas largas com muitos pixels e `topo.mp4` (720p) para o resto. `topo.jpg` e `topo-v.jpg` são as imagens mostradas antes de carregar e para quem desativa animações.
-- `img/`: fotos dos cartões de serviço e da história.
+- `img/`: fotos dos cartões de serviço e da história; `compartilhar.jpg` é a prévia do link no WhatsApp/Instagram (fonte em `tools/compartilhar.html`).
 
 ## Trocar o vídeo do topo
 
