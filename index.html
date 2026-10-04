@@ -223,6 +223,30 @@ section[id]{scroll-margin-top:64px}
 .review figcaption b{font-weight:700}
 .review figcaption span{color:var(--muted)}
 .reviews-note{margin-top:20px;font-size:12px;color:var(--muted)}
+.reviews-note[hidden],.rev-admin[hidden]{display:none}
+.review{position:relative}
+.review .post-del{top:16px;right:16px}
+.rev-admin{margin-top:32px;background:var(--black);color:var(--white);padding:24px;border-left:3px solid var(--gold)}
+.rev-admin>b{display:block;font-size:16px;margin-bottom:4px}
+.rev-admin>span{color:#bdbdb6;font-size:14px}
+.pend{display:grid;gap:12px;margin-top:16px}
+.pend article{background:#151515;border:1px solid #2a2a2a;padding:16px 18px;display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center;justify-content:space-between}
+.pend article>div{min-width:0;flex:1 1 320px}
+.pend p{color:#d9d9d4;font-size:15px;margin:6px 0 4px;overflow-wrap:anywhere}
+.pend small{color:#86867f;font-size:13px}
+.pend .row{display:flex;gap:12px;align-items:center}
+.pend .btn{min-height:40px;padding:0 16px;font-size:14px}
+.pend .btn-line{color:var(--white);border-color:rgba(255,255,255,.3)}
+.rate{border:0;display:flex;flex-direction:row-reverse;justify-content:flex-end;gap:4px}
+.rate legend{font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;width:100%}
+.rate input{position:absolute;opacity:0;width:1px;height:1px}
+.rate label{font-size:30px;line-height:1;color:#d4d4cf;cursor:pointer;transition:color .12s ease-out}
+.rate input:checked~label,.rate label:hover,.rate label:hover~label{color:var(--gold)}
+.rate input:focus-visible+label{outline:2px solid var(--gold);outline-offset:2px}
+.vid-form{display:flex;flex-wrap:wrap;gap:12px;margin:16px 0 8px}
+.vid-form .input{flex:1 1 280px;min-width:0}
+.pend a{color:var(--gold-hi);overflow-wrap:anywhere;font-size:14px}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 @media (max-width:900px){.reviews{grid-template-columns:minmax(0,1fr)}}
 
 /* Contato */
@@ -490,6 +514,12 @@ footer::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;back
       <a class="link" href="https://www.instagram.com/reido_ppf/" target="_blank" rel="noopener">Seguir @reido_ppf</a>
     </div>
     <div class="reels" id="reels"></div>
+    <div class="rev-admin" id="vidAdmin" hidden>
+      <b>Vídeos do Instagram</b><span>Cole o link de um reel do Instagram. Aparecem os 6 mais recentes que você adicionar.</span>
+      <form class="vid-form" id="vidForm" novalidate><input class="input" id="vidUrl" name="link" type="url" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://www.instagram.com/reel/…"><button class="btn btn-gold" type="submit" id="vidBtn">Adicionar</button></form>
+      <span id="vidErr" role="alert" style="color:#ff8a8a;font-size:14px"></span>
+      <div class="pend" id="vidList"></div>
+    </div>
   </div>
 </section>
 
@@ -525,13 +555,14 @@ footer::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;back
 
 <section id="avaliacoes" class="block">
   <div class="wrap">
-    <div class="head"><div><span class="eyebrow">Avaliações</span><h2 class="wide">Quem protegeu, recomenda</h2></div></div>
-    <div class="reviews">
+    <div class="head"><div><span class="eyebrow">Avaliações</span><h2 class="wide">Quem protegeu, recomenda</h2></div><button class="btn btn-line" type="button" id="openReview">Deixar minha avaliação</button></div>
+    <div class="reviews" id="reviews">
       <figure class="review"><div class="stars">★★★★★</div><blockquote>O PPF ficou completamente invisível. Você não percebe que tem película. Superou o que eu esperava.</blockquote><figcaption><b>Rafael M.</b><span>BMW M3 Competition</span></figcaption></figure>
       <figure class="review"><div class="stars">★★★★★</div><blockquote>Fiz o full body no meu SUV. Ambiente organizado, explicaram cada etapa e o resultado ficou perfeito.</blockquote><figcaption><b>Carla S.</b><span>Range Rover Velar</span></figcaption></figure>
       <figure class="review"><div class="stars">★★★★★</div><blockquote>Entrega no prazo e o PPF encaixado como se fosse de fábrica. Recomendo demais.</blockquote><figcaption><b>Felipe M.</b><span>Porsche Cayenne</span></figcaption></figure>
     </div>
-    <p class="reviews-note">Avaliações de exemplo · trocar pelas avaliações do Google</p>
+    <p class="reviews-note" id="reviewsNote">Avaliações de exemplo · somem quando a primeira avaliação real for aprovada</p>
+    <div class="rev-admin" id="revAdmin" hidden><b>Avaliações para aprovar</b><span id="revAdminHint">Só aparecem no site depois que você aprovar.</span><div class="pend" id="pending"></div></div>
   </div>
 </section>
 
@@ -592,6 +623,29 @@ footer::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;back
         <div class="thumbs" id="thumbs"></div>
         <div class="actions" style="grid-column:1/-1"><button class="btn btn-dark" type="submit" id="pubBtn">Publicar</button><span id="pubErr" role="alert" style="color:#a3121b;font-size:14px"></span></div>
         <p class="small" style="color:var(--muted);text-align:left">O post aparece no site para todos os visitantes. As fotos são reduzidas antes de enviar.</p>
+      </form>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="revDlg" aria-labelledby="revTitle">
+  <div class="dlg">
+    <div class="dlg-head"><span class="eyebrow" id="revTitle">Deixar minha avaliação</span><button class="x" type="button" data-close aria-label="Fechar">×</button></div>
+    <div class="dlg-body">
+      <form class="pub" id="revForm" novalidate>
+        <fieldset class="rate field full"><legend>Nota</legend>
+          <input type="radio" name="nota" id="n5" value="5" checked><label for="n5" title="5 estrelas">★</label>
+          <input type="radio" name="nota" id="n4" value="4"><label for="n4" title="4 estrelas">★</label>
+          <input type="radio" name="nota" id="n3" value="3"><label for="n3" title="3 estrelas">★</label>
+          <input type="radio" name="nota" id="n2" value="2"><label for="n2" title="2 estrelas">★</label>
+          <input type="radio" name="nota" id="n1" value="1"><label for="n1" title="1 estrela">★</label>
+        </fieldset>
+        <div class="field"><label for="r-nome">Seu nome</label><input class="input" id="r-nome" name="nome" autocomplete="name" maxlength="60" placeholder="Ex.: Rafael M.…"></div>
+        <div class="field"><label for="r-carro">Seu carro</label><input class="input" id="r-carro" name="carro" autocomplete="off" maxlength="60" placeholder="Ex.: BMW M3 2023…"></div>
+        <div class="field full"><label for="r-texto">Como foi o serviço?</label><textarea class="input" id="r-texto" name="texto" autocomplete="off" maxlength="600" placeholder="Conte como ficou o carro e como foi o atendimento…"></textarea></div>
+        <div class="hp" aria-hidden="true"><label for="r-site">Não preencha</label><input id="r-site" name="site" tabindex="-1" autocomplete="off"></div>
+        <div class="actions" style="grid-column:1/-1"><button class="btn btn-dark" type="submit" id="revBtn">Enviar avaliação</button><span id="revErr" role="alert" style="color:#a3121b;font-size:14px"></span></div>
+        <p class="small" style="color:var(--muted);text-align:left">Sua avaliação aparece no site depois de aprovada pela equipe.</p>
       </form>
     </div>
   </div>
@@ -798,8 +852,58 @@ $('#pubForm').addEventListener('submit',async e=>{
   }finally{btn.disabled=false;btn.textContent='Publicar'}
 });
 
+/* ── Avaliações: visitante envia, fica pendente; adm aprova ou apaga ── */
+let reviews=null;   // null: usar os exemplos do HTML
+const EXEMPLOS=$('#reviews').innerHTML;
+const stars=n=>'★'.repeat(n)+'☆'.repeat(5-n);
+async function loadReviews(){
+  let rows=null;
+  try{rows=await sb('/rest/v1/avaliacoes?select=*&order=created_at.desc',{auth:!!session})}
+  catch(e){try{rows=await sb('/rest/v1/avaliacoes?select=*&order=created_at.desc')}catch(e2){rows=null}}
+  reviews=rows;renderReviews();
+}
+function renderReviews(){
+  const ok=(reviews||[]).filter(r=>r.aprovada),pend=(reviews||[]).filter(r=>!r.aprovada);
+  const box=$('#reviews');
+  if(ok.length){
+    box.innerHTML=ok.map(r=>'<figure class="review" data-id="'+esc(r.id)+'"><div class="stars" aria-label="'+r.nota+' de 5 estrelas">'+stars(r.nota)+'</div><blockquote>'+esc(r.texto)+'</blockquote><figcaption><b>'+esc(r.nome)+'</b><span>'+esc(r.carro)+'</span></figcaption>'+(session?'<button class="post-del" type="button" data-del="'+esc(r.id)+'">'+TRASH+'Apagar</button>':'')+'</figure>').join('');
+  }else box.innerHTML=EXEMPLOS;
+  $('#reviewsNote').hidden=!!ok.length;
+  $('#revAdmin').hidden=!session;
+  $('#revAdminHint').textContent=pend.length?'Só aparecem no site depois que você aprovar.':'Nenhuma avaliação esperando aprovação.';
+  $('#pending').innerHTML=pend.map(r=>'<article><div><span class="stars" aria-label="'+r.nota+' de 5 estrelas">'+stars(r.nota)+'</span><p>'+esc(r.texto)+'</p><small>'+esc(r.nome)+(r.carro?' · '+esc(r.carro):'')+' · '+fmt(r.created_at.slice(0,10))+'</small></div><div class="row"><button class="btn btn-gold" type="button" data-ok="'+esc(r.id)+'">Aprovar</button><button class="btn btn-line" type="button" data-del="'+esc(r.id)+'">Apagar</button></div></article>').join('');
+}
+document.addEventListener('click',async e=>{
+  const ok=e.target.closest('[data-ok]'),del=e.target.closest('#reviews [data-del],#pending [data-del]');
+  if(!ok&&!del)return;
+  const btn=ok||del,id=btn.dataset.ok||btn.dataset.del;
+  if(del&&!confirm('Apagar esta avaliação? Não dá para desfazer.'))return;
+  btn.disabled=true;
+  try{
+    if(ok)await sb('/rest/v1/avaliacoes?id=eq.'+encodeURIComponent(id),{method:'PATCH',auth:true,headers:{'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({aprovada:true})});
+    else await sb('/rest/v1/avaliacoes?id=eq.'+encodeURIComponent(id),{method:'DELETE',auth:true});
+    toast(ok?'Avaliação aprovada':'Avaliação apagada');loadReviews();
+  }catch(err){btn.disabled=false;toast(err.status===401?'Sua sessão expirou. Entre de novo pela Área do adm.':'Não deu certo. Tente de novo.')}
+});
+$('#openReview').onclick=()=>{$('#revErr').textContent='';$('#revDlg').showModal()};
+$('#revForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  if($('#r-site').value){$('#revDlg').close();return}   // campo escondido: só robô preenche
+  const nome=$('#r-nome').value.trim(),carro=$('#r-carro').value.trim(),texto=$('#r-texto').value.trim();
+  const nota=+document.querySelector('input[name="nota"]:checked').value;
+  if(nome.length<2){$('#revErr').textContent='Escreva seu nome.';$('#r-nome').focus();return}
+  if(texto.length<10){$('#revErr').textContent='Conte um pouco mais sobre o serviço (pelo menos 10 letras).';$('#r-texto').focus();return}
+  const btn=$('#revBtn');btn.disabled=true;btn.textContent='Enviando…';$('#revErr').textContent='';
+  try{
+    await sb('/rest/v1/avaliacoes',{method:'POST',headers:{'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({nome,carro,nota,texto})});
+    $('#revForm').reset();$('#revDlg').close();toast('Obrigado! Sua avaliação aparece depois de aprovada');
+    if(session)loadReviews();
+  }catch(err){$('#revErr').textContent='Não deu para enviar agora. Confira a internet e tente de novo.'}
+  finally{btn.disabled=false;btn.textContent='Enviar avaliação'}
+});
+
 /* ── Área do adm: login ── */
-function syncAdmin(){$('#adminBar').hidden=!session;$('#openLogin').textContent=session?'Sair do adm':'Área do adm';renderPosts()}
+function syncAdmin(){$('#adminBar').hidden=!session;$('#openLogin').textContent=session?'Sair do adm':'Área do adm';renderPosts();loadReviews();renderReels()}
 function openLogin(){$('#loginErr').textContent='';$('#loginDlg').showModal()}
 function logout(){const t=session&&session.access;saveSession(null);syncAdmin();toast('Você saiu do adm');if(t)fetch(SB+'/auth/v1/logout',{method:'POST',headers:{apikey:SBKEY,Authorization:'Bearer '+t}}).catch(()=>{})}
 $('#openLogin').onclick=()=>session?logout():openLogin();
@@ -816,8 +920,6 @@ $('#loginForm').addEventListener('submit',async e=>{
   finally{btn.disabled=false;btn.textContent='Entrar'}
 });
 function adminLink(){if(location.hash!=='#admin')return;if(session)$('#adminBar').scrollIntoView({block:'center'});else openLogin()}
-addEventListener('hashchange',adminLink);adminLink();
-syncAdmin();
 
 /* ── Orçamento ── */
 function updateWa(){
@@ -831,20 +933,49 @@ document.querySelectorAll('[data-svc]').forEach(b=>b.addEventListener('click',()
 $('#copyPhone').onclick=()=>{const el=$('#phoneText');const sel=()=>{const r=document.createRange();r.selectNodeContents(el);const s=getSelection();s.removeAllRanges();s.addRange(r)};try{navigator.clipboard.writeText(el.textContent).then(()=>toast('Número copiado'),sel)}catch(e){sel()}};
 let tt;function toast(m){const el=$('#toast');el.textContent=m;el.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('on'),2600)}
 
-/* ── Instagram: cole aqui os links dos reels/posts que devem aparecer ── */
+/* ── Instagram: o adm escolhe os reels colando o link; os 3 abaixo valem enquanto não houver nenhum no banco ── */
 const REELS=[
   'https://www.instagram.com/reel/DcgMsOqxX3n/',
   'https://www.instagram.com/reel/DYk1jY9pb5F/',
   'https://www.instagram.com/reel/DZ-PO3DRjGf/',
 ];
-if(REELS.length){
-  $('#reels').innerHTML=REELS.slice(0,6).map(u=>'<blockquote class="instagram-media" data-instgrm-permalink="'+esc(u)+'" data-instgrm-version="14"><a href="'+esc(u)+'" target="_blank" rel="noopener"><span class="play"><svg viewBox="0 0 24 24" fill="#0a0a0a" aria-hidden="true"><path d="M6 4l14 8-14 8z"/></svg></span>Ver vídeo no Instagram</a></blockquote>').join('');
-  const sc=document.createElement('script');sc.async=true;sc.src='https://www.instagram.com/embed.js';document.body.appendChild(sc);
-}else{
-  $('#reels').innerHTML='<div class="ig-cta"><div><b>Siga @reido_ppf</b><p>Todo dia tem carro novo recebendo película. Os vídeos mais recentes aparecem aqui.</p></div><a class="link" href="https://www.instagram.com/reido_ppf/" target="_blank" rel="noopener">Abrir o Instagram</a></div>';
+let videos=null;
+// aceita link com ?igsh=, sem www, de post ou reel; guarda sempre no mesmo formato
+function igLink(u){const m=String(u).trim().match(/^(?:https?:\/\/)?(?:www\.)?instagram\.com\/(?:[\w.]+\/)?(reels?|p|tv)\/([\w-]+)/i);return m?'https://www.instagram.com/'+(m[1].toLowerCase()==='p'?'p':m[1].toLowerCase()==='tv'?'tv':'reel')+'/'+m[2]+'/':null}
+function renderReels(){
+  const list=videos&&videos.length?videos.map(v=>v.url):REELS;
+  $('#reels').innerHTML=list.slice(0,6).map(u=>'<blockquote class="instagram-media" data-instgrm-permalink="'+esc(u)+'" data-instgrm-version="14"><a href="'+esc(u)+'" target="_blank" rel="noopener"><span class="play"><svg viewBox="0 0 24 24" fill="#0a0a0a" aria-hidden="true"><path d="M6 4l14 8-14 8z"/></svg></span>Ver vídeo no Instagram</a></blockquote>').join('');
+  if(window.instgrm)window.instgrm.Embeds.process();
+  else if(!document.getElementById('igjs')){const sc=document.createElement('script');sc.id='igjs';sc.async=true;sc.src='https://www.instagram.com/embed.js';document.body.appendChild(sc)}
+  $('#vidAdmin').hidden=!session;
+  $('#vidList').innerHTML=(videos||[]).map(v=>'<article><div><a href="'+esc(v.url)+'" target="_blank" rel="noopener">'+esc(v.url)+'</a></div><div class="row"><button class="btn btn-line" type="button" data-vdel="'+esc(v.id)+'">Remover</button></div></article>').join('')||(session?'<small>Nenhum vídeo adicionado ainda: o site mostra os 3 vídeos de exemplo.</small>':'');
 }
+async function loadVideos(){
+  try{videos=await sb('/rest/v1/videos?select=*&order=created_at.desc')}catch(e){videos=null}
+  renderReels();
+}
+$('#vidForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const url=igLink($('#vidUrl').value);
+  if(!url){$('#vidErr').textContent='Cole um link de reel do Instagram, como https://www.instagram.com/reel/…';$('#vidUrl').focus();return}
+  const btn=$('#vidBtn');btn.disabled=true;$('#vidErr').textContent='';
+  try{
+    await sb('/rest/v1/videos',{method:'POST',auth:true,headers:{'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({url})});
+    $('#vidForm').reset();toast('Vídeo adicionado');loadVideos();
+  }catch(err){$('#vidErr').textContent=err.status===401?'Sua sessão expirou. Entre de novo pela Área do adm.':'Não deu para adicionar. Tente de novo.'}
+  finally{btn.disabled=false}
+});
+document.addEventListener('click',async e=>{
+  const btn=e.target.closest('[data-vdel]');if(!btn)return;
+  if(!confirm('Tirar este vídeo do site?'))return;
+  btn.disabled=true;
+  try{await sb('/rest/v1/videos?id=eq.'+encodeURIComponent(btn.dataset.vdel),{method:'DELETE',auth:true});toast('Vídeo removido');loadVideos()}
+  catch(err){btn.disabled=false;toast(err.status===401?'Sua sessão expirou. Entre de novo pela Área do adm.':'Não deu para remover. Tente de novo.')}
+});
 
-renderPosts();loadPosts();
+syncAdmin();   // também carrega avaliações e vídeos
+loadPosts();loadVideos();
+addEventListener('hashchange',adminLink);adminLink();
 })();
 </script>
 </body>
