@@ -385,6 +385,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
 .reels-bar{display:flex;align-items:center;justify-content:space-between;gap:16px;max-width:980px;margin-bottom:12px}
 .reels-bar .swipe-hint{margin:0}
 .posts-bar{max-width:none}
+.posts-bar:has(.swipe-hint[hidden]){display:none}
 .reels-arrows{display:flex;gap:8px;margin-left:auto}
 .reels-arrows button{width:44px;height:44px;display:grid;place-items:center;background:transparent;border:1px solid rgba(255,255,255,.25);color:var(--white);cursor:pointer;transition:border-color .16s ease-out,color .16s ease-out,opacity .16s ease-out,transform .12s ease-out}
 .reels-arrows svg{width:16px;height:16px}
@@ -518,6 +519,14 @@ footer{border-top:0;position:relative}
 footer::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent)}
 @media (prefers-reduced-motion:reduce){.stage::after{animation:none}}
 /* ── Barra de rolagem escura, combinando com o vídeo ── */
+/* janelas: rolagem própria — trilho dourado fino à direita e linha de progresso sob o cabeçalho */
+.dlg{scrollbar-width:none}
+.dlg::-webkit-scrollbar{display:none}
+.dlg-head::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--gold);transform-origin:0 50%;transform:scaleX(var(--sp,0));opacity:var(--so,0);transition:opacity .2s ease-out}
+.dlg-rail{position:absolute;right:5px;top:var(--rt,64px);bottom:8px;width:3px;z-index:3;background:rgba(18,18,18,.08);pointer-events:none;opacity:0;transition:opacity .2s ease-out}
+.dlg-rail i{position:absolute;left:0;top:0;width:100%;height:var(--th,40px);background:var(--gold);transform:translate3d(0,var(--ty,0px),0)}
+dialog.has-scroll .dlg-rail{opacity:1}
+dialog.reel-dlg .dlg-rail{background:rgba(255,255,255,.12)}
 html{scrollbar-width:thin;scrollbar-color:#3a3a36 #0a0a0a}
 ::-webkit-scrollbar{width:10px;height:10px}
 ::-webkit-scrollbar-track{background:#0a0a0a}
@@ -763,8 +772,8 @@ dialog.drawer{overflow:hidden;transform:translate3d(100%,0,0);transition:transfo
         <p>Todo carro que sai daqui vira um post com as fotos, o serviço feito e o que o cliente queria.</p>
       </div>      <button class="btn btn-line rev-add adm-add" type="button" id="addPost" hidden><span class="plus-float" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg></span>Novo trabalho</button>
     </div>
-    <div class="bar"><div class="chips" id="filters" role="group" aria-label="Filtrar por serviço"></div></div>
-    <div class="reels-bar posts-bar"><p class="swipe-hint" id="postsHint" aria-hidden="true" hidden></p><div class="reels-arrows" id="postsArrows" hidden><button type="button" id="postsPrev" aria-label="Anteriores"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M10 3L5 8l5 5"/></svg></button><button type="button" id="postsNext" aria-label="Próximos"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 3l5 5-5 5"/></svg></button></div></div>
+    <div class="bar"><div class="chips" id="filters" role="group" aria-label="Filtrar por serviço"></div><div class="reels-arrows" id="postsArrows" hidden><button type="button" id="postsPrev" aria-label="Anteriores"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M10 3L5 8l5 5"/></svg></button><button type="button" id="postsNext" aria-label="Próximos"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 3l5 5-5 5"/></svg></button></div></div>
+    <div class="reels-bar posts-bar"><p class="swipe-hint" id="postsHint" aria-hidden="true" hidden></p></div>
     <div class="posts" id="posts"></div>
   </div>
 </section>
@@ -1135,6 +1144,25 @@ function renderPosts(){
 const waUrl=t=>'https://wa.me/'+WA+'?text='+encodeURIComponent(t);
 const PENCIL='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M10.5 2.5l3 3L6 13H3v-3z"/></svg>';
 const TRASH='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2.5 4h11M6 4V2.5h4V4M4 4l.7 9.5h6.6L12 4"/></svg>';
+// rolagem das janelas: trilho e linha de progresso dourados (a barra padrão fica escondida)
+document.querySelectorAll('dialog').forEach(d=>{
+  const sc=d.querySelector('.dlg');if(!sc)return;
+  const rail=document.createElement('span');rail.className='dlg-rail';rail.setAttribute('aria-hidden','true');rail.innerHTML='<i></i>';d.appendChild(rail);
+  const head=sc.querySelector('.dlg-head'),thumb=rail.firstChild;
+  const upd=()=>{
+    const sh=sc.scrollHeight,ch=sc.clientHeight,st=sc.scrollTop,over=sh-ch>4;
+    d.classList.toggle('has-scroll',over);
+    const top=head?head.offsetHeight+6:8;rail.style.setProperty('--rt',top+'px');
+    if(head){head.style.setProperty('--sp',over?(st/(sh-ch)).toFixed(4):0);head.style.setProperty('--so',over&&st>2?1:0)}
+    if(!over)return;
+    const rh=ch-top-8,th=Math.max(28,rh*ch/sh);
+    rail.style.setProperty('--th',th+'px');rail.style.setProperty('--ty',(st/(sh-ch))*(rh-th)+'px');
+  };
+  sc.addEventListener('scroll',upd,{passive:true});
+  sc.addEventListener('load',upd,true);
+  new MutationObserver(()=>requestAnimationFrame(upd)).observe(d,{attributes:true,attributeFilter:['open'],childList:true,subtree:true});
+  if('ResizeObserver' in window)new ResizeObserver(upd).observe(sc);
+});
 // estados dos botões do adm (salvando → ✓) e item saindo/entrando com animação
 const IC={
   plus:'<svg class="i" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M8 3v10M3 8h10"/></svg>',
