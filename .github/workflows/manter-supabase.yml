@@ -1,11 +1,16 @@
 # O Supabase grátis pausa o projeto depois de ~7 dias sem uso.
 # A cada 3 dias esta tarefa lê um post do banco, o que conta como uso.
+# E o GitHub desliga tarefas agendadas de repositórios sem nenhum commit há 60 dias:
+# se o repositório ficar parado por 45 dias, ela mesma registra a data em .github/ultima-atividade.txt.
 name: Manter o Supabase ativo
 
 on:
   schedule:
     - cron: '17 12 */3 * *'
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   ping:
@@ -16,3 +21,17 @@ jobs:
         run: |
           curl -fsS "https://vktidxurujnhcnhauqmj.supabase.co/rest/v1/posts?select=id&limit=1" \
             -H "apikey: sb_publishable_cG9ok0PIix_s2iqkFG79NA_puTqa8x1" > /dev/null
+
+      - uses: actions/checkout@v4
+
+      - name: Manter o repositório ativo (se estiver parado há 45 dias)
+        run: |
+          ultimo=$(git log -1 --format=%ct)
+          if [ $(( $(date +%s) - ultimo )) -gt $(( 45 * 86400 )) ]; then
+            date -u +%Y-%m-%d > .github/ultima-atividade.txt
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add .github/ultima-atividade.txt
+            git commit -m "Manter o repositório ativo"
+            git push
+          fi
