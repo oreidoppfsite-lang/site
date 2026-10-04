@@ -76,7 +76,11 @@ section[id]{scroll-margin-top:64px}
 /* ── Topo com vídeo preso à rolagem ── */
 #topo{position:relative;height:420vh;background:#000;color:var(--white)}
 .stage{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;background:#000}
-#film{position:absolute;inset:0;width:100%;height:100%;display:block}
+#film{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:cover;background:#000}
+.vid-toggle{position:absolute;z-index:2;right:var(--gutter);top:calc(84px + env(safe-area-inset-top,0px));width:40px;height:40px;display:grid;place-items:center;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.25);color:var(--white);cursor:pointer;transition:border-color .16s ease-out,transform .12s ease-out}
+.vid-toggle:active{transform:scale(.97)}
+.vid-toggle svg{width:14px;height:14px}
+@media (hover:hover) and (pointer:fine){.vid-toggle:hover{border-color:var(--white)}}
 .shade{position:absolute;inset:0;pointer-events:none;background:linear-gradient(to top,rgba(0,0,0,.75) 0%,rgba(0,0,0,0) 38%),linear-gradient(to bottom,rgba(0,0,0,.55) 0%,rgba(0,0,0,0) 22%)}
 .beat{position:absolute;padding-inline:var(--gutter);transition:opacity .5s var(--ease),transform .7s var(--ease)}
 .beat.off{opacity:0;transform:translateY(24px);pointer-events:none}
@@ -98,7 +102,6 @@ section[id]{scroll-margin-top:64px}
 .beat-4 h2 b{font-weight:700;color:var(--gold-hi)}
 .progress{position:absolute;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:120px;height:2px;background:rgba(255,255,255,.18);overflow:hidden}
 .progress i{position:absolute;inset:0;background:var(--white);transform-origin:left;transform:scaleX(var(--p,0))}
-.loading{position:absolute;right:var(--gutter);top:calc(84px + env(safe-area-inset-top,0px));font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--soft)}
 .provisorio{position:absolute;left:var(--gutter);top:calc(84px + env(safe-area-inset-top,0px));font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);border:1px solid rgba(255,255,255,.2);padding:6px 10px;border-radius:0}
 @media (max-width:760px){
   .beat-2,.beat-3{top:auto;bottom:calc(96px + env(safe-area-inset-bottom,0px));left:0;right:0;text-align:left}
@@ -300,12 +303,12 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
 /* ── Acabamento: bordas, luz e profundidade ── */
 :root{--r:0;--edge:rgba(0,0,0,.07);--gold-glow:rgba(227,193,90,.55)}
 /* botões com reflexo */
-/* topo: luz de estúdio, vinheta e grão de filme sobre o carro */
+/* topo: vinheta e grão de filme sobre o vídeo */
 .stage::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(70% 45% at 50% 62%,rgba(227,193,90,.10),transparent 70%),radial-gradient(120% 90% at 50% 50%,transparent 55%,rgba(0,0,0,.65) 100%)}
 .stage::after{content:"";position:absolute;inset:-50%;z-index:1;pointer-events:none;opacity:.09;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");animation:grain 1s steps(4) infinite}
 @keyframes grain{0%{transform:translate(0,0)}25%{transform:translate(-3%,2%)}50%{transform:translate(2%,-3%)}75%{transform:translate(-2%,-1%)}100%{transform:translate(0,0)}}
-.shade,.beat,.progress,.loading,.provisorio{z-index:2}
-.provisorio{background:rgba(0,0,0,.35);backdrop-filter:blur(6px)}
+.shade,.beat,.progress,.provisorio{z-index:2}
+.provisorio{background:rgba(0,0,0,.35);backdrop-filter:blur(6px);max-width:calc(100% - 2*var(--gutter) - 56px)}
 .progress i{background:var(--gold)}
 /* navegação */
 .nav.solid{box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 10px 30px -22px rgba(0,0,0,.35)}
@@ -365,10 +368,10 @@ footer::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;back
 <main>
 <section id="topo" aria-label="Apresentação">
   <div class="stage">
-    <canvas id="film" role="img" aria-label="Vídeo do carro girando conforme a rolagem"></canvas>
+    <video id="film" muted loop playsinline preload="auto" poster="video/topo.jpg" aria-hidden="true"></video>
     <div class="shade"></div>
-    <span class="provisorio">Vídeo provisório · trocar pelo carro real</span>
-    <span class="loading" id="loading">Carregando vídeo… 0%</span>
+    <span class="provisorio">Vídeo de exemplo</span>
+    <button class="vid-toggle" id="vidToggle" type="button" aria-label="Pausar vídeo"></button>
     <div class="beat beat-1" data-from="0" data-to=".2">
       <span class="eyebrow">Proteção de pintura automotiva</span>
       <h1>Proteção que <b>você não vê.</b></h1>
@@ -392,7 +395,7 @@ footer::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;back
     </div>
     <div class="svc-grid">
       <article class="svc">
-        <div class="svc-img"><img src="seq/m/f010.jpg" alt="Carro preto com PPF full body, vista frontal" width="1024" height="576" loading="lazy" decoding="async"></div>
+        <div class="svc-img"><img src="img/servico-full.jpg" alt="Carro preto com PPF full body, vista frontal" width="1024" height="576" loading="lazy" decoding="async"></div>
         <div class="svc-body">
           <span class="tag">Mais pedido</span>
           <h3>Full Body</h3>
@@ -402,7 +405,7 @@ footer::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;back
         </div>
       </article>
       <article class="svc">
-        <div class="svc-img"><img src="seq/m/f060.jpg" alt="Lateral do carro, áreas de impacto" width="1024" height="576" loading="lazy" decoding="async"></div>
+        <div class="svc-img"><img src="img/servico-parcial.jpg" alt="Lateral do carro, áreas de impacto" width="1024" height="576" loading="lazy" decoding="async"></div>
         <div class="svc-body">
           <h3>Parcial</h3>
           <p>Capô, para-lamas, para-choque e retrovisores, onde mais bate pedra na estrada.</p>
@@ -411,7 +414,7 @@ footer::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;back
         </div>
       </article>
       <article class="svc">
-        <div class="svc-img"><img src="seq/m/f090.jpg" alt="Traseira do carro, pontos de desgaste" width="1024" height="576" loading="lazy" decoding="async"></div>
+        <div class="svc-img"><img src="img/servico-pontual.jpg" alt="Traseira do carro, pontos de desgaste" width="1024" height="576" loading="lazy" decoding="async"></div>
         <div class="svc-body">
           <h3>Pontual</h3>
           <p>Soleiras, maçanetas e borda do porta-malas, os pontos que sofrem no uso diário.</p>
@@ -467,7 +470,7 @@ footer::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;back
 
 <section id="historia" class="block">
   <div class="wrap story">
-    <div class="story-img"><img src="seq/m/f119.jpg" alt="Traseira do carro preto no estúdio" width="1024" height="576" loading="lazy" decoding="async"></div>
+    <div class="story-img"><img src="img/historia.jpg" alt="Traseira do carro preto no estúdio" width="1024" height="576" loading="lazy" decoding="async"></div>
     <div class="story-text">
       <span class="eyebrow">Nossa história</span>
       <h2 class="wide">Da garagem de casa ao trono</h2>
@@ -577,43 +580,24 @@ footer::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;back
 'use strict';
 const $=s=>document.querySelector(s);
 const WA='5562993411237';
-const FRAMES=120;
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-const nav=$('#nav'),topo=$('#topo'),canvas=$('#film'),ctx=canvas.getContext('2d');
+const nav=$('#nav'),topo=$('#topo'),film=$('#film');
 const beats=[...document.querySelectorAll('.beat')];
 
-/* ── Vídeo em quadros: avança e volta com a rolagem ── */
-const imgs=new Array(FRAMES);let loaded=0,current=-1,wanted=0;
-// celular baixa os quadros de 1024px (seq/m/), menos da metade do peso
-const DIR=Math.min(screen.width,screen.height)<700?'seq/m/f':'seq/f';
-const src=i=>DIR+String(i).padStart(3,'0')+'.jpg';
-function load(i){
-  if(imgs[i])return;
-  const im=new Image();im.decoding='async';
-  im.onload=()=>{loaded++;$('#loading').textContent='Carregando vídeo… '+Math.round(loaded/FRAMES*100)+'%';if(loaded===FRAMES)$('#loading').hidden=true;if(i===wanted||current<0)draw(true)};
-  im.src=src(i);imgs[i]=im;
-}
-// primeiro o quadro inicial, depois um a cada 8, depois o resto: a rolagem já funciona enquanto carrega
-load(0);for(let s=8;s>=1;s=s>>1)for(let i=0;i<FRAMES;i+=s)load(i);
-function nearest(i){for(let d=0;d<FRAMES;d++){const a=imgs[i-d],b=imgs[i+d];if(a&&a.complete&&a.naturalWidth)return a;if(b&&b.complete&&b.naturalWidth)return b}return null}
-let cw=0,ch=0;
-function size(){
-  const r=canvas.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);
-  const w=Math.round(r.width*dpr),h=Math.round(r.height*dpr);
-  if(w!==cw||h!==ch){cw=canvas.width=w;ch=canvas.height=h;current=-1}
-}
-function draw(force){
-  size();
-  if(!force&&wanted===current)return;
-  const im=nearest(wanted);if(!im)return;
-  const iw=im.naturalWidth,ih=im.naturalHeight;
-  // paisagem: cobre a tela; retrato: o carro ocupa a largura e o preto completa o resto
-  const s=cw/ch>=1?Math.max(cw/iw,ch/ih):cw/(iw*.78);
-  const dw=iw*s,dh=ih*s;
-  ctx.fillStyle='#000';ctx.fillRect(0,0,cw,ch);
-  ctx.drawImage(im,(cw-dw)/2,(ch-dh)/2-(cw/ch<1?ch*.06:0),dw,dh);
-  current=wanted;
-}
+/* ── Vídeo do topo: toca sozinho, sem som, em loop ── */
+// celular baixa a versão de 480p, menos da metade do peso
+film.src=Math.min(screen.width,screen.height)<700?'video/topo-m.mp4':'video/topo.mp4';
+const PLAY='<svg viewBox="0 0 14 14" fill="currentColor" aria-hidden="true"><path d="M3 1.5l9 5.5-9 5.5z"/></svg>';
+const PAUSE='<svg viewBox="0 0 14 14" fill="currentColor" aria-hidden="true"><path d="M3 1.5h3v11H3zM8 1.5h3v11H8z"/></svg>';
+let wantPlay=!reduce;   // quem pede menos movimento no sistema vê só a imagem parada
+const vidBtn=$('#vidToggle');
+function syncBtn(){vidBtn.innerHTML=wantPlay?PAUSE:PLAY;vidBtn.setAttribute('aria-label',wantPlay?'Pausar vídeo':'Tocar vídeo')}
+function setPlay(){if(wantPlay&&topoVisible){const pr=film.play();if(pr)pr.catch(()=>{})}else film.pause()}
+let topoVisible=true;
+// pausa quando o topo sai da tela, para não gastar bateria
+new IntersectionObserver(es=>{topoVisible=es[0].isIntersecting;setPlay()}).observe(topo);
+vidBtn.onclick=()=>{wantPlay=!wantPlay;syncBtn();setPlay()};
+syncBtn();setPlay();
 let ticking=false;
 function onScroll(){
   if(ticking)return;ticking=true;
@@ -621,15 +605,13 @@ function onScroll(){
     ticking=false;
     const r=topo.getBoundingClientRect(),span=Math.max(1,r.height-innerHeight);
     const p=Math.min(1,Math.max(0,-r.top/span));
-    wanted=Math.min(FRAMES-1,Math.round(p*(FRAMES-1)));
-    draw(false);
     beats.forEach(b=>b.classList.toggle('off',!(p>=+b.dataset.from&&p<+b.dataset.to)));
     $('#prog').style.setProperty('--p',p.toFixed(3));
     nav.classList.toggle('solid',r.bottom<=70);
   });
 }
 addEventListener('scroll',onScroll,{passive:true});
-addEventListener('resize',()=>{current=-1;onScroll()});
+addEventListener('resize',onScroll);
 onScroll();
 
 /* ── Diário ── */
@@ -666,7 +648,7 @@ function renderPosts(){
   list.forEach((p,i)=>{
     const b=document.createElement('button');b.type='button';b.className='post'+(i===0&&list.length>2?' featured':'');
     b.innerHTML='<div class="post-img">'+(p.fotos&&p.fotos.length?'<img alt="" src="'+p.fotos[0]+'">':ph(p))+'</div>'+
-      '<div class="post-body"><div class="meta"><span>'+SVC[p.servico]+'</span><span>'+fmt(p.date)+(p.exemplo?' · exemplo':'')+'</span></div><h3>'+esc(p.titulo)+'</h3><p>'+esc(p.texto)+'</p><span class="arrow">Ler post</span></div>';
+      '<div class="post-body"><div class="meta"><span>'+SVC[p.servico]+'</span><span>'+esc(p.carro)+'</span><span>'+fmt(p.date)+(p.exemplo?' · exemplo':'')+'</span></div><h3>'+esc(p.titulo)+'</h3><p>'+esc(p.texto)+'</p><span class="arrow">Ler post</span></div>';
     b.onclick=()=>openPost(p);box.appendChild(b);
   });
 }
