@@ -666,7 +666,7 @@ function renderPosts(){
   list.forEach((p,i)=>{
     const b=document.createElement('button');b.type='button';b.className='post'+(i===0&&list.length>2?' featured':'');
     b.innerHTML='<div class="post-img">'+(p.fotos&&p.fotos.length?'<img alt="" src="'+p.fotos[0]+'">':ph(p))+'</div>'+
-      '<div class="post-body"><div class="meta"><span>'+SVC[p.servico]+'</span><span>'+fmt(p.date)+(p.exemplo?' · exemplo':'')+'</span></div><h3>'+esc(p.titulo)+'</h3><p>'+esc(p.texto)+'</p><span class="arrow">Ler post</span></div>';
+      '<div class="post-body"><div class="meta"><span>'+SVC[p.servico]+'</span><span>'+esc(p.carro)+'</span><span>'+fmt(p.date)+(p.exemplo?' · exemplo':'')+'</span></div><h3>'+esc(p.titulo)+'</h3><p>'+esc(p.texto)+'</p><span class="arrow">Ler post</span></div>';
     b.onclick=()=>openPost(p);box.appendChild(b);
   });
 }
