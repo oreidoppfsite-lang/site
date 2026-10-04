@@ -448,6 +448,19 @@ html{scrollbar-width:thin;scrollbar-color:#3a3a36 #0a0a0a}
 .fx-on .rise{opacity:0;transform:translateY(18px)}
 .fx-on .rise.in{opacity:1;transform:none;transition:opacity .7s var(--ease),transform .8s var(--ease)}
 
+/* ── Muitos posts/avaliações: no celular, fileira que arrasta para o lado; no computador, "Ver mais" ── */
+.more{display:flex;justify-content:center;margin-top:32px}
+.more:has(button[hidden]){display:none}
+.swipe-hint{display:none;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:12px}
+@media (max-width:760px){
+  .posts,.reviews{display:grid;grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:84%;gap:14px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;margin-inline:calc(-1 * var(--gutter));padding:4px var(--gutter) 10px;scroll-padding-inline:var(--gutter);scrollbar-width:none;align-items:stretch}
+  .posts::-webkit-scrollbar,.reviews::-webkit-scrollbar{display:none}
+  .posts>*,.reviews>*{scroll-snap-align:start}
+  .post-wrap.featured{grid-column:auto}
+  .post.featured{display:flex}
+  .post.featured .post-img{min-height:0;aspect-ratio:4/3}
+  .swipe-hint:not([hidden]){display:flex}
+}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
 </style>
 </head>
@@ -553,7 +566,9 @@ html{scrollbar-width:thin;scrollbar-color:#3a3a36 #0a0a0a}
       </div>
     </div>
     <div class="bar"><div class="chips" id="filters" role="group" aria-label="Filtrar por serviço"></div></div>
+    <p class="swipe-hint" id="postsHint" aria-hidden="true" hidden></p>
     <div class="posts" id="posts"></div>
+    <div class="more"><button class="btn btn-line" type="button" id="morePosts" hidden>Ver mais trabalhos</button></div>
   </div>
 </section>
 
@@ -610,11 +625,13 @@ html{scrollbar-width:thin;scrollbar-color:#3a3a36 #0a0a0a}
 <section id="avaliacoes" class="block">
   <div class="wrap">
     <div class="head"><div><span class="eyebrow">Avaliações</span><h2 class="wide">Quem protegeu, recomenda</h2></div><button class="btn btn-line" type="button" id="openReview">Deixar minha avaliação</button></div>
+    <p class="swipe-hint" id="reviewsHint" aria-hidden="true" hidden></p>
     <div class="reviews" id="reviews">
       <figure class="review"><div class="stars">★★★★★</div><blockquote>O PPF ficou completamente invisível. Você não percebe que tem película. Superou o que eu esperava.</blockquote><figcaption><b>Rafael M.</b><span>BMW M3 Competition</span></figcaption></figure>
       <figure class="review"><div class="stars">★★★★★</div><blockquote>Fiz o full body no meu SUV. Ambiente organizado, explicaram cada etapa e o resultado ficou perfeito.</blockquote><figcaption><b>Carla S.</b><span>Range Rover Velar</span></figcaption></figure>
       <figure class="review"><div class="stars">★★★★★</div><blockquote>Entrega no prazo e o PPF encaixado como se fosse de fábrica. Recomendo demais.</blockquote><figcaption><b>Felipe M.</b><span>Porsche Cayenne</span></figcaption></figure>
     </div>
+    <div class="more"><button class="btn btn-line" type="button" id="moreReviews" hidden>Ver mais avaliações</button></div>
     <p class="reviews-note" id="reviewsNote">Avaliações de exemplo · somem quando a primeira avaliação real for aprovada</p>
     <div class="rev-admin" id="revAdmin" hidden><b>Avaliações para aprovar</b><span id="revAdminHint">Só aparecem no site depois que você aprovar.</span><div class="pend" id="pending"></div></div>
   </div>
@@ -842,7 +859,7 @@ const ph=p=>'<div class="ph">'+CAM+'<strong>'+esc(p.carro)+'</strong><span>Foto 
 let filter='todos';
 [['todos','Todos'],['full','Full Body'],['parcial','Parcial'],['pontual','Pontual']].forEach(([id,name],i)=>{
   const b=document.createElement('button');b.type='button';b.className='chip';b.textContent=name;b.setAttribute('aria-pressed',i===0);
-  b.onclick=()=>{filter=id;document.querySelectorAll('#filters .chip').forEach(x=>x.setAttribute('aria-pressed',x===b));renderPosts()};
+  b.onclick=()=>{filter=id;morePosts=false;document.querySelectorAll('#filters .chip').forEach(x=>x.setAttribute('aria-pressed',x===b));renderPosts()};
   $('#filters').appendChild(b);
 });
 /* ── Animações de entrada (encapar) e menu com a seção atual ── */
@@ -858,11 +875,24 @@ const navLinks=[...document.querySelectorAll('.nav ul a')];
 const navIO=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)navLinks.forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+e.target.id))}),{rootMargin:'-45% 0px -50% 0px'});
 navIO.observe(topo);
 document.querySelectorAll('main > section[id]').forEach(sec=>navIO.observe(sec));
+const wide=matchMedia('(min-width: 761px)');
+const POSTS_MAX=8,REVIEWS_MAX=6;
+let morePosts=false,moreReviews=false;
+// no celular mostra "1 de 7 · arraste para o lado" e atualiza ao deslizar
+function swipeHint(box,hint){
+  const n=box.children.length;hint.hidden=wide.matches||n<2;if(hint.hidden)return;
+  const first=box.children[0],step=first.getBoundingClientRect().width+14;
+  const i=Math.min(n,Math.round(box.scrollLeft/step)+1);
+  hint.textContent=i+' de '+n+' · arraste para o lado →';
+}
 function renderPosts(){
-  const list=allPosts().filter(p=>filter==='todos'||p.servico===filter);
+  const all=allPosts().filter(p=>filter==='todos'||p.servico===filter);
+  const list=wide.matches&&!morePosts?all.slice(0,POSTS_MAX):all;
+  $('#morePosts').hidden=!(wide.matches&&!morePosts&&all.length>POSTS_MAX);
+  $('#morePosts').textContent='Ver mais trabalhos ('+(all.length-POSTS_MAX)+')';
   const box=$('#posts');box.innerHTML='';
   $('#ownerHint').textContent=remote&&remote.length?'Publique um trabalho novo, ou use os botões “Apagar” nos posts, “Aprovar” nas avaliações e “Adicionar” nos vídeos.':'Os posts de exemplo somem quando você publicar o primeiro trabalho.';
-  if(!list.length){box.innerHTML='<p class="empty">Ainda não há trabalhos com esse serviço.</p>';return}
+  if(!list.length){box.innerHTML='<p class="empty">Ainda não há trabalhos com esse serviço.</p>';$('#postsHint').hidden=true;return}
   list.forEach((p,i)=>{
     const feat=i===0&&list.length>2?' featured':'';
     const w=document.createElement('div');w.className='post-wrap'+feat;
@@ -876,6 +906,7 @@ function renderPosts(){
     }
     box.appendChild(w);
   });
+  box.scrollLeft=0;swipeHint(box,$('#postsHint'));
   fxScan();
 }
 const waUrl=t=>'https://wa.me/'+WA+'?text='+encodeURIComponent(t);
@@ -960,9 +991,12 @@ async function loadReviews(){
 function renderReviews(){
   const ok=(reviews||[]).filter(r=>r.aprovada),pend=(reviews||[]).filter(r=>!r.aprovada);
   const box=$('#reviews');
+  $('#moreReviews').hidden=!(wide.matches&&!moreReviews&&ok.length>REVIEWS_MAX);
+  $('#moreReviews').textContent='Ver mais avaliações ('+(ok.length-REVIEWS_MAX)+')';
   if(ok.length){
-    box.innerHTML=ok.map(r=>'<figure class="review" data-id="'+esc(r.id)+'">'+(r.foto?'<img src="'+esc(r.foto)+'" alt="Carro de '+esc(r.nome)+'" loading="lazy">':'')+'<div class="stars" aria-label="'+r.nota+' de 5 estrelas">'+stars(r.nota)+'</div><blockquote>'+esc(r.texto)+'</blockquote><figcaption><b>'+esc(r.nome)+'</b><span>'+esc(r.carro)+'</span></figcaption>'+(session?'<button class="post-del" type="button" data-del="'+esc(r.id)+'">'+TRASH+'Apagar</button>':'')+'</figure>').join('');
+    box.innerHTML=(wide.matches&&!moreReviews?ok.slice(0,REVIEWS_MAX):ok).map(r=>'<figure class="review" data-id="'+esc(r.id)+'">'+(r.foto?'<img src="'+esc(r.foto)+'" alt="Carro de '+esc(r.nome)+'" loading="lazy">':'')+'<div class="stars" aria-label="'+r.nota+' de 5 estrelas">'+stars(r.nota)+'</div><blockquote>'+esc(r.texto)+'</blockquote><figcaption><b>'+esc(r.nome)+'</b><span>'+esc(r.carro)+'</span></figcaption>'+(session?'<button class="post-del" type="button" data-del="'+esc(r.id)+'">'+TRASH+'Apagar</button>':'')+'</figure>').join('');
   }else box.innerHTML=EXEMPLOS;
+  box.scrollLeft=0;swipeHint(box,$('#reviewsHint'));
   fxScan();
   $('#reviewsNote').hidden=!!ok.length;
   $('#revAdmin').hidden=!session;
@@ -985,6 +1019,11 @@ document.addEventListener('click',async e=>{
     toast(ok?'Avaliação aprovada':'Avaliação apagada');loadReviews();
   }catch(err){btn.disabled=false;toast(err.status===401?'Sua sessão expirou. Entre de novo pela Área do adm.':'Não deu certo. Tente de novo.')}
 });
+$('#morePosts').onclick=()=>{morePosts=true;renderPosts()};
+$('#moreReviews').onclick=()=>{moreReviews=true;renderReviews()};
+$('#posts').addEventListener('scroll',()=>swipeHint($('#posts'),$('#postsHint')),{passive:true});
+$('#reviews').addEventListener('scroll',()=>swipeHint($('#reviews'),$('#reviewsHint')),{passive:true});
+wide.addEventListener('change',()=>{renderPosts();renderReviews()});
 let revFoto=null;
 $('#openReview').onclick=()=>{$('#revErr').textContent='';$('#revForm').hidden=false;$('#revSent').hidden=true;$('#revDlg').showModal()};
 $('#r-foto').addEventListener('change',async e=>{const f=e.target.files[0];revFoto=null;$('#revThumb').innerHTML='';if(!f||!f.type.startsWith('image/'))return;try{revFoto=await shrink(f);$('#revThumb').innerHTML='<img alt="" src="'+revFoto+'">'}catch(err){$('#revErr').textContent='Não deu para ler essa foto. Tente outra.'}});
