@@ -26,10 +26,12 @@ Os posts ficam no Supabase (projeto `rei-do-ppf`, plano grátis): tabela `posts`
 
 A chave em `index.html` é a *publishable*, pública de propósito; a segurança vem das regras (RLS) do banco. Nunca coloque a `secret`/`service_role` no site.
 
+Também ficam no Supabase as **avaliações** (visitante envia pelo botão "Deixar minha avaliação"; só aparecem depois que o adm aprova) e os **vídeos do Instagram** (o adm cola o link do reel). O SQL de cada parte está em `supabase/`.
+
 `.github/workflows/manter-supabase.yml` lê o banco a cada 3 dias para o projeto grátis não pausar por falta de uso.
 
 ## Aviso
 
-História, avaliações e os números técnicos são conteúdo de exemplo. Os posts de exemplo do diário somem quando o primeiro post real for publicado.
+História e os números técnicos são conteúdo de exemplo. Os posts, avaliações e vídeos de exemplo somem quando o primeiro item real for publicado ou aprovado.
 
 Quadros provisórios renderizados a partir do modelo 3D "Ferrari 458 Italia" de vicent091036 (CC BY 4.0).
