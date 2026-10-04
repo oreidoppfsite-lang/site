@@ -361,13 +361,17 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
 .ig-link{gap:10px}
 .ig-link .ig{width:22px;height:22px;flex-shrink:0}
 .reels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;max-width:980px}
-.reel{position:relative;display:block;aspect-ratio:3/4;padding:0;border:0;background:#151515;cursor:pointer;overflow:hidden}
+.reel{position:relative;display:block;aspect-ratio:3/4;background:#151515;overflow:hidden}
 .reel img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s var(--ease)}
 .reel-ph{position:absolute;inset:0;display:grid;place-items:center;background:radial-gradient(70% 50% at 50% 45%,rgba(201,164,50,.2),transparent 70%),linear-gradient(#1b1b1b,#0d0d0d)}
 .reel-ph svg{width:30%;max-width:56px;color:var(--gold)}
+.reel-prev{position:absolute;left:0;top:calc(-56px * var(--s,.4));width:326px;height:calc((100% + 56px * var(--s,.4)) / var(--s,.4));border:0;transform:scale(var(--s,.4));transform-origin:0 0;pointer-events:none;background:transparent}
+.reel-hit{position:absolute;inset:0;z-index:2;width:100%;height:100%;padding:0;border:0;background:transparent;cursor:pointer}
+.reel-hit:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
+.reel-ico{z-index:3}
 .reel-ico{position:absolute;top:8px;right:8px;width:20px;height:20px;color:var(--white);filter:drop-shadow(0 1px 3px rgba(0,0,0,.7))}
 .reel::after{content:"";position:absolute;inset:0;background:rgba(0,0,0,0);transition:background-color .2s ease-out}
-.reel:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.reel::after{z-index:1}
 @media (hover:hover) and (pointer:fine){.reel:hover::after{background:rgba(0,0,0,.25)}.reel:hover img{transform:scale(1.04)}}
 dialog.reel-dlg{width:min(480px,calc(100vw - 32px))}
 .reel-dlg .instagram-media{min-width:0!important;width:100%!important;margin:0!important}
@@ -475,7 +479,35 @@ html{scrollbar-width:thin;scrollbar-color:#3a3a36 #0a0a0a}
   .post.featured .post-img{min-height:0;aspect-ratio:4/3}
   .swipe-hint:not([hidden]){display:flex}
 }
-@media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
+/* ── Menu do celular: sanduíche dourado e painel que entra da direita como película sendo aplicada ── */
+.burger{display:none;position:relative;width:42px;height:38px;margin-left:10px;padding:0;background:transparent;border:1px solid var(--gold);cursor:pointer;flex-shrink:0}
+.burger span{position:absolute;left:10px;right:10px;height:2px;background:var(--gold);transition:transform .25s var(--ease)}
+.burger span:nth-child(1){top:11px}.burger span:nth-child(2){top:17px}.burger span:nth-child(3){top:23px}
+.burger:active{transform:scale(.96)}
+@media (max-width:860px){.burger{display:block}}
+dialog.drawer{margin:0 0 0 auto;width:min(360px,86vw);max-width:none;height:100%;max-height:none;padding:0;background:transparent;overflow:visible}
+dialog.drawer::backdrop{background:rgba(0,0,0,0);backdrop-filter:none;transition:background-color .4s ease-out}
+dialog.drawer.on::backdrop{background:rgba(0,0,0,.55)}
+.drawer-panel{position:relative;height:100%;display:flex;flex-direction:column;background:var(--black);color:var(--white);border-left:2px solid var(--gold);padding:calc(16px + env(safe-area-inset-top,0px)) 24px calc(24px + env(safe-area-inset-bottom,0px));overflow:hidden auto;clip-path:inset(0 0 0 100%);transition:clip-path .55s cubic-bezier(.65,0,.35,1)}
+.drawer.on .drawer-panel{clip-path:inset(0 0 0 0)}
+.drawer-sheen{position:absolute;inset:0;pointer-events:none;background:linear-gradient(255deg,transparent 35%,rgba(227,193,90,.28) 50%,transparent 65%);transform:translateX(110%)}
+.drawer.on .drawer-sheen{animation:sheenL .9s .3s cubic-bezier(.2,.7,.2,1) forwards}
+@keyframes sheenL{to{transform:translateX(-110%)}}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,.12)}
+.drawer-head .brand{color:var(--white)}
+.drawer .x{color:var(--gold-hi);font-size:30px}
+.drawer .x:hover,.drawer .x:focus{background:rgba(255,255,255,.08);color:var(--gold-hi)}
+.drawer-list{list-style:none;margin:20px 0 auto}
+.drawer-list li{opacity:0;transform:translateX(24px);transition:opacity .35s var(--ease),transform .45s var(--ease)}
+.drawer.on .drawer-list li{opacity:1;transform:none}
+.drawer.on .drawer-list li:nth-child(1){transition-delay:.18s}.drawer.on .drawer-list li:nth-child(2){transition-delay:.23s}.drawer.on .drawer-list li:nth-child(3){transition-delay:.28s}
+.drawer.on .drawer-list li:nth-child(4){transition-delay:.33s}.drawer.on .drawer-list li:nth-child(5){transition-delay:.38s}.drawer.on .drawer-list li:nth-child(6){transition-delay:.43s}
+.drawer-list a{display:flex;align-items:baseline;gap:14px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.08);color:var(--white);text-decoration:none;font-size:24px;font-weight:700;font-stretch:115%;text-transform:uppercase;letter-spacing:.01em}
+.drawer-list small{font-size:12px;font-weight:600;letter-spacing:.12em;color:var(--gold)}
+.drawer-list a:active,.drawer-list a.on{color:var(--gold-hi)}
+.drawer-foot{display:flex;flex-direction:column;align-items:flex-start;gap:14px;padding-top:24px}
+.drawer-foot .btn{align-self:stretch}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}.drawer-sheen{display:none}}
 </style>
 </head>
 <body>
@@ -494,7 +526,26 @@ html{scrollbar-width:thin;scrollbar-color:#3a3a36 #0a0a0a}
     <li><a href="#avaliacoes">Avaliações</a></li>
   </ul>
   <a class="btn btn-gold" href="#contato">Orçamento</a>
+  <button class="burger" type="button" id="openMenu" aria-label="Abrir menu" aria-controls="menuDlg" aria-expanded="false"><span></span><span></span><span></span></button>
 </nav>
+
+<dialog id="menuDlg" class="drawer" aria-label="Menu">
+  <div class="drawer-panel">
+    <div class="drawer-head"><span class="brand"><svg viewBox="0 0 28 24" aria-hidden="true"><path d="M2 18L3.5 5l6 6L14 2l4.5 9 6-6L26 18z" fill="#c9a432"/><rect x="2" y="20" width="24" height="3" fill="#c9a432"/></svg><b translate="no">O Rei do PPF</b></span><button class="x" type="button" id="closeMenu" aria-label="Fechar menu">×</button></div>
+    <nav aria-label="Seções do site">
+      <ol class="drawer-list">
+        <li><a href="#servicos"><small>01</small>Serviços</a></li>
+        <li><a href="#diario"><small>02</small>Trabalhos</a></li>
+        <li><a href="#insta"><small>03</small>Vídeos</a></li>
+        <li><a href="#historia"><small>04</small>Nossa história</a></li>
+        <li><a href="#avaliacoes"><small>05</small>Avaliações</a></li>
+        <li><a href="#contato"><small>06</small>Orçamento</a></li>
+      </ol>
+    </nav>
+    <div class="drawer-foot"><a class="btn btn-gold" id="menuWa" href="#" target="_blank" rel="noopener">Falar no WhatsApp</a><a class="link" href="https://www.instagram.com/reido_ppf/" target="_blank" rel="noopener">@reido_ppf no Instagram</a></div>
+    <i class="drawer-sheen" aria-hidden="true"></i>
+  </div>
+</dialog>
 
 <main>
 <section id="topo" aria-label="Apresentação">
@@ -526,7 +577,7 @@ html{scrollbar-width:thin;scrollbar-color:#3a3a36 #0a0a0a}
     </div>
     <div class="svc-grid">
       <article class="svc">
-        <div class="svc-img"><img src="img/servico-full.jpg" alt="Carro preto com PPF full body, vista frontal" width="1024" height="576" loading="lazy" decoding="async"></div>
+        <div class="svc-img"><img src="img/servico-full.jpg" alt="Carro preto com a película em toda a lataria, destacada em dourado" width="1024" height="576" loading="lazy" decoding="async"></div>
         <div class="svc-body">
           <span class="tag">Mais pedido</span>
           <h3>Full Body</h3>
@@ -536,7 +587,7 @@ html{scrollbar-width:thin;scrollbar-color:#3a3a36 #0a0a0a}
         </div>
       </article>
       <article class="svc">
-        <div class="svc-img"><img src="img/servico-parcial.jpg" alt="Lateral do carro, áreas de impacto" width="1024" height="576" loading="lazy" decoding="async"></div>
+        <div class="svc-img"><img src="img/servico-parcial.jpg" alt="Carro preto com a película só na frente: capô, para-lamas e para-choque, destacados em dourado" width="1024" height="576" loading="lazy" decoding="async"></div>
         <div class="svc-body">
           <h3>Parcial</h3>
           <p>Capô, para-lamas, para-choque e retrovisores, onde mais bate pedra na estrada.</p>
@@ -545,7 +596,7 @@ html{scrollbar-width:thin;scrollbar-color:#3a3a36 #0a0a0a}
         </div>
       </article>
       <article class="svc">
-        <div class="svc-img"><img src="img/servico-pontual.jpg" alt="Traseira do carro, pontos de desgaste" width="1024" height="576" loading="lazy" decoding="async"></div>
+        <div class="svc-img"><img src="img/servico-pontual.jpg" alt="Lateral do carro com a película nas soleiras, na maçaneta e na borda do porta-malas, destacadas em dourado" width="1024" height="576" loading="lazy" decoding="async"></div>
         <div class="svc-body">
           <h3>Pontual</h3>
           <p>Soleiras, maçanetas e borda do porta-malas, os pontos que sofrem no uso diário.</p>
@@ -686,7 +737,7 @@ html{scrollbar-width:thin;scrollbar-color:#3a3a36 #0a0a0a}
       <div><b>Você está logado como adm</b><span id="ownerHint">Publique um trabalho novo, ou use os botões “Apagar” nos posts, “Aprovar” nas avaliações e “Adicionar” nos vídeos.</span></div>
       <div class="owner-actions"><button class="btn btn-gold" type="button" id="openPublish">Publicar trabalho</button><button class="link" type="button" id="logout">Sair</button></div>
     </div>
-    <div class="legal"><span>© 2026 O Rei do PPF · Protótipo</span></div>
+    <div class="legal"><span>© 2026 O Rei do PPF · Protótipo</span><span>Imagens dos serviços e da história feitas com o modelo 3D “Ferrari 458 Italia” de vicent091036, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a></span></div>
   </div>
 </footer>
 
@@ -891,7 +942,7 @@ function fxScan(){
   document.querySelectorAll('.svc-img,.post-img,.story-img,.review>img').forEach(el=>{if(el.classList.contains('wrapfx'))return;el.classList.add('wrapfx');const i=document.createElement('i');i.className='sheen';el.appendChild(i);fxIO.observe(el)});
   document.querySelectorAll('.head h2,.band h2,.story-text h2,.contact h2').forEach(el=>{if(el.classList.contains('rise'))return;el.classList.add('rise');fxIO.observe(el)});
 }
-const navLinks=[...document.querySelectorAll('.nav ul a')];
+const navLinks=[...document.querySelectorAll('.nav ul a, .drawer-list a')];
 // marca no menu a seção que está no meio da tela (no topo, nenhuma)
 const navIO=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)navLinks.forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+e.target.id))}),{rootMargin:'-45% 0px -50% 0px'});
 navIO.observe(topo);
@@ -962,7 +1013,7 @@ function openPost(p){
   if(del)del.onclick=()=>deletePost(p,del);
   $('#postDlg').showModal();
 }
-document.querySelectorAll('dialog').forEach(d=>d.addEventListener('click',e=>{if(e.target===d||e.target.closest('[data-close]'))d.close()}));
+document.querySelectorAll('dialog:not(.drawer)').forEach(d=>d.addEventListener('click',e=>{if(e.target===d||e.target.closest('[data-close]'))d.close()}));   // o menu lateral fecha com animação, à parte
 
 /* ── Publicar ── */
 let pending=[];
@@ -1087,6 +1138,20 @@ $('#loginForm').addEventListener('submit',async e=>{
   }catch(err){$('#loginErr').textContent=err.status===400?'E-mail ou senha incorretos.':'Não deu para entrar agora. Confira a internet e tente de novo.'}
   finally{btn.disabled=false;btn.textContent='Entrar'}
 });
+/* ── Menu do celular ── */
+const menu=$('#menuDlg'),burger=$('#openMenu');
+function openMenu(){menu.showModal();burger.setAttribute('aria-expanded','true');requestAnimationFrame(()=>requestAnimationFrame(()=>menu.classList.add('on')))}
+function closeMenu(then){
+  if(!menu.open)return;
+  menu.classList.remove('on');burger.setAttribute('aria-expanded','false');
+  setTimeout(()=>{menu.close();if(then)then()},reduce?0:420);
+}
+burger.onclick=openMenu;
+$('#closeMenu').onclick=()=>closeMenu();
+menu.addEventListener('cancel',e=>{e.preventDefault();closeMenu()});
+menu.addEventListener('click',e=>{if(e.target===menu)closeMenu()});
+menu.querySelectorAll('.drawer-list a').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();const id=a.getAttribute('href');closeMenu(()=>document.querySelector(id).scrollIntoView({behavior:reduce?'auto':'smooth'}))}));
+$('#menuWa').href=waUrl('Olá, Rei do PPF! Quero um orçamento.');
 function adminLink(){if(location.hash!=='#admin')return;if(session)$('#adminBar').scrollIntoView({block:'center'});else openLogin()}
 
 /* ── Orçamento ── */
@@ -1114,11 +1179,16 @@ const PLAY_SM='<svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><
 const PLAY_LG='<svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><circle cx="24" cy="24" r="22" stroke="currentColor" stroke-width="2"/><path d="M19 15l14 9-14 9z" fill="currentColor"/></svg>';
 function renderReels(){
   const list=videos&&videos.length?videos:REELS.map(url=>({url}));
-  $('#reels').innerHTML=list.slice(0,9).map((v,i)=>'<button type="button" class="reel" data-reel="'+esc(v.url)+'" aria-label="Ver vídeo '+(i+1)+' do Instagram">'+(v.capa?'<img src="'+esc(v.capa)+'" alt="" loading="lazy">':'<span class="reel-ph">'+PLAY_LG+'</span>')+'<span class="reel-ico">'+PLAY_SM+'</span></button>').join('');
+  // sem capa: mostra o próprio player do Instagram, reduzido e sem o cabeçalho, como prévia (o quadro escuro fica por baixo enquanto carrega)
+  $('#reels').innerHTML=list.slice(0,9).map((v,i)=>'<div class="reel">'+(v.capa?'<img src="'+esc(v.capa)+'" alt="" loading="lazy">':'<span class="reel-ph">'+PLAY_LG+'</span><iframe class="reel-prev" src="'+esc(v.url)+'embed/" loading="lazy" scrolling="no" tabindex="-1" aria-hidden="true" title=""></iframe>')+'<span class="reel-ico">'+PLAY_SM+'</span><button type="button" class="reel-hit" data-reel="'+esc(v.url)+'" aria-label="Ver vídeo '+(i+1)+' do Instagram"></button></div>').join('');
+  reelScale();
   $('#vidAdmin').hidden=!session;
   $('#vidList').innerHTML=(videos||[]).map(v=>'<article>'+(v.capa?'<img src="'+esc(v.capa)+'" alt="">':'')+'<div><a href="'+esc(v.url)+'" target="_blank" rel="noopener">'+esc(v.url)+'</a></div><div class="row"><label class="btn btn-line">'+(v.capa?'Trocar capa':'Pôr capa')+'<input type="file" accept="image/*" data-vcapa="'+esc(v.id)+'"></label><button class="btn btn-line" type="button" data-vdel="'+esc(v.id)+'">Remover</button></div></article>').join('')||(session?'<small>Nenhum vídeo adicionado ainda: o site mostra os 3 vídeos de exemplo.</small>':'');
 }
-// o player do Instagram só carrega quando a pessoa abre um vídeo
+// ajusta a escala da prévia ao tamanho do quadrado (o player do Instagram tem 326px de largura mínima)
+function reelScale(){document.querySelectorAll('#reels .reel').forEach(t=>t.style.setProperty('--s',(t.clientWidth/326).toFixed(4)))}
+if('ResizeObserver' in window)new ResizeObserver(reelScale).observe($('#reels'));
+// o player completo só carrega quando a pessoa abre um vídeo
 function openReel(url){
   $('#reelBody').innerHTML='<blockquote class="instagram-media" data-instgrm-permalink="'+esc(url)+'" data-instgrm-version="14"><a href="'+esc(url)+'" target="_blank" rel="noopener">Ver no Instagram</a></blockquote><a class="link" href="'+esc(url)+'" target="_blank" rel="noopener">Abrir no Instagram</a>';
   $('#reelDlg').showModal();
