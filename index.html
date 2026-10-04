@@ -222,7 +222,11 @@ section[id]{scroll-margin-top:64px}
 @media (max-width:560px){.steps{grid-template-columns:minmax(0,1fr)}}
 
 /* Avaliações */
-.reviews{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+.reviews{display:grid;grid-auto-flow:column;grid-auto-columns:calc((100% - 48px) / 3.15);gap:24px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scrollbar-width:none;padding:4px 0 10px;align-items:stretch}
+.reviews::-webkit-scrollbar{display:none}
+.reviews>*{scroll-snap-align:start}
+.rev-bar .reels-arrows button{color:var(--ink);border-color:rgba(18,18,18,.25)}
+.rev-bar:has(.reels-arrows[hidden]):has(.swipe-hint[hidden]){display:none}
 .review{border:1px solid var(--line);border-radius:0;padding:28px;display:flex;flex-direction:column;gap:16px}
 .stars{color:var(--gold);letter-spacing:3px}
 .review blockquote{font-size:16px;line-height:1.65;flex:1}
@@ -235,7 +239,7 @@ section[id]{scroll-margin-top:64px}
 .reviews-note[hidden],.rev-admin[hidden]{display:none}
 .review{position:relative}
 .review .post-del{top:16px;right:16px}
-.review>img{width:calc(100% + 56px);margin:-28px -28px 0;aspect-ratio:4/3;object-fit:cover;display:block}
+.review>img{width:calc(100% + 56px);max-width:none;margin:-28px -28px 0;aspect-ratio:4/3;object-fit:cover;display:block}
 .pend img{width:96px;height:72px;object-fit:cover;flex-shrink:0}
 .rev-admin{margin-top:32px;background:var(--black);color:var(--white);padding:24px;border-left:3px solid var(--gold)}
 .rev-admin>b{display:block;font-size:16px;margin-bottom:4px}
@@ -272,7 +276,7 @@ dialog.confirm{width:min(440px,calc(100vw - 32px))}
 .btn-danger{background:#a3121b;color:var(--white)}
 @media (hover:hover) and (pointer:fine){.btn-danger:hover{background:#7f0e15}}
 .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
-@media (max-width:900px){.reviews{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:1000px){.reviews{grid-auto-columns:calc((100% - 24px) / 2.15)}}
 
 /* Contato */
 .contact{background:var(--black);color:var(--white);padding-block:112px}
@@ -401,7 +405,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
 .reels-bar{display:flex;align-items:center;justify-content:space-between;gap:16px;max-width:980px;margin-bottom:12px}
 .reels-bar .swipe-hint{margin:0}
 .posts-bar{max-width:none}
-.posts-bar:has(.swipe-hint[hidden]){display:none}
+.posts-bar:not(.rev-bar):has(.swipe-hint[hidden]){display:none}
 .reels-arrows{display:flex;gap:8px;margin-left:auto}
 .reels-arrows button{width:44px;height:44px;display:grid;place-items:center;background:transparent;border:1px solid rgba(255,255,255,.25);color:var(--white);cursor:pointer;transition:border-color .16s ease-out,color .16s ease-out,opacity .16s ease-out,transform .12s ease-out}
 .reels-arrows svg{width:16px;height:16px}
@@ -835,13 +839,12 @@ dialog.drawer{overflow:hidden;transform:translate3d(100%,0,0);transition:transfo
   <div class="wrap">
     <div class="head"><div><span class="eyebrow">Avaliações</span><h2 class="wide">Quem protegeu, recomenda</h2></div><button class="btn btn-line rev-add" type="button" id="openReview"><span class="plus-float" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg></span>Deixar minha avaliação</button></div>
     <p class="rev-wait" id="revWait" role="status" hidden><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="10" cy="10" r="7.5"/><path d="M10 5.5V10l3 2"/></svg><span>Sua avaliação foi enviada e está <b>aguardando aprovação</b> da equipe. Assim que aprovarem, ela aparece aqui.</span></p>
-    <p class="swipe-hint" id="reviewsHint" aria-hidden="true" hidden></p>
+    <div class="reels-bar posts-bar rev-bar"><p class="swipe-hint" id="reviewsHint" aria-hidden="true" hidden></p><div class="reels-arrows" id="reviewsArrows" hidden><button type="button" id="reviewsPrev" aria-label="Avaliações anteriores"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M10 3L5 8l5 5"/></svg></button><button type="button" id="reviewsNext" aria-label="Próximas avaliações"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 3l5 5-5 5"/></svg></button></div></div>
     <div class="reviews" id="reviews">
       <figure class="review"><div class="stars">★★★★★</div><blockquote>O PPF ficou completamente invisível. Você não percebe que tem película. Superou o que eu esperava.</blockquote><figcaption><b>Rafael M.</b><span>BMW M3 Competition</span></figcaption></figure>
       <figure class="review"><div class="stars">★★★★★</div><blockquote>Fiz o full body no meu SUV. Ambiente organizado, explicaram cada etapa e o resultado ficou perfeito.</blockquote><figcaption><b>Carla S.</b><span>Range Rover Velar</span></figcaption></figure>
       <figure class="review"><div class="stars">★★★★★</div><blockquote>Entrega no prazo e o PPF encaixado como se fosse de fábrica. Recomendo demais.</blockquote><figcaption><b>Felipe M.</b><span>Porsche Cayenne</span></figcaption></figure>
     </div>
-    <div class="more"><button class="btn btn-line" type="button" id="moreReviews" hidden>Ver mais avaliações</button></div>
     <p class="reviews-note" id="reviewsNote">Avaliações de exemplo · somem quando a primeira avaliação real for aprovada</p>
     <div class="rev-admin" id="revAdmin" hidden><b>Avaliações para aprovar</b><span id="revAdminHint">Só aparecem no site depois que você aprovar.</span><div class="pend" id="pending"></div></div>
   </div>
@@ -1121,8 +1124,6 @@ const navIO=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)navL
 navIO.observe(topo);
 document.querySelectorAll('main > section[id]').forEach(sec=>navIO.observe(sec));
 const wide=matchMedia('(min-width: 761px)');
-const POSTS_MAX=8,REVIEWS_MAX=6;
-let morePosts=false,moreReviews=false;
 // no celular mostra "1 de 7 · arraste para o lado" e atualiza ao deslizar
 function swipeHint(box,hint){
   const n=box.children.length;hint.hidden=wide.matches||n<2;if(hint.hidden)return;
@@ -1337,12 +1338,10 @@ async function loadReviews(){
 function renderReviews(){
   const ok=(reviews||[]).filter(r=>r.aprovada),pend=(reviews||[]).filter(r=>!r.aprovada);
   const box=$('#reviews');
-  $('#moreReviews').hidden=!(wide.matches&&!moreReviews&&ok.length>REVIEWS_MAX);
-  $('#moreReviews').textContent='Ver mais avaliações ('+(ok.length-REVIEWS_MAX)+')';
   if(ok.length){
-    box.innerHTML=(wide.matches&&!moreReviews?ok.slice(0,REVIEWS_MAX):ok).map(r=>'<figure class="review" data-id="'+esc(r.id)+'">'+(r.foto?'<img src="'+esc(r.foto)+'" alt="Carro de '+esc(r.nome)+'" loading="lazy">':'')+'<div class="stars" aria-label="'+r.nota+' de 5 estrelas">'+stars(r.nota)+'</div><blockquote>'+esc(r.texto)+'</blockquote><figcaption><b>'+esc(r.nome)+'</b><span>'+esc(r.carro)+'</span></figcaption>'+(session?'<button class="post-del" type="button" data-del="'+esc(r.id)+'">'+TRASH+'Apagar</button>':'')+'</figure>').join('');
+    box.innerHTML=ok.map(r=>'<figure class="review" data-id="'+esc(r.id)+'">'+(r.foto?'<img src="'+esc(r.foto)+'" alt="Carro de '+esc(r.nome)+'" loading="lazy">':'')+'<div class="stars" aria-label="'+r.nota+' de 5 estrelas">'+stars(r.nota)+'</div><blockquote>'+esc(r.texto)+'</blockquote><figcaption><b>'+esc(r.nome)+'</b><span>'+esc(r.carro)+'</span></figcaption>'+(session?'<button class="post-del" type="button" data-del="'+esc(r.id)+'">'+TRASH+'Apagar</button>':'')+'</figure>').join('');
   }else box.innerHTML=EXEMPLOS;
-  box.scrollLeft=0;swipeHint(box,$('#reviewsHint'));
+  box.scrollLeft=0;rowNav('reviews');
   fxScan();
   $('#reviewsNote').hidden=!!ok.length;
   $('#revAdmin').hidden=!session;
@@ -1367,7 +1366,6 @@ document.addEventListener('click',async e=>{
     if(ok)justIn(document.querySelector('#reviews [data-id="'+CSS.escape(id)+'"]'));
   }catch(err){idle(btn);toast(err.status===401?'Sua sessão expirou. Entre de novo pela Área do adm.':'Não deu certo. Tente de novo.')}
 });
-$('#moreReviews').onclick=()=>{moreReviews=true;renderReviews()};
 // fileiras que arrastam para o lado: no celular o aviso "1 de N", no computador as setas
 function rowNav(pre){
   const box=$('#'+pre);if(!box)return;
@@ -1380,7 +1378,9 @@ function rowGo(pre,d){const box=$('#'+pre),c=box.firstElementChild,gap=parseFloa
 $('#posts').addEventListener('scroll',()=>rowNav('posts'),{passive:true});
 $('#postsPrev').onclick=()=>rowGo('posts',-1);$('#postsNext').onclick=()=>rowGo('posts',1);
 if('ResizeObserver' in window)new ResizeObserver(()=>rowNav('posts')).observe($('#posts'));
-$('#reviews').addEventListener('scroll',()=>swipeHint($('#reviews'),$('#reviewsHint')),{passive:true});
+$('#reviews').addEventListener('scroll',()=>rowNav('reviews'),{passive:true});
+$('#reviewsPrev').onclick=()=>rowGo('reviews',-1);$('#reviewsNext').onclick=()=>rowGo('reviews',1);
+if('ResizeObserver' in window)new ResizeObserver(()=>rowNav('reviews')).observe($('#reviews'));
 wide.addEventListener('change',()=>{renderPosts();renderReviews()});
 let revFoto=null;
 try{if(sessionStorage.getItem('reiPPF.revWait'))$('#revWait').hidden=false}catch(e){}
