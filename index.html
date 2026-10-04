@@ -360,21 +360,20 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
 #insta .eyebrow{color:var(--gold-hi)}
 .ig-link{gap:10px}
 .ig-link .ig{width:22px;height:22px;flex-shrink:0}
+/* fileira que arrasta para o lado (igual às avaliações); no computador, setas e 3 vídeos e pouco à vista */
 .reels-box{position:relative;max-width:980px}
-.reels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
-.reels-scroll{overflow-y:auto;scrollbar-width:none}
-.reels-scroll::-webkit-scrollbar{display:none}
-/* rolagem própria: mostra 1 fileira e meia; trilho dourado fino, véu embaixo e o botão "Mais vídeos" enquanto houver mais */
-.reels-rail{position:absolute;top:0;bottom:0;right:-14px;width:2px;background:rgba(255,255,255,.08);opacity:0;transition:opacity .2s ease-out}
-.reels-rail i{position:absolute;top:0;left:0;width:100%;height:var(--th,40%);background:var(--gold);transform:translate3d(0,var(--ty,0px),0)}
-.reels-box.scroll .reels-rail{opacity:1}
-.reels-box::after{content:"";position:absolute;left:0;right:0;bottom:0;height:38%;z-index:4;pointer-events:none;background:linear-gradient(transparent,rgba(10,10,10,.92));opacity:0;transition:opacity .25s ease-out}
-.reels-box.more::after{opacity:1}
-.reels-more{position:absolute;left:50%;bottom:16px;z-index:5;display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 16px;background:rgba(10,10,10,.85);border:1px solid rgba(201,164,50,.55);color:var(--gold-hi);font:inherit;font-size:13px;font-weight:600;cursor:pointer;transform:translate3d(-50%,8px,0);opacity:0;pointer-events:none;transition:opacity .2s ease-out,transform .25s var(--ease)}
-.reels-more svg{width:12px;height:12px}
-.reels-box.more .reels-more{opacity:1;transform:translate3d(-50%,0,0);pointer-events:auto}
-.reels-more:active{transform:translate3d(-50%,0,0) scale(.97)}
-@media (hover:hover) and (pointer:fine){.reels-more:hover{background:var(--gold);color:var(--black)}}
+.reels{display:grid;grid-auto-flow:column;grid-auto-columns:calc((100% - 16px) / 3.2);gap:8px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scrollbar-width:none}
+.reels::-webkit-scrollbar{display:none}
+.reels>*{scroll-snap-align:start}
+.reels-bar{display:flex;align-items:center;justify-content:space-between;gap:16px;max-width:980px;margin-bottom:12px}
+.reels-bar .swipe-hint{margin:0}
+.reels-arrows{display:flex;gap:8px;margin-left:auto}
+.reels-arrows button{width:44px;height:44px;display:grid;place-items:center;background:transparent;border:1px solid rgba(255,255,255,.25);color:var(--white);cursor:pointer;transition:border-color .16s ease-out,color .16s ease-out,opacity .16s ease-out,transform .12s ease-out}
+.reels-arrows svg{width:16px;height:16px}
+.reels-arrows button:active{transform:scale(.95)}
+.reels-arrows button:disabled{opacity:.3;cursor:default}
+@media (hover:hover) and (pointer:fine){.reels-arrows button:not(:disabled):hover{border-color:var(--gold);color:var(--gold-hi)}}
+.reels-bar:not(:has(.reels-arrows:not([hidden]))):has(.swipe-hint[hidden]){display:none}
 .reel{position:relative;display:block;aspect-ratio:3/4;background:#151515;overflow:hidden}
 .reel img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s var(--ease)}
 .reel-ph{position:absolute;inset:0;display:grid;place-items:center;background:radial-gradient(70% 50% at 50% 45%,rgba(201,164,50,.2),transparent 70%),linear-gradient(#1b1b1b,#0d0d0d)}
@@ -406,18 +405,23 @@ dialog.reel-dlg{width:min(420px,calc(100vw - 24px));background:var(--black);colo
 .vid-capa input{display:none}
 .vid-capa.ok{border-style:solid;border-color:var(--gold);color:var(--gold-hi)}
 .pend .row label.btn{cursor:pointer}
+/* lista de vídeos do adm: miniatura | link | botões, sempre nas mesmas colunas */
+#vidList article{display:grid;grid-template-columns:96px minmax(0,1fr) auto;align-items:center;gap:12px 20px}
+#vidList article>div{flex:none;min-width:0}
+#vidList article a{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#vidList .row{justify-content:flex-end}
+#vidList .row .btn{min-width:150px}
+.vid-noimg{width:96px;height:72px;display:grid;place-items:center;border:1px dashed rgba(255,255,255,.2);color:#77776f;font-size:12px}
+#vidList .row .btn{white-space:nowrap}
+@media (max-width:640px){.vid-form .vid-capa,.vid-form .btn{flex:1 1 100%;justify-content:center}#vidList .row .btn{padding:0 10px;gap:8px}#vidList article{grid-template-columns:72px minmax(0,1fr)}#vidList img,.vid-noimg{width:72px;height:54px}#vidList .row{grid-column:1/-1;justify-content:stretch}#vidList .row .btn{flex:1;min-width:0}}
 .pend .row label.btn input{display:none}
 .ig-cta{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px;padding:32px;border-radius:var(--r);border:1px solid transparent;background:linear-gradient(180deg,#171717,#121212) padding-box,linear-gradient(140deg,rgba(227,193,90,.6),rgba(255,255,255,.08) 40%,rgba(227,193,90,.3)) border-box}
 .ig-cta b{font-size:clamp(22px,2.6vw,30px);font-stretch:115%}
 .ig-cta p{color:#bdbdb6;margin-top:6px;max-width:52ch}
-/* celular: os vídeos viram uma fileira que arrasta para o lado, igual às avaliações */
 @media (max-width:760px){
   .reels-box{margin-inline:calc(-1 * var(--gutter))}
-  .reels{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:44%;gap:8px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;padding:0 var(--gutter) 4px;scroll-padding-inline:var(--gutter);scrollbar-width:none}
-  .reels::-webkit-scrollbar{display:none}
-  .reels>*{scroll-snap-align:start}
-  .reels-scroll{max-height:none!important;overflow:visible}
-  .reels-rail,.reels-more,.reels-box::after{display:none}
+  .reels{grid-auto-columns:44%;padding:0 var(--gutter) 4px;scroll-padding-inline:var(--gutter)}
+  .reels-arrows{display:none}
 }
 /* ── Acabamento: bordas, luz e profundidade ── */
 :root{--r:0;--edge:rgba(0,0,0,.07);--gold-glow:rgba(227,193,90,.55)}
@@ -566,7 +570,8 @@ dialog.drawer{overflow:hidden;transform:translate3d(100%,0,0);transition:transfo
 .nav .nav-cta.hide{clip-path:inset(0 0 0 100%);pointer-events:none}
 .nav .nav-cta.shine{background-position:-60% 0;transition:clip-path .5s cubic-bezier(.65,0,.35,1),background-color .16s ease-out,background-position .8s .25s var(--ease)}
 /* ── Botões do adm: ícone, linha correndo enquanto salva, ✓ quando dá certo, e o item sai/entra animado ── */
-.btn,.post-del{position:relative;overflow:hidden}
+.btn{position:relative;overflow:hidden}
+.post-del{overflow:hidden}
 .btn svg.i,.post-del svg{flex-shrink:0}
 .btn svg.i{width:16px;height:16px}
 .btn.busy,.post-del.busy{pointer-events:none;opacity:1}
@@ -733,12 +738,8 @@ dialog.drawer{overflow:hidden;transform:translate3d(100%,0,0);transition:transfo
       </div>
       <a class="link ig-link" href="https://www.instagram.com/reido_ppf/" target="_blank" rel="noopener"><svg class="ig" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"/></svg>Seguir @reido_ppf</a>
     </div>
-    <p class="swipe-hint" id="reelsHint" aria-hidden="true" hidden></p>
-    <div class="reels-box" id="reelsBox">
-      <div class="reels-scroll" id="reelsScroll"><div class="reels" id="reels"></div></div>
-      <span class="reels-rail" aria-hidden="true"><i id="reelsThumb"></i></span>
-      <button class="reels-more" type="button" id="reelsMore">Mais vídeos <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M2 4.5l4 4 4-4"/></svg></button>
-    </div>
+    <div class="reels-bar"><p class="swipe-hint" id="reelsHint" aria-hidden="true" hidden></p><div class="reels-arrows" id="reelsArrows" hidden><button type="button" id="reelsPrev" aria-label="Vídeos anteriores"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M10 3L5 8l5 5"/></svg></button><button type="button" id="reelsNext" aria-label="Próximos vídeos"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 3l5 5-5 5"/></svg></button></div></div>
+    <div class="reels-box" id="reelsBox"><div class="reels" id="reels"></div></div>
     <div class="rev-admin" id="vidAdmin" hidden>
       <b>Vídeos do Instagram</b><span>Cole o link de um reel do Instagram e, se quiser, um print dele como capa. Aparecem os 9 mais recentes.</span>
       <form class="vid-form" id="vidForm" novalidate><input class="input" id="vidUrl" name="link" type="url" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://www.instagram.com/reel/…"><label class="vid-capa" id="vidCapaLbl">Capa (opcional): print do reel<input id="vidCapa" type="file" accept="image/*"></label><button class="btn btn-gold" type="submit" id="vidBtn">Adicionar</button></form>
@@ -1310,7 +1311,7 @@ function renderReels(){
   $('#reels').innerHTML=list.slice(0,9).map((v,i)=>'<div class="reel">'+(v.capa?'<img src="'+esc(v.capa)+'" alt="" loading="lazy">':'<span class="reel-ph">'+PLAY_LG+'</span><iframe class="reel-prev" src="'+esc(v.url)+'embed/" loading="lazy" scrolling="no" tabindex="-1" aria-hidden="true" title=""></iframe>')+'<span class="reel-ico">'+PLAY_SM+'</span><span class="reel-cap">'+IG_ICON+'<span>Ver reel</span></span><button type="button" class="reel-hit" data-reel="'+esc(v.url)+'" aria-label="Ver vídeo '+(i+1)+' do Instagram"></button></div>').join('');
   reelScale();reelsFit();
   $('#vidAdmin').hidden=!session;
-  $('#vidList').innerHTML=(videos||[]).map(v=>'<article>'+(v.capa?'<img src="'+esc(v.capa)+'" alt="">':'')+'<div><a href="'+esc(v.url)+'" target="_blank" rel="noopener">'+esc(v.url)+'</a></div><div class="row"><label class="btn btn-line">'+IC.img+(v.capa?'Trocar capa':'Pôr capa')+'<input type="file" accept="image/*" data-vcapa="'+esc(v.id)+'"></label><button class="btn btn-line btn-del" type="button" data-vdel="'+esc(v.id)+'">'+TRASH.replace('<svg','<svg class="i"')+'Remover</button></div></article>').join('')||(session?'<small>Nenhum vídeo adicionado ainda: o site mostra os 3 vídeos de exemplo.</small>':'');
+  $('#vidList').innerHTML=(videos||[]).map(v=>'<article>'+(v.capa?'<img src="'+esc(v.capa)+'" alt="">':'<span class="vid-noimg">sem capa</span>')+'<div><a href="'+esc(v.url)+'" target="_blank" rel="noopener">'+esc(v.url)+'</a></div><div class="row"><label class="btn btn-line">'+IC.img+(v.capa?'Trocar capa':'Pôr capa')+'<input type="file" accept="image/*" data-vcapa="'+esc(v.id)+'"></label><button class="btn btn-line btn-del" type="button" data-vdel="'+esc(v.id)+'">'+TRASH.replace('<svg','<svg class="i"')+'Remover</button></div></article>').join('')||(session?'<small>Nenhum vídeo adicionado ainda: o site mostra os 3 vídeos de exemplo.</small>':'');
 }
 // ajusta a escala da prévia ao tamanho do quadrado (o player do Instagram tem 326px de largura mínima)
 // no player do Instagram (326px de largura) a área do vídeo vai de ~56px a ~428px de altura;
@@ -1318,24 +1319,16 @@ function renderReels(){
 function reelScale(){document.querySelectorAll('#reels .reel').forEach(t=>{const s=Math.max(t.clientWidth/326,t.clientHeight/372);t.style.setProperty('--s',s.toFixed(4));t.style.setProperty('--x',((t.clientWidth-326*s)/2).toFixed(1)+'px')})}
 // caixa dos vídeos: altura de 1 fileira e meia (a do meio fica cortada, sinal de que tem mais) e indicador próprio da rolagem
 function reelsFit(){
-  const reelsEl=$('#reels'),sc=$('#reelsScroll');
-  const first=reelsEl.querySelector('.reel');if(!first)return;
-  const rows=Math.ceil(reelsEl.children.length/3),h=first.offsetHeight,gap=parseFloat(getComputedStyle(reelsEl).rowGap)||0;
-  if(!wide.matches){sc.style.maxHeight='';swipeHint(reelsEl,$('#reelsHint'));reelsState();return}
+  const box=$('#reels'),n=box.children.length;
+  if(!wide.matches){$('#reelsArrows').hidden=true;swipeHint(box,$('#reelsHint'));return}
   $('#reelsHint').hidden=true;
-  sc.style.maxHeight=rows>1?Math.round(h*1.5+gap)+'px':'';
-  reelsState();
+  const over=box.scrollWidth-box.clientWidth>4;$('#reelsArrows').hidden=!over||n<2;
+  $('#reelsPrev').disabled=box.scrollLeft<4;$('#reelsNext').disabled=box.scrollLeft+box.clientWidth>box.scrollWidth-4;
 }
-function reelsState(){
-  const reelsEl=$('#reelsScroll'),reelsBox=$('#reelsBox'),reelsThumb=$('#reelsThumb');
-  const sh=reelsEl.scrollHeight,ch=reelsEl.clientHeight,st=reelsEl.scrollTop,over=sh-ch>4;
-  reelsBox.classList.toggle('scroll',over);reelsBox.classList.toggle('more',over&&st+ch<sh-8);
-  if(over){const th=ch*ch/sh;reelsThumb.style.setProperty('--th',th+'px');reelsThumb.style.setProperty('--ty',(st/(sh-ch))*(ch-th)+'px')}
-}
-$('#reelsScroll').addEventListener('scroll',reelsState,{passive:true});
-$('#reels').addEventListener('scroll',()=>swipeHint($('#reels'),$('#reelsHint')),{passive:true});
-$('#reelsMore').onclick=()=>{const reelsEl=$('#reelsScroll'),r=reelsEl.querySelector('.reel');reelsEl.scrollBy({top:r?r.offsetHeight:200,behavior:reduce?'auto':'smooth'})};
-if('ResizeObserver' in window)new ResizeObserver(()=>{reelScale();reelsFit()}).observe($('#reelsBox'));
+$('#reels').addEventListener('scroll',reelsFit,{passive:true});
+function reelsGo(d){const box=$('#reels'),r=box.querySelector('.reel');box.scrollBy({left:d*(r?r.getBoundingClientRect().width+8:300)*(wide.matches?3:1),behavior:reduce?'auto':'smooth'})}
+$('#reelsPrev').onclick=()=>reelsGo(-1);$('#reelsNext').onclick=()=>reelsGo(1);
+if('ResizeObserver' in window)new ResizeObserver(()=>{reelScale();reelsFit()}).observe($('#reels'));
 // o player completo só carrega quando a pessoa abre um vídeo
 function openReel(url){
   // o player do Instagram dentro de um quadro do tamanho da área do vídeo, sem o cabeçalho e o rodapé dele
@@ -1373,7 +1366,7 @@ $('#vidForm').addEventListener('submit',async e=>{
     await sb('/rest/v1/videos',{method:'POST',auth:true,headers:{'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(capa?{url,capa}:{url})});
     await done(btn,'Adicionado');
     $('#vidForm').reset();$('#vidCapaLbl').classList.remove('ok');$('#vidCapaLbl').firstChild.textContent='Capa (opcional): print do reel';toast('Vídeo adicionado');
-    await loadVideos();$('#reelsScroll').scrollTop=0;justIn($('#reels .reel'));justIn($('#vidList article'));
+    await loadVideos();$('#reels').scrollLeft=0;justIn($('#reels .reel'));justIn($('#vidList article'));
   }catch(err){$('#vidErr').textContent=err.status===401?'Sua sessão expirou. Entre de novo pela Área do adm.':'Não deu para adicionar ('+err.message+'). Tente de novo.'}
   finally{idle(btn)}
 });
