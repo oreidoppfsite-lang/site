@@ -20,8 +20,16 @@ ffmpeg -ss 5 -i video.mp4 -frames:v 1 -vf "crop=608:1080:(iw-608)/2:0" -q:v 4 vi
 
 `tools/render_topo.py` é o render 3D usado antes do vídeo, guardado caso volte a ser útil.
 
+## Diário (Supabase)
+
+Os posts ficam no Supabase (projeto `rei-do-ppf`, plano grátis): tabela `posts` e pasta de fotos `fotos`. Visitantes só leem; para publicar ou apagar, a equipe entra pela "Área do dono" no rodapé (ou `site/#admin`) com o login criado em Authentication → Users. O cadastro de novos usuários fica desligado.
+
+A chave em `index.html` é a *publishable*, pública de propósito; a segurança vem das regras (RLS) do banco. Nunca coloque a `secret`/`service_role` no site.
+
+`.github/workflows/manter-supabase.yml` lê o banco a cada 3 dias para o projeto grátis não pausar por falta de uso.
+
 ## Aviso
 
-Telefone, posts do diário, história e avaliações são conteúdo de exemplo. Os posts publicados pelo botão "+ Publicar trabalho" ficam só no navegador (localStorage).
+História, avaliações e os números técnicos são conteúdo de exemplo. Os posts de exemplo do diário somem quando o primeiro post real for publicado.
 
 Quadros provisórios renderizados a partir do modelo 3D "Ferrari 458 Italia" de vicent091036 (CC BY 4.0).

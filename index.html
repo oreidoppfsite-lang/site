@@ -247,6 +247,10 @@ footer{background:var(--black);color:#9a9a93;border-top:1px solid #1f1f1f;paddin
 .foot a{text-decoration:none}
 .foot a:hover{color:var(--white)}
 .foot .brand{color:var(--white);margin-bottom:14px}
+.admin{display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px}
+.admin[hidden]{display:none}
+.btn:disabled{opacity:.6;cursor:progress}
+.foot button.link{min-height:0;font-size:inherit;font-weight:inherit;color:inherit;text-decoration:none}
 .legal{margin-top:40px;padding-top:24px;border-top:1px solid #1f1f1f;display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;font-size:12px}
 @media (max-width:760px){.foot{grid-template-columns:minmax(0,1fr)}}
 
@@ -447,7 +451,7 @@ footer::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;back
         <h2 class="wide">Trabalhos recentes</h2>
         <p>Todo carro que sai daqui vira um post com as fotos, o serviço feito e o que o cliente queria.</p>
       </div>
-      <button class="btn btn-dark" type="button" id="openPublish">Publicar trabalho</button>
+      <div class="admin" id="adminBar" hidden><button class="btn btn-dark" type="button" id="openPublish">Publicar trabalho</button><button class="link" type="button" id="logout">Sair</button></div>
     </div>
     <div class="bar"><div class="chips" id="filters" role="group" aria-label="Filtrar por serviço"></div></div>
     <div class="posts" id="posts"></div>
@@ -540,9 +544,9 @@ footer::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;back
     <div class="foot">
       <div><a class="brand" href="#topo"><svg viewBox="0 0 28 24" aria-hidden="true" style="width:28px;height:24px"><path d="M2 18L3.5 5l6 6L14 2l4.5 9 6-6L26 18z" fill="#c9a432"/><rect x="2" y="20" width="24" height="3" fill="#c9a432"/></svg><b translate="no">O Rei do PPF</b></a><p>Proteção de pintura automotiva. Full body, parcial e pontual.</p></div>
       <div><h4>Site</h4><ul><li><a href="#servicos">Serviços</a></li><li><a href="#diario">Trabalhos</a></li><li><a href="#historia">Nossa história</a></li><li><a href="#contato">Orçamento</a></li></ul></div>
-      <div><h4>Contato</h4><ul><li><a href="https://www.instagram.com/reido_ppf/" target="_blank" rel="noopener">Instagram</a></li><li><a href="#contato">WhatsApp</a></li></ul></div>
+      <div><h4>Contato</h4><ul><li><a href="https://www.instagram.com/reido_ppf/" target="_blank" rel="noopener">Instagram</a></li><li><a href="#contato">WhatsApp</a></li><li><button class="link" type="button" id="openLogin">Área do dono</button></li></ul></div>
     </div>
-    <div class="legal"><span>© 2026 O Rei do PPF · Protótipo</span><span>Vídeo provisório feito com o modelo 3D “Ferrari 458 Italia” de vicent091036, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a></span></div>
+    <div class="legal"><span>© 2026 O Rei do PPF · Protótipo</span></div>
   </div>
 </footer>
 
@@ -566,8 +570,22 @@ footer::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;back
         <div class="field full"><label for="p-texto">Conte o trabalho</label><textarea class="input" id="p-texto" name="texto" autocomplete="off" placeholder="O que foi feito, quanto tempo levou, o que o cliente queria…"></textarea></div>
         <label class="drop" id="drop" for="p-fotos">Toque para escolher as fotos ou arraste aqui<input id="p-fotos" type="file" accept="image/*" multiple></label>
         <div class="thumbs" id="thumbs"></div>
-        <div class="actions" style="grid-column:1/-1"><button class="btn btn-dark" type="submit">Publicar</button><span id="pubErr" role="alert" style="color:#a3121b;font-size:14px"></span></div>
-        <p class="small" style="color:var(--muted);text-align:left">No protótipo o post fica salvo só neste navegador. No site final ele aparece para todos os visitantes.</p>
+        <div class="actions" style="grid-column:1/-1"><button class="btn btn-dark" type="submit" id="pubBtn">Publicar</button><span id="pubErr" role="alert" style="color:#a3121b;font-size:14px"></span></div>
+        <p class="small" style="color:var(--muted);text-align:left">O post aparece no site para todos os visitantes. As fotos são reduzidas antes de enviar.</p>
+      </form>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="loginDlg" aria-labelledby="loginTitle">
+  <div class="dlg">
+    <div class="dlg-head"><span class="eyebrow" id="loginTitle">Área do dono</span><button class="x" type="button" data-close aria-label="Fechar">×</button></div>
+    <div class="dlg-body">
+      <form class="pub" id="loginForm" novalidate>
+        <div class="field full"><label for="l-email">E-mail</label><input class="input" id="l-email" name="email" type="email" autocomplete="username" spellcheck="false" inputmode="email"></div>
+        <div class="field full"><label for="l-senha">Senha</label><input class="input" id="l-senha" name="senha" type="password" autocomplete="current-password"></div>
+        <div class="actions" style="grid-column:1/-1"><button class="btn btn-dark" type="submit" id="loginBtn">Entrar</button><span id="loginErr" role="alert" style="color:#a3121b;font-size:14px"></span></div>
+        <p class="small" style="color:var(--muted);text-align:left">Só para a equipe publicar e apagar trabalhos do diário.</p>
       </form>
     </div>
   </div>
@@ -638,10 +656,37 @@ const SEED=[
   {id:'s7',date:'2026-09-11',carro:'Volkswagen Nivus',servico:'pontual',titulo:'Borda do porta-malas sem marca de mala',texto:'Quem viaja muito arrasta mala na borda do porta-malas. Uma faixa de PPF resolve e ninguém percebe que está ali.'}
 ];
 SEED.forEach(p=>p.exemplo=true);
-let local=[];
-try{local=JSON.parse(localStorage.getItem('reiPPF.v4.posts')||'[]')}catch(e){local=[]}
-const saveLocal=()=>{try{localStorage.setItem('reiPPF.v4.posts',JSON.stringify(local));return true}catch(e){return false}};
-const allPosts=()=>[...local,...SEED].sort((a,b)=>b.date.localeCompare(a.date)||(b.ts||0)-(a.ts||0));
+/* ── Supabase: os posts ficam no banco e todo visitante vê; só o dono (com login) publica e apaga ── */
+const SB='https://vktidxurujnhcnhauqmj.supabase.co';
+// chave pública de propósito: quem protege os dados são as regras (RLS) do banco
+const SBKEY='sb_publishable_cG9ok0PIix_s2iqkFG79NA_puTqa8x1';
+let remote=null;   // null: ainda carregando ou o banco não respondeu
+let session=null;
+try{session=JSON.parse(localStorage.getItem('reiPPF.sessao')||'null')}catch(e){}
+function saveSession(v){session=v;try{v?localStorage.setItem('reiPPF.sessao',JSON.stringify(v)):localStorage.removeItem('reiPPF.sessao')}catch(e){}}
+async function sb(path,opt={}){
+  const headers={apikey:SBKEY,...(opt.headers||{})};
+  if(opt.auth){const t=await token();if(!t){const e=new Error('login');e.status=401;throw e}headers.Authorization='Bearer '+t}
+  const res=await fetch(SB+path,{method:opt.method||'GET',headers,body:opt.body});
+  if(!res.ok){let m='';try{const j=await res.json();m=j.msg||j.message||j.error_description||j.error||''}catch(e){}const e=new Error(m||'HTTP '+res.status);e.status=res.status;throw e}
+  const txt=await res.text();return txt?JSON.parse(txt):null;
+}
+function keep(t){saveSession({access:t.access_token,refresh:t.refresh_token,exp:Date.now()+t.expires_in*1000})}
+async function token(){
+  if(!session)return null;
+  if(Date.now()<session.exp-60000)return session.access;
+  try{keep(await sb('/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({refresh_token:session.refresh})}));return session.access}
+  catch(e){saveSession(null);syncAdmin();return null}
+}
+async function loadPosts(){
+  try{
+    const rows=await sb('/rest/v1/posts?select=*&order=data.desc,created_at.desc');
+    remote=rows.map(r=>({id:r.id,date:r.data,carro:r.carro,servico:r.servico,titulo:r.titulo,texto:r.texto,fotos:r.fotos||[]}));
+  }catch(e){remote=null}
+  renderPosts();
+}
+// enquanto não houver post real, o diário mostra os exemplos
+const allPosts=()=>remote&&remote.length?remote:SEED;
 const DF=new Intl.DateTimeFormat('pt-BR',{day:'2-digit',month:'short',year:'numeric',timeZone:'UTC'});
 const fmt=d=>DF.format(new Date(d+'T00:00:00Z')).replace(/\./g,'').replace(/ de /g,' ');
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -659,7 +704,7 @@ function renderPosts(){
   if(!list.length){box.innerHTML='<p class="empty">Ainda não há trabalhos com esse serviço.</p>';return}
   list.forEach((p,i)=>{
     const b=document.createElement('button');b.type='button';b.className='post'+(i===0&&list.length>2?' featured':'');
-    b.innerHTML='<div class="post-img">'+(p.fotos&&p.fotos.length?'<img alt="" src="'+p.fotos[0]+'">':ph(p))+'</div>'+
+    b.innerHTML='<div class="post-img">'+(p.fotos&&p.fotos.length?'<img alt="" loading="lazy" src="'+esc(p.fotos[0])+'">':ph(p))+'</div>'+
       '<div class="post-body"><div class="meta"><span>'+SVC[p.servico]+'</span><span>'+esc(p.carro)+'</span><span>'+fmt(p.date)+(p.exemplo?' · exemplo':'')+'</span></div><h3>'+esc(p.titulo)+'</h3><p>'+esc(p.texto)+'</p><span class="arrow">Ler post</span></div>';
     b.onclick=()=>openPost(p);box.appendChild(b);
   });
@@ -667,11 +712,20 @@ function renderPosts(){
 const waUrl=t=>'https://wa.me/'+WA+'?text='+encodeURIComponent(t);
 function openPost(p){
   $('#postKicker').textContent=SVC[p.servico]+(p.exemplo?' · post de exemplo':'');
-  const photos=p.fotos&&p.fotos.length?'<div class="dlg-photos'+(p.fotos.length>1?' many':'')+'">'+p.fotos.map(s=>'<img alt="Foto do trabalho" src="'+s+'">').join('')+'</div>':'<div class="dlg-cover">'+ph(p)+'</div>';
+  const photos=p.fotos&&p.fotos.length?'<div class="dlg-photos'+(p.fotos.length>1?' many':'')+'">'+p.fotos.map(s=>'<img alt="Foto do trabalho" src="'+esc(s)+'">').join('')+'</div>':'<div class="dlg-cover">'+ph(p)+'</div>';
   $('#postBody').innerHTML=photos+'<div class="meta"><span>'+fmt(p.date)+'</span><span>'+esc(p.carro)+'</span></div><h2 id="postTitle">'+esc(p.titulo)+'</h2><p class="dlg-text">'+esc(p.texto)+'</p>'+
-    '<div class="actions"><a class="btn btn-gold" target="_blank" rel="noopener" href="'+waUrl('Olá! Vi o post "'+p.titulo+'" e quero um orçamento de '+SVC[p.servico]+'.')+'">Quero um orçamento assim</a>'+(p.exemplo?'':'<button class="btn btn-line" type="button" id="delPost">Apagar post</button>')+'</div>';
+    '<div class="actions"><a class="btn btn-gold" target="_blank" rel="noopener" href="'+waUrl('Olá! Vi o post "'+p.titulo+'" e quero um orçamento de '+SVC[p.servico]+'.')+'">Quero um orçamento assim</a>'+(p.exemplo||!session?'':'<button class="btn btn-line" type="button" id="delPost">Apagar post</button>')+'</div>';
   const del=$('#delPost');
-  if(del)del.onclick=()=>{if(del.dataset.armed){local=local.filter(x=>x.id!==p.id);saveLocal();$('#postDlg').close();renderPosts();toast('Post apagado')}else{del.dataset.armed='1';del.textContent='Toque de novo para apagar'}};
+  if(del)del.onclick=async()=>{
+    if(!del.dataset.armed){del.dataset.armed='1';del.textContent='Toque de novo para apagar';return}
+    del.disabled=true;del.textContent='Apagando…';
+    try{
+      await sb('/rest/v1/posts?id=eq.'+encodeURIComponent(p.id),{method:'DELETE',auth:true});
+      const paths=(p.fotos||[]).map(u=>u.split('/object/public/fotos/')[1]).filter(Boolean);
+      if(paths.length)sb('/storage/v1/object/fotos',{method:'DELETE',auth:true,headers:{'Content-Type':'application/json'},body:JSON.stringify({prefixes:paths})}).catch(()=>{});
+      $('#postDlg').close();toast('Post apagado');loadPosts();
+    }catch(e){del.disabled=false;del.textContent='Apagar post';toast(e.status===401?'Sua sessão expirou. Entre de novo pela Área do dono.':'Não deu para apagar. Tente de novo.')}
+  };
   $('#postDlg').showModal();
 }
 document.querySelectorAll('dialog').forEach(d=>d.addEventListener('click',e=>{if(e.target===d||e.target.closest('[data-close]'))d.close()}));
@@ -686,17 +740,50 @@ const drop=$('#drop');
 ['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('over')}));
 ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('over')}));
 drop.addEventListener('drop',e=>addFiles(e.dataTransfer.files));
-$('#pubForm').addEventListener('submit',e=>{
+const uid=()=>crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2);
+$('#pubForm').addEventListener('submit',async e=>{
   e.preventDefault();
   const carro=$('#p-carro').value.trim(),titulo=$('#p-titulo').value.trim();
   if(!carro||!titulo){$('#pubErr').textContent='Preencha o carro e o título para publicar.';$(carro?'#p-titulo':'#p-carro').focus();return}
-  const now=new Date(),pad=n=>String(n).padStart(2,'0');
-  local.unshift({id:'l'+now.getTime(),ts:now.getTime(),date:now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate()),carro,titulo,servico:$('#p-servico').value,texto:$('#p-texto').value.trim()||'Mais um carro protegido pela equipe.',fotos:pending.slice()});
-  if(!saveLocal()){local[0].fotos=local[0].fotos.slice(0,1);if(!saveLocal())toast('Publicado, mas as fotos são grandes demais para ficar salvas neste navegador')}
-  pending=[];$('#thumbs').innerHTML='';$('#pubForm').reset();$('#pubDlg').close();
-  filter='todos';document.querySelectorAll('#filters .chip').forEach((x,i)=>x.setAttribute('aria-pressed',i===0));
-  renderPosts();toast('Publicado no diário');$('#diario').scrollIntoView({behavior:reduce?'auto':'smooth'});
+  const btn=$('#pubBtn');btn.disabled=true;btn.textContent='Publicando…';$('#pubErr').textContent='';
+  try{
+    const fotos=[];
+    for(const d of pending){
+      const path=new Date().toISOString().slice(0,7)+'/'+uid()+'.jpg';
+      await sb('/storage/v1/object/fotos/'+path,{method:'POST',auth:true,headers:{'Content-Type':'image/jpeg'},body:await (await fetch(d)).blob()});
+      fotos.push(SB+'/storage/v1/object/public/fotos/'+path);
+    }
+    const now=new Date(),pad=n=>String(n).padStart(2,'0');
+    await sb('/rest/v1/posts',{method:'POST',auth:true,headers:{'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({
+      data:now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate()),
+      carro,titulo,servico:$('#p-servico').value,texto:$('#p-texto').value.trim()||'Mais um carro protegido pela equipe.',fotos})});
+    pending=[];$('#thumbs').innerHTML='';$('#pubForm').reset();$('#pubDlg').close();
+    filter='todos';document.querySelectorAll('#filters .chip').forEach((x,i)=>x.setAttribute('aria-pressed',i===0));
+    await loadPosts();toast('Publicado no diário');$('#diario').scrollIntoView({behavior:reduce?'auto':'smooth'});
+  }catch(err){
+    $('#pubErr').textContent=err.status===401?'Sua sessão expirou. Entre de novo pela Área do dono.':'Não deu para publicar ('+err.message+'). Confira a internet e tente de novo.';
+  }finally{btn.disabled=false;btn.textContent='Publicar'}
 });
+
+/* ── Área do dono: login ── */
+function syncAdmin(){$('#adminBar').hidden=!session;$('#openLogin').textContent=session?'Sair da área do dono':'Área do dono'}
+function openLogin(){$('#loginErr').textContent='';$('#loginDlg').showModal()}
+function logout(){const t=session&&session.access;saveSession(null);syncAdmin();toast('Você saiu da área do dono');if(t)fetch(SB+'/auth/v1/logout',{method:'POST',headers:{apikey:SBKEY,Authorization:'Bearer '+t}}).catch(()=>{})}
+$('#openLogin').onclick=()=>session?logout():openLogin();
+$('#logout').onclick=logout;
+$('#loginForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const email=$('#l-email').value.trim(),senha=$('#l-senha').value;
+  if(!email||!senha){$('#loginErr').textContent='Preencha o e-mail e a senha.';$(email?'#l-senha':'#l-email').focus();return}
+  const btn=$('#loginBtn');btn.disabled=true;btn.textContent='Entrando…';$('#loginErr').textContent='';
+  try{
+    keep(await sb('/auth/v1/token?grant_type=password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:senha})}));
+    $('#loginForm').reset();$('#loginDlg').close();syncAdmin();toast('Pronto, já pode publicar');$('#diario').scrollIntoView({behavior:reduce?'auto':'smooth'});
+  }catch(err){$('#loginErr').textContent=err.status===400?'E-mail ou senha incorretos.':'Não deu para entrar agora. Confira a internet e tente de novo.'}
+  finally{btn.disabled=false;btn.textContent='Entrar'}
+});
+if(location.hash==='#admin')openLogin();
+syncAdmin();
 
 /* ── Orçamento ── */
 function updateWa(){
@@ -723,7 +810,7 @@ if(REELS.length){
   $('#reels').innerHTML='<div class="ig-cta"><div><b>Siga @reido_ppf</b><p>Todo dia tem carro novo recebendo película. Os vídeos mais recentes aparecem aqui.</p></div><a class="link" href="https://www.instagram.com/reido_ppf/" target="_blank" rel="noopener">Abrir o Instagram</a></div>';
 }
 
-renderPosts();
+renderPosts();loadPosts();
 })();
 </script>
 </body>
