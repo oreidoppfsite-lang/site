@@ -398,6 +398,36 @@ dialog{border-radius:0;box-shadow:0 40px 90px -30px rgba(0,0,0,.6)}
 footer{border-top:0;position:relative}
 footer::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent)}
 @media (prefers-reduced-motion:reduce){.stage::after{animation:none}}
+/* ── Barra de rolagem escura, combinando com o vídeo ── */
+html{scrollbar-width:thin;scrollbar-color:#3a3a36 #0a0a0a}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:#0a0a0a}
+::-webkit-scrollbar-thumb{background:#3a3a36;border:2px solid #0a0a0a}
+::-webkit-scrollbar-thumb:hover{background:var(--gold)}
+
+/* ── Menu: sublinhado que desliza e seção atual marcada ── */
+.nav ul a{position:relative;padding:6px 0;transition:opacity .16s ease-out}
+.nav ul a::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:currentColor;transform:scaleX(0);transform-origin:right;transition:transform .35s var(--ease)}
+.nav ul a.on{opacity:1}
+.nav ul a.on::after{transform:scaleX(1)}
+@media (hover:hover) and (pointer:fine){
+  .nav ul a:hover::after{transform:scaleX(1);transform-origin:left}
+  .nav:not(.solid) .btn:hover{background:var(--gold);color:var(--black)}
+}
+
+/* ── Brilho de película atravessando os botões dourados ── */
+.btn-gold{background-image:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.5) 50%,transparent 65%);background-size:250% 100%;background-position:160% 0;background-repeat:no-repeat;transition:background-color .16s ease-out,background-position 0s,transform .12s ease-out}
+@media (hover:hover) and (pointer:fine){.btn-gold:hover{background-position:-60% 0;transition:background-color .16s ease-out,background-position .75s var(--ease),transform .12s ease-out}}
+
+/* ── "Encapar": a foto é revelada como película sendo esticada, com um reflexo passando ── */
+.fx-on .wrapfx{clip-path:inset(0 100% 0 0)}
+.fx-on .wrapfx.in{clip-path:inset(0 0 0 0);transition:clip-path 1s cubic-bezier(.65,0,.35,1)}
+.sheen{position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.38) 50%,transparent 62%);transform:translateX(-110%)}
+.fx-on .in>.sheen{animation:sheen 1.1s .55s cubic-bezier(.2,.7,.2,1) forwards}
+@keyframes sheen{to{transform:translateX(110%)}}
+.fx-on .rise{opacity:0;transform:translateY(18px)}
+.fx-on .rise.in{opacity:1;transform:none;transition:opacity .7s var(--ease),transform .8s var(--ease)}
+
 @media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
 </style>
 </head>
@@ -785,6 +815,19 @@ let filter='todos';
   b.onclick=()=>{filter=id;document.querySelectorAll('#filters .chip').forEach(x=>x.setAttribute('aria-pressed',x===b));renderPosts()};
   $('#filters').appendChild(b);
 });
+/* ── Animações de entrada (encapar) e menu com a seção atual ── */
+const fxIO=!reduce&&'IntersectionObserver' in window?new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');fxIO.unobserve(e.target)}}),{rootMargin:'0px 0px -12% 0px'}):null;
+if(fxIO)document.documentElement.classList.add('fx-on');
+function fxScan(){
+  if(!fxIO)return;
+  document.querySelectorAll('.svc-img,.post-img,.story-img,.review>img').forEach(el=>{if(el.classList.contains('wrapfx'))return;el.classList.add('wrapfx');const i=document.createElement('i');i.className='sheen';el.appendChild(i);fxIO.observe(el)});
+  document.querySelectorAll('.head h2,.band h2,.story-text h2,.contact h2').forEach(el=>{if(el.classList.contains('rise'))return;el.classList.add('rise');fxIO.observe(el)});
+}
+const navLinks=[...document.querySelectorAll('.nav ul a')];
+// marca no menu a seção que está no meio da tela (no topo, nenhuma)
+const navIO=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)navLinks.forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+e.target.id))}),{rootMargin:'-45% 0px -50% 0px'});
+navIO.observe(topo);
+document.querySelectorAll('main > section[id]').forEach(sec=>navIO.observe(sec));
 function renderPosts(){
   const list=allPosts().filter(p=>filter==='todos'||p.servico===filter);
   const box=$('#posts');box.innerHTML='';
@@ -803,6 +846,7 @@ function renderPosts(){
     }
     box.appendChild(w);
   });
+  fxScan();
 }
 const waUrl=t=>'https://wa.me/'+WA+'?text='+encodeURIComponent(t);
 const TRASH='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2.5 4h11M6 4V2.5h4V4M4 4l.7 9.5h6.6L12 4"/></svg>';
@@ -879,6 +923,7 @@ function renderReviews(){
   if(ok.length){
     box.innerHTML=ok.map(r=>'<figure class="review" data-id="'+esc(r.id)+'">'+(r.foto?'<img src="'+esc(r.foto)+'" alt="Carro de '+esc(r.nome)+'" loading="lazy">':'')+'<div class="stars" aria-label="'+r.nota+' de 5 estrelas">'+stars(r.nota)+'</div><blockquote>'+esc(r.texto)+'</blockquote><figcaption><b>'+esc(r.nome)+'</b><span>'+esc(r.carro)+'</span></figcaption>'+(session?'<button class="post-del" type="button" data-del="'+esc(r.id)+'">'+TRASH+'Apagar</button>':'')+'</figure>').join('');
   }else box.innerHTML=EXEMPLOS;
+  fxScan();
   $('#reviewsNote').hidden=!!ok.length;
   $('#revAdmin').hidden=!session;
   $('#revAdminHint').textContent=pend.length?'Só aparecem no site depois que você aprovar.':'Nenhuma avaliação esperando aprovação.';
