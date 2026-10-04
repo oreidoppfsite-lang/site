@@ -499,22 +499,26 @@ html{scrollbar-width:thin;scrollbar-color:#3a3a36 #0a0a0a}
 .burger:active{transform:scale(.96)}
 @media (max-width:860px){.burger{display:block;margin-left:0}.nav{gap:10px}.nav .btn{margin-left:auto}}
 @media (max-width:380px){.nav .brand b{font-size:13px}.nav .btn{padding:0 10px}}
-dialog.drawer{margin:0 0 0 auto;width:min(340px,84vw);max-width:none;height:100%;max-height:none;padding:0;background:transparent;overflow:visible}
+dialog.drawer{margin:0 0 0 auto;width:min(340px,84vw);max-width:none;height:100%;max-height:none;padding:0;background:transparent}
 dialog.drawer::backdrop{background:rgba(0,0,0,.55);opacity:0;transition:opacity .35s ease-out}
 dialog.drawer.on::backdrop{opacity:1}
-/* tudo só com transform/opacity (roda no compositor, sem repintar a cada quadro):
-   o painel entra deslizando e uma película cobre o conteúdo; ela recolhe da direita para a esquerda
-   com a borda dourada, e cada palavra só aparece quando a borda passa por ela */
-.drawer-panel{position:relative;height:100%;display:flex;flex-direction:column;background:#0b0b0b;color:var(--white);border-left:1px solid rgba(201,164,50,.45);padding:calc(14px + env(safe-area-inset-top,0px)) 22px calc(20px + env(safe-area-inset-bottom,0px));overflow:hidden auto;transform:translate3d(100%,0,0);transition:transform .34s cubic-bezier(.32,.72,0,1);will-change:transform}
-.drawer.on .drawer-panel,.drawer.out .drawer-panel{transform:none}
-.drawer.out .drawer-panel{transform:translate3d(100%,0,0);transition-duration:.28s;transition-timing-function:cubic-bezier(.4,0,1,1)}
-.drawer-film{position:absolute;top:0;left:0;width:100%;height:100vh;height:100dvh;z-index:2;pointer-events:none;background:#0b0b0b;transform:translate3d(0,0,0);will-change:transform}
-.drawer-film::before{content:"";position:absolute;top:0;bottom:0;right:0;width:46px;background:linear-gradient(90deg,transparent,rgba(227,193,90,.14))}
-.drawer-film::after{content:"";position:absolute;top:0;bottom:0;right:0;width:2px;background:var(--gold-hi);box-shadow:0 0 0 1px rgba(227,193,90,.18)}
-.drawer.on .drawer-film{transform:translate3d(-101%,0,0);transition:transform .62s .2s cubic-bezier(.65,0,.35,1)}
-.drawer.out .drawer-film{transform:translate3d(-101%,0,0)}
+/* "plastificar" da direita para a esquerda, só com transform (roda no compositor, sem repintar a cada quadro):
+   o dialog recorta e desliza para a esquerda enquanto o painel desliza ao contrário, então o painel fica parado
+   e vai sendo revelado — mesmo visual de um clip-path, mas fluido no celular */
+dialog.drawer{overflow:hidden;transform:translate3d(100%,0,0);transition:transform .4s cubic-bezier(.65,0,.35,1);will-change:transform}
+.drawer-panel{position:relative;height:100%;display:flex;flex-direction:column;background:#0b0b0b;color:var(--white);border-left:1px solid rgba(201,164,50,.45);padding:calc(14px + env(safe-area-inset-top,0px)) 22px calc(20px + env(safe-area-inset-bottom,0px));overflow:hidden auto;transform:translate3d(-100%,0,0);transition:transform .4s cubic-bezier(.65,0,.35,1);will-change:transform}
+.drawer.on,.drawer.on .drawer-panel{transform:none;transition-duration:.55s}
+.drawer-sheen{position:absolute;inset:0;pointer-events:none;background:linear-gradient(255deg,transparent 40%,rgba(227,193,90,.16) 50%,transparent 60%);transform:translate3d(110%,0,0);will-change:transform}
+.drawer.on .drawer-sheen{animation:sheenL .8s .25s cubic-bezier(.2,.7,.2,1) forwards}
+@keyframes sheenL{to{transform:translate3d(-110%,0,0)}}
+/* as palavras só entram depois que a borda da película passa por elas */
+.drawer-list li{opacity:0;transform:translate3d(16px,0,0);transition:opacity .2s ease-out,transform .2s ease-out}
+.drawer.on .drawer-list li{opacity:1;transform:none;transition:opacity .35s ease-out,transform .45s var(--ease)}
+.drawer.on .drawer-list li:nth-child(1){transition-delay:.42s}.drawer.on .drawer-list li:nth-child(2){transition-delay:.47s}.drawer.on .drawer-list li:nth-child(3){transition-delay:.52s}
+.drawer.on .drawer-list li:nth-child(4){transition-delay:.57s}.drawer.on .drawer-list li:nth-child(5){transition-delay:.62s}.drawer.on .drawer-list li:nth-child(6){transition-delay:.67s}
 .drawer-head{display:flex;align-items:center;justify-content:space-between;height:48px}
-.drawer-title{font-size:13px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-hi)}
+.drawer-title svg{width:22px;height:19px}
+.drawer-title{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-hi)}
 .drawer-x{width:40px;height:40px;margin-right:-8px;display:grid;place-items:center;background:none;border:0;color:#d9d9d4;cursor:pointer;transition:color .16s ease-out,transform .12s ease-out}
 .drawer-x svg{width:20px;height:20px}
 .drawer-x:active{transform:scale(.94)}
@@ -539,7 +543,7 @@ dialog.drawer.on::backdrop{opacity:1}
 .nav .nav-cta{clip-path:inset(0 0 0 0);transition:clip-path .5s cubic-bezier(.65,0,.35,1),background-color .16s ease-out,background-position 0s,transform .12s ease-out}
 .nav .nav-cta.hide{clip-path:inset(0 0 0 100%);pointer-events:none}
 .nav .nav-cta.shine{background-position:-60% 0;transition:clip-path .5s cubic-bezier(.65,0,.35,1),background-color .16s ease-out,background-position .8s .25s var(--ease)}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}.drawer-film{display:none}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}.drawer-sheen{display:none}}
 </style>
 </head>
 <body>
@@ -563,7 +567,7 @@ dialog.drawer.on::backdrop{opacity:1}
 
 <dialog id="menuDlg" class="drawer" aria-label="Menu">
   <div class="drawer-panel">
-    <div class="drawer-head"><span class="drawer-title">Menu</span><button class="drawer-x" type="button" id="closeMenu" aria-label="Fechar menu"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15"/></svg></button></div>
+    <div class="drawer-head"><span class="drawer-title"><svg viewBox="0 0 28 24" aria-hidden="true"><path d="M2 18L3.5 5l6 6L14 2l4.5 9 6-6L26 18z" fill="#c9a432"/><rect x="2" y="20" width="24" height="3" fill="#c9a432"/></svg>Menu</span><button class="drawer-x" type="button" id="closeMenu" aria-label="Fechar menu"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15"/></svg></button></div>
     <nav aria-label="Seções do site">
       <ol class="drawer-list">
         <li><a href="#servicos"><small>01</small><span>Serviços</span><i aria-hidden="true">→</i></a></li>
@@ -579,7 +583,7 @@ dialog.drawer.on::backdrop{opacity:1}
       <a class="drawer-ig" href="https://www.instagram.com/reido_ppf/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"/></svg><span translate="no">@reido_ppf</span></a>
       <p class="drawer-info">Seg a sáb, com hora marcada · (62) 99341-1237</p>
     </div>
-    <i class="drawer-film" aria-hidden="true"></i>
+    <i class="drawer-sheen" aria-hidden="true"></i>
   </div>
 </dialog>
 
@@ -1186,11 +1190,11 @@ $('#loginForm').addEventListener('submit',async e=>{
 });
 /* ── Menu do celular ── */
 const menu=$('#menuDlg'),burger=$('#openMenu');
-function openMenu(){menu.classList.remove('out');menu.showModal();burger.setAttribute('aria-expanded','true');requestAnimationFrame(()=>requestAnimationFrame(()=>menu.classList.add('on')))}
+function openMenu(){menu.showModal();burger.setAttribute('aria-expanded','true');requestAnimationFrame(()=>requestAnimationFrame(()=>menu.classList.add('on')))}
 function closeMenu(then){
   if(!menu.open)return;
-  menu.classList.replace('on','out');burger.setAttribute('aria-expanded','false');
-  setTimeout(()=>{menu.close();menu.classList.remove('out');if(then)then()},reduce?0:300);
+  menu.classList.remove('on');burger.setAttribute('aria-expanded','false');
+  setTimeout(()=>{menu.close();if(then)then()},reduce?0:420);
 }
 burger.onclick=openMenu;
 $('#closeMenu').onclick=()=>closeMenu();
