@@ -405,6 +405,19 @@ dialog.reel-dlg{width:min(420px,calc(100vw - 24px));background:var(--black);colo
 .vid-capa input{display:none}
 .vid-capa.ok{border-style:solid;border-color:var(--gold);color:var(--gold-hi)}
 .pend .row label.btn{cursor:pointer}
+/* "Deixar minha avaliação": + dourado flutuando; aviso de aprovação */
+.rev-add{gap:12px}
+.plus-float{display:grid;place-items:center;width:24px;height:24px;background:var(--gold);color:var(--black);animation:plusFloat 2.4s ease-in-out infinite}
+.plus-float svg{width:14px;height:14px}
+@keyframes plusFloat{0%,100%{transform:translateY(2px)}50%{transform:translateY(-3px)}}
+@media (hover:hover) and (pointer:fine){.rev-add:hover .plus-float{animation-duration:1.2s}}
+.rev-wait{display:flex;align-items:center;gap:12px;margin:-24px 0 32px;padding:14px 18px;border-left:3px solid var(--gold);background:rgba(201,164,50,.1);font-size:15px;color:var(--ink);animation:justIn .5s var(--ease)}
+.rev-wait[hidden]{display:none}
+.rev-wait svg{width:20px;height:20px;flex-shrink:0;color:var(--gold-ink)}
+.sent-ic{display:grid;place-items:center;width:48px;height:48px;border:2px solid var(--gold);color:var(--gold-ink)}
+.sent-ic svg{width:26px;height:26px;stroke-dasharray:24;stroke-dashoffset:24;animation:okDraw .5s .15s var(--ease) forwards}
+.sent p b{font-size:inherit;color:var(--ink)}
+@media (prefers-reduced-motion:reduce){.plus-float,.rev-wait{animation:none}.sent-ic svg{animation:none;stroke-dashoffset:0}}
 /* adm: botão "+" no topo da seção abre o formulário */
 .head-actions{display:flex;flex-wrap:wrap;align-items:center;gap:16px 28px}
 @media (min-width:761px){.head-actions{flex-wrap:nowrap}}
@@ -776,7 +789,8 @@ dialog.drawer{overflow:hidden;transform:translate3d(100%,0,0);transition:transfo
 
 <section id="avaliacoes" class="block">
   <div class="wrap">
-    <div class="head"><div><span class="eyebrow">Avaliações</span><h2 class="wide">Quem protegeu, recomenda</h2></div><button class="btn btn-line" type="button" id="openReview">Deixar minha avaliação</button></div>
+    <div class="head"><div><span class="eyebrow">Avaliações</span><h2 class="wide">Quem protegeu, recomenda</h2></div><button class="btn btn-line rev-add" type="button" id="openReview"><span class="plus-float" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg></span>Deixar minha avaliação</button></div>
+    <p class="rev-wait" id="revWait" role="status" hidden><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="10" cy="10" r="7.5"/><path d="M10 5.5V10l3 2"/></svg><span>Sua avaliação foi enviada e está <b>aguardando aprovação</b> da equipe. Assim que aprovarem, ela aparece aqui.</span></p>
     <p class="swipe-hint" id="reviewsHint" aria-hidden="true" hidden></p>
     <div class="reviews" id="reviews">
       <figure class="review"><div class="stars">★★★★★</div><blockquote>O PPF ficou completamente invisível. Você não percebe que tem película. Superou o que eu esperava.</blockquote><figcaption><b>Rafael M.</b><span>BMW M3 Competition</span></figcaption></figure>
@@ -892,7 +906,7 @@ dialog.drawer{overflow:hidden;transform:translate3d(100%,0,0);transition:transfo
         <div class="actions" style="grid-column:1/-1"><button class="btn btn-dark" type="submit" id="revBtn">Enviar avaliação</button><span id="revErr" role="alert" style="color:#a3121b;font-size:14px"></span></div>
         <p class="small" style="color:var(--muted);text-align:left">Sua avaliação aparece no site depois de aprovada pela equipe.</p>
       </form>
-      <div class="sent" id="revSent" hidden><b>Recebemos sua avaliação. Obrigado!</b><p>Ela aparece no site depois que a equipe aprovar.</p><button class="btn btn-dark" type="button" data-close>Fechar</button></div>
+      <div class="sent" id="revSent" hidden><span class="sent-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><b id="revSentTitle">Avaliação enviada para aprovação</b><p>A equipe do Rei do PPF confere cada avaliação antes de publicar. <b>Assim que for aprovada, ela aparece aqui no site.</b></p><button class="btn btn-dark" type="button" data-close>Fechar</button></div>
     </div>
   </div>
 </dialog>
@@ -1244,6 +1258,7 @@ $('#posts').addEventListener('scroll',()=>swipeHint($('#posts'),$('#postsHint'))
 $('#reviews').addEventListener('scroll',()=>swipeHint($('#reviews'),$('#reviewsHint')),{passive:true});
 wide.addEventListener('change',()=>{renderPosts();renderReviews()});
 let revFoto=null;
+try{if(sessionStorage.getItem('reiPPF.revWait'))$('#revWait').hidden=false}catch(e){}
 $('#openReview').onclick=()=>{$('#revErr').textContent='';$('#revForm').hidden=false;$('#revSent').hidden=true;$('#revDlg').showModal()};
 $('#r-foto').addEventListener('change',async e=>{const f=e.target.files[0];revFoto=null;$('#revThumb').innerHTML='';if(!f||!f.type.startsWith('image/'))return;try{revFoto=await shrink(f);$('#revThumb').innerHTML='<img alt="" src="'+revFoto+'">'}catch(err){$('#revErr').textContent='Não deu para ler essa foto. Tente outra.'}});
 $('#revForm').addEventListener('submit',async e=>{
@@ -1262,7 +1277,9 @@ $('#revForm').addEventListener('submit',async e=>{
       foto=SB+'/storage/v1/object/public/avaliacoes/'+path;
     }
     await sb('/rest/v1/avaliacoes',{method:'POST',headers:{'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({nome,carro,nota,texto,foto})});
+    $('#revSentTitle').textContent='Obrigado, '+nome.split(' ')[0]+'! Sua avaliação foi para aprovação';
     revFoto=null;$('#revThumb').innerHTML='';$('#revForm').reset();$('#revForm').hidden=true;$('#revSent').hidden=false;
+    $('#revWait').hidden=false;try{sessionStorage.setItem('reiPPF.revWait','1')}catch(e){}toast('Avaliação enviada para aprovação');
     if(session)loadReviews();
   }catch(err){$('#revErr').textContent='Não deu para enviar agora ('+err.message+'). Tente de novo.'}
   finally{btn.disabled=false;btn.textContent='Enviar avaliação'}
