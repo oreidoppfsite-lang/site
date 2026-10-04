@@ -557,6 +557,31 @@ dialog.drawer{overflow:hidden;transform:translate3d(100%,0,0);transition:transfo
 .nav .nav-cta{clip-path:inset(0 0 0 0);transition:clip-path .5s cubic-bezier(.65,0,.35,1),background-color .16s ease-out,background-position 0s,transform .12s ease-out}
 .nav .nav-cta.hide{clip-path:inset(0 0 0 100%);pointer-events:none}
 .nav .nav-cta.shine{background-position:-60% 0;transition:clip-path .5s cubic-bezier(.65,0,.35,1),background-color .16s ease-out,background-position .8s .25s var(--ease)}
+/* ── Botões do adm: ícone, linha correndo enquanto salva, ✓ quando dá certo, e o item sai/entra animado ── */
+.btn,.post-del{position:relative;overflow:hidden}
+.btn svg.i,.post-del svg{flex-shrink:0}
+.btn svg.i{width:16px;height:16px}
+.btn.busy,.post-del.busy{pointer-events:none;opacity:1}
+.btn.busy::before,.post-del.busy::before{content:"";position:absolute;left:0;bottom:0;width:45%;height:2px;background:currentColor;animation:busyLine .9s cubic-bezier(.45,0,.55,1) infinite}
+@keyframes busyLine{from{transform:translateX(-100%)}to{transform:translateX(230%)}}
+.btn.done{pointer-events:none;opacity:1}
+.btn.done::after,.btn.busy::after,.btn:has(svg.i)::after{content:none}
+.btn .ok-ic{width:16px;height:16px;stroke-dasharray:20;stroke-dashoffset:20;animation:okDraw .35s .05s var(--ease) forwards}
+@keyframes okDraw{to{stroke-dashoffset:0}}
+.pend .btn-del{color:#ff8a8f;border-color:rgba(255,120,128,.35)}
+@media (hover:hover) and (pointer:fine){
+  .pend .btn-del:hover{background:#a3121b;border-color:#a3121b;color:var(--white)}
+  .pend .btn-line:not(.btn-del):hover{border-color:var(--gold);color:var(--gold-hi)}
+  .pend .btn-del:hover svg{animation:trashTip .4s var(--ease)}
+  .post-del:hover svg{animation:trashTip .4s var(--ease)}
+}
+@keyframes trashTip{40%{transform:rotate(-14deg) translateY(-1px)}100%{transform:none}}
+.just-in{animation:justIn .9s var(--ease)}
+@keyframes justIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.just-in::before{content:"";position:absolute;inset:0;z-index:5;pointer-events:none;border:2px solid var(--gold);animation:justRing 1.8s ease-out forwards}
+@keyframes justRing{0%,40%{opacity:1}100%{opacity:0}}
+.pend article,.post-wrap,.review{position:relative}
+@media (prefers-reduced-motion:reduce){.btn.busy::before,.post-del.busy::before{animation:none;width:100%;opacity:.5}.just-in,.just-in::before{animation:none}.just-in::before{display:none}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}.drawer-sheen{display:none}}
 </style>
 </head>
@@ -1051,16 +1076,37 @@ function renderPosts(){
 }
 const waUrl=t=>'https://wa.me/'+WA+'?text='+encodeURIComponent(t);
 const TRASH='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2.5 4h11M6 4V2.5h4V4M4 4l.7 9.5h6.6L12 4"/></svg>';
+// estados dos botões do adm (salvando → ✓) e item saindo/entrando com animação
+const IC={
+  plus:'<svg class="i" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M8 3v10M3 8h10"/></svg>',
+  ok:'<svg class="i" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"/></svg>',
+  img:'<svg class="i" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="2" y="3" width="12" height="10"/><path d="M2 11l3.5-3.5 3 3L10.5 8 14 11.5"/><circle cx="10.5" cy="5.8" r="1"/></svg>'
+};
+const DONE='<svg class="ok-ic" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"/></svg>';
+function busy(btn,txt){if(!btn)return;btn._html=btn._html||btn.innerHTML;btn.disabled=true;btn.classList.add('busy');btn.setAttribute('aria-busy','true');if(txt)btn.textContent=txt}
+function idle(btn){if(!btn)return;btn.classList.remove('busy','done');btn.removeAttribute('aria-busy');btn.disabled=false;if(btn._html!=null){btn.innerHTML=btn._html;btn._html=null}}
+function done(btn,txt){if(!btn)return Promise.resolve();btn.classList.remove('busy');btn.removeAttribute('aria-busy');btn.classList.add('done');btn.innerHTML=DONE+'<span>'+txt+'</span>';return new Promise(r=>setTimeout(r,reduce?0:650))}
+function leave(el){
+  if(!el||reduce)return Promise.resolve();
+  const list=el.matches('.pend article');
+  el.style.transition='opacity .22s ease-out,transform .3s var(--ease)';el.style.opacity='0';el.style.transform=list?'translateX(24px)':'scale(.96)';
+  if(!list)return new Promise(r=>setTimeout(r,300));
+  el.style.overflow='hidden';el.style.height=el.offsetHeight+'px';
+  return new Promise(r=>setTimeout(()=>{el.style.transition+=',height .28s var(--ease),padding .28s var(--ease),margin .28s var(--ease),border-width .28s';el.style.height='0px';el.style.paddingTop=el.style.paddingBottom='0px';el.style.borderWidth='0px';el.style.marginTop='-12px';setTimeout(r,300)},200));
+}
+function justIn(el){if(!el||reduce)return;el.classList.remove('just-in');void el.offsetWidth;el.classList.add('just-in');setTimeout(()=>el.classList.remove('just-in'),1900)}
 async function deletePost(p,btn){
   if(!await askConfirm({title:'Apagar este post?',text:'“'+p.titulo+'” e as fotos dele saem do site. Não dá para desfazer.',ok:'Apagar post'}))return;
-  const label=btn.innerHTML;btn.disabled=true;btn.textContent='Apagando…';
+  busy(btn,'Apagando…');
   try{
     await sb('/rest/v1/posts?id=eq.'+encodeURIComponent(p.id),{method:'DELETE',auth:true});
+    if($('#postDlg').open)await done(btn,'Apagado');
     const paths=(p.fotos||[]).map(u=>u.split('/object/public/fotos/')[1]).filter(Boolean);
     if(paths.length)sb('/storage/v1/object/fotos',{method:'DELETE',auth:true,headers:{'Content-Type':'application/json'},body:JSON.stringify({prefixes:paths})}).catch(()=>{});
     if($('#postDlg').open)$('#postDlg').close();
-    toast('Post apagado');loadPosts();
-  }catch(e){btn.disabled=false;btn.innerHTML=label;toast(e.status===401?'Sua sessão expirou. Entre de novo pela Área do adm.':'Não deu para apagar. Tente de novo.')}
+    const card=btn.closest('.post-wrap')||[...document.querySelectorAll('#posts .post-del')].find(d=>d.getAttribute('aria-label')==='Apagar o post '+p.titulo)?.closest('.post-wrap');
+    await leave(card);toast('Post apagado');loadPosts();
+  }catch(e){idle(btn);toast(e.status===401?'Sua sessão expirou. Entre de novo pela Área do adm.':'Não deu para apagar. Tente de novo.')}
 }
 // confirmação no estilo do site (no lugar da caixa padrão do navegador)
 function askConfirm({title,text,ok}){
@@ -1076,7 +1122,7 @@ function openPost(p){
   $('#postKicker').textContent=SVC[p.servico]+(p.exemplo?' · post de exemplo':'');
   const photos=p.fotos&&p.fotos.length?'<div class="dlg-photos'+(p.fotos.length>1?' many':'')+'">'+p.fotos.map(s=>'<img alt="Foto do trabalho" src="'+esc(s)+'">').join('')+'</div>':'<div class="dlg-cover">'+ph(p)+'</div>';
   $('#postBody').innerHTML=photos+'<div class="meta"><span>'+fmt(p.date)+'</span><span>'+esc(p.carro)+'</span></div><h2 id="postTitle">'+esc(p.titulo)+'</h2><p class="dlg-text">'+esc(p.texto)+'</p>'+
-    '<div class="actions"><a class="btn btn-gold" target="_blank" rel="noopener" href="'+waUrl('Olá! Vi o post "'+p.titulo+'" e quero um orçamento de '+SVC[p.servico]+'.')+'">Quero um orçamento assim</a>'+(p.exemplo||!session?'':'<button class="btn btn-line" type="button" id="delPost">Apagar post</button>')+'</div>';
+    '<div class="actions"><a class="btn btn-gold" target="_blank" rel="noopener" href="'+waUrl('Olá! Vi o post "'+p.titulo+'" e quero um orçamento de '+SVC[p.servico]+'.')+'">Quero um orçamento assim</a>'+(p.exemplo||!session?'':'<button class="btn btn-line btn-del" type="button" id="delPost">'+TRASH.replace('<svg','<svg class="i"')+'Apagar post</button>')+'</div>';
   const del=$('#delPost');
   if(del)del.onclick=()=>deletePost(p,del);
   $('#postDlg').showModal();
@@ -1098,7 +1144,7 @@ $('#pubForm').addEventListener('submit',async e=>{
   e.preventDefault();
   const carro=$('#p-carro').value.trim(),titulo=$('#p-titulo').value.trim();
   if(!carro||!titulo){$('#pubErr').textContent='Preencha o carro e o título para publicar.';$(carro?'#p-titulo':'#p-carro').focus();return}
-  const btn=$('#pubBtn');btn.disabled=true;btn.textContent='Publicando…';$('#pubErr').textContent='';
+  const btn=$('#pubBtn');busy(btn,pending.length?'Enviando fotos…':'Publicando…');$('#pubErr').textContent='';
   try{
     const fotos=[];
     for(const d of pending){
@@ -1110,12 +1156,13 @@ $('#pubForm').addEventListener('submit',async e=>{
     await sb('/rest/v1/posts',{method:'POST',auth:true,headers:{'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({
       data:now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate()),
       carro,titulo,servico:$('#p-servico').value,texto:$('#p-texto').value.trim()||'Mais um carro protegido pela equipe.',fotos})});
+    await done(btn,'Publicado');
     pending=[];$('#thumbs').innerHTML='';$('#pubForm').reset();$('#pubDlg').close();
     filter='todos';document.querySelectorAll('#filters .chip').forEach((x,i)=>x.setAttribute('aria-pressed',i===0));
-    await loadPosts();toast('Publicado no diário');$('#diario').scrollIntoView({behavior:reduce?'auto':'smooth'});
+    await loadPosts();toast('Publicado no diário');$('#diario').scrollIntoView({behavior:reduce?'auto':'smooth'});setTimeout(()=>justIn($('#posts .post-wrap')),reduce?0:450);
   }catch(err){
     $('#pubErr').textContent=err.status===401?'Sua sessão expirou. Entre de novo pela Área do adm.':'Não deu para publicar ('+err.message+'). Confira a internet e tente de novo.';
-  }finally{btn.disabled=false;btn.textContent='Publicar'}
+  }finally{idle(btn)}
 });
 
 /* ── Avaliações: visitante envia, fica pendente; adm aprova ou apaga ── */
@@ -1141,14 +1188,14 @@ function renderReviews(){
   $('#reviewsNote').hidden=!!ok.length;
   $('#revAdmin').hidden=!session;
   $('#revAdminHint').textContent=pend.length?'Só aparecem no site depois que você aprovar.':'Nenhuma avaliação esperando aprovação.';
-  $('#pending').innerHTML=pend.map(r=>'<article>'+(r.foto?'<img src="'+esc(r.foto)+'" alt="">':'')+'<div><span class="stars" aria-label="'+r.nota+' de 5 estrelas">'+stars(r.nota)+'</span><p>'+esc(r.texto)+'</p><small>'+esc(r.nome)+(r.carro?' · '+esc(r.carro):'')+' · '+fmt(r.created_at.slice(0,10))+'</small></div><div class="row"><button class="btn btn-gold" type="button" data-ok="'+esc(r.id)+'">Aprovar</button><button class="btn btn-line" type="button" data-del="'+esc(r.id)+'">Apagar</button></div></article>').join('');
+  $('#pending').innerHTML=pend.map(r=>'<article>'+(r.foto?'<img src="'+esc(r.foto)+'" alt="">':'')+'<div><span class="stars" aria-label="'+r.nota+' de 5 estrelas">'+stars(r.nota)+'</span><p>'+esc(r.texto)+'</p><small>'+esc(r.nome)+(r.carro?' · '+esc(r.carro):'')+' · '+fmt(r.created_at.slice(0,10))+'</small></div><div class="row"><button class="btn btn-gold" type="button" data-ok="'+esc(r.id)+'">'+IC.ok+'Aprovar</button><button class="btn btn-line btn-del" type="button" data-del="'+esc(r.id)+'">'+TRASH.replace('<svg','<svg class="i"')+'Apagar</button></div></article>').join('');
 }
 document.addEventListener('click',async e=>{
   const ok=e.target.closest('[data-ok]'),del=e.target.closest('#reviews [data-del],#pending [data-del]');
   if(!ok&&!del)return;
   const btn=ok||del,id=btn.dataset.ok||btn.dataset.del;
   if(del){const rv=(reviews||[]).find(x=>x.id===id);if(!await askConfirm({title:'Apagar esta avaliação?',text:(rv?'A avaliação de '+rv.nome+(rv.foto?', com a foto,':'')+' sai do site. ':'')+'Não dá para desfazer.',ok:'Apagar avaliação'}))return}
-  btn.disabled=true;
+  busy(btn,ok?'Aprovando…':'Apagando…');
   try{
     if(ok)await sb('/rest/v1/avaliacoes?id=eq.'+encodeURIComponent(id),{method:'PATCH',auth:true,headers:{'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({aprovada:true})});
     else{
@@ -1156,8 +1203,10 @@ document.addEventListener('click',async e=>{
       const rv=(reviews||[]).find(x=>x.id===id),path=rv&&rv.foto&&rv.foto.split('/object/public/avaliacoes/')[1];
       if(path)sb('/storage/v1/object/avaliacoes',{method:'DELETE',auth:true,headers:{'Content-Type':'application/json'},body:JSON.stringify({prefixes:[path]})}).catch(()=>{});
     }
-    toast(ok?'Avaliação aprovada':'Avaliação apagada');loadReviews();
-  }catch(err){btn.disabled=false;toast(err.status===401?'Sua sessão expirou. Entre de novo pela Área do adm.':'Não deu certo. Tente de novo.')}
+    await done(btn,ok?'Aprovada':'Apagada');await leave(btn.closest('article,figure'));
+    toast(ok?'Avaliação aprovada':'Avaliação apagada');await loadReviews();
+    if(ok)justIn(document.querySelector('#reviews [data-id="'+CSS.escape(id)+'"]'));
+  }catch(err){idle(btn);toast(err.status===401?'Sua sessão expirou. Entre de novo pela Área do adm.':'Não deu certo. Tente de novo.')}
 });
 $('#morePosts').onclick=()=>{morePosts=true;renderPosts()};
 $('#moreReviews').onclick=()=>{moreReviews=true;renderReviews()};
@@ -1252,7 +1301,7 @@ function renderReels(){
   $('#reels').innerHTML=list.slice(0,9).map((v,i)=>'<div class="reel">'+(v.capa?'<img src="'+esc(v.capa)+'" alt="" loading="lazy">':'<span class="reel-ph">'+PLAY_LG+'</span><iframe class="reel-prev" src="'+esc(v.url)+'embed/" loading="lazy" scrolling="no" tabindex="-1" aria-hidden="true" title=""></iframe>')+'<span class="reel-ico">'+PLAY_SM+'</span><span class="reel-cap">'+IG_ICON+'<span>Ver reel</span></span><button type="button" class="reel-hit" data-reel="'+esc(v.url)+'" aria-label="Ver vídeo '+(i+1)+' do Instagram"></button></div>').join('');
   reelScale();reelsFit();
   $('#vidAdmin').hidden=!session;
-  $('#vidList').innerHTML=(videos||[]).map(v=>'<article>'+(v.capa?'<img src="'+esc(v.capa)+'" alt="">':'')+'<div><a href="'+esc(v.url)+'" target="_blank" rel="noopener">'+esc(v.url)+'</a></div><div class="row"><label class="btn btn-line">'+(v.capa?'Trocar capa':'Pôr capa')+'<input type="file" accept="image/*" data-vcapa="'+esc(v.id)+'"></label><button class="btn btn-line" type="button" data-vdel="'+esc(v.id)+'">Remover</button></div></article>').join('')||(session?'<small>Nenhum vídeo adicionado ainda: o site mostra os 3 vídeos de exemplo.</small>':'');
+  $('#vidList').innerHTML=(videos||[]).map(v=>'<article>'+(v.capa?'<img src="'+esc(v.capa)+'" alt="">':'')+'<div><a href="'+esc(v.url)+'" target="_blank" rel="noopener">'+esc(v.url)+'</a></div><div class="row"><label class="btn btn-line">'+IC.img+(v.capa?'Trocar capa':'Pôr capa')+'<input type="file" accept="image/*" data-vcapa="'+esc(v.id)+'"></label><button class="btn btn-line btn-del" type="button" data-vdel="'+esc(v.id)+'">'+TRASH.replace('<svg','<svg class="i"')+'Remover</button></div></article>').join('')||(session?'<small>Nenhum vídeo adicionado ainda: o site mostra os 3 vídeos de exemplo.</small>':'');
 }
 // ajusta a escala da prévia ao tamanho do quadrado (o player do Instagram tem 326px de largura mínima)
 // no player do Instagram (326px de largura) a área do vídeo vai de ~56px a ~428px de altura;
@@ -1293,8 +1342,10 @@ async function uploadCapa(file){
 $('#vidCapa').addEventListener('change',e=>{const f=e.target.files[0];$('#vidCapaLbl').classList.toggle('ok',!!f);$('#vidCapaLbl').firstChild.textContent=f?'Capa escolhida ✓':'Capa (opcional): print do reel'});
 document.addEventListener('change',async e=>{
   const inp=e.target.closest('[data-vcapa]');if(!inp||!inp.files[0])return;
-  try{const capa=await uploadCapa(inp.files[0]);await sb('/rest/v1/videos?id=eq.'+encodeURIComponent(inp.dataset.vcapa),{method:'PATCH',auth:true,headers:{'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({capa})});toast('Capa atualizada');loadVideos()}
-  catch(err){toast(err.status===401?'Sua sessão expirou. Entre de novo pela Área do adm.':'Não deu para trocar a capa ('+err.message+').')}
+  const lbl=inp.closest('label'),t=[...lbl.childNodes].find(n=>n.nodeType===3),was=t.textContent;
+  lbl.classList.add('busy');t.textContent='Enviando…';
+  try{const capa=await uploadCapa(inp.files[0]);await sb('/rest/v1/videos?id=eq.'+encodeURIComponent(inp.dataset.vcapa),{method:'PATCH',auth:true,headers:{'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({capa})});toast('Capa atualizada');await loadVideos();const i=(videos||[]).findIndex(v=>v.id===inp.dataset.vcapa);justIn(document.querySelectorAll('#vidList article')[i]);justIn(document.querySelectorAll('#reels .reel')[i])}
+  catch(err){lbl.classList.remove('busy');t.textContent=was;toast(err.status===401?'Sua sessão expirou. Entre de novo pela Área do adm.':'Não deu para trocar a capa ('+err.message+').')}
 });
 async function loadVideos(){
   try{videos=await sb('/rest/v1/videos?select=*&order=created_at.desc')}catch(e){videos=null}
@@ -1304,20 +1355,22 @@ $('#vidForm').addEventListener('submit',async e=>{
   e.preventDefault();
   const url=igLink($('#vidUrl').value);
   if(!url){$('#vidErr').textContent='Cole um link de reel do Instagram, como https://www.instagram.com/reel/…';$('#vidUrl').focus();return}
-  const btn=$('#vidBtn');btn.disabled=true;$('#vidErr').textContent='';
+  const btn=$('#vidBtn');busy(btn,$('#vidCapa').files[0]?'Enviando capa…':'Adicionando…');$('#vidErr').textContent='';
   try{
     const f=$('#vidCapa').files[0],capa=f?await uploadCapa(f):null;
     await sb('/rest/v1/videos',{method:'POST',auth:true,headers:{'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(capa?{url,capa}:{url})});
-    $('#vidForm').reset();$('#vidCapaLbl').classList.remove('ok');$('#vidCapaLbl').firstChild.textContent='Capa (opcional): print do reel';toast('Vídeo adicionado');loadVideos();
+    await done(btn,'Adicionado');
+    $('#vidForm').reset();$('#vidCapaLbl').classList.remove('ok');$('#vidCapaLbl').firstChild.textContent='Capa (opcional): print do reel';toast('Vídeo adicionado');
+    await loadVideos();$('#reelsScroll').scrollTop=0;justIn($('#reels .reel'));justIn($('#vidList article'));
   }catch(err){$('#vidErr').textContent=err.status===401?'Sua sessão expirou. Entre de novo pela Área do adm.':'Não deu para adicionar ('+err.message+'). Tente de novo.'}
-  finally{btn.disabled=false}
+  finally{idle(btn)}
 });
 document.addEventListener('click',async e=>{
   const btn=e.target.closest('[data-vdel]');if(!btn)return;
   if(!await askConfirm({title:'Tirar este vídeo do site?',text:'Ele continua no Instagram, só deixa de aparecer aqui.',ok:'Remover vídeo'}))return;
-  btn.disabled=true;
-  try{await sb('/rest/v1/videos?id=eq.'+encodeURIComponent(btn.dataset.vdel),{method:'DELETE',auth:true});toast('Vídeo removido');loadVideos()}
-  catch(err){btn.disabled=false;toast(err.status===401?'Sua sessão expirou. Entre de novo pela Área do adm.':'Não deu para remover. Tente de novo.')}
+  busy(btn,'Removendo…');
+  try{await sb('/rest/v1/videos?id=eq.'+encodeURIComponent(btn.dataset.vdel),{method:'DELETE',auth:true});await done(btn,'Removido');await leave(btn.closest('article'));toast('Vídeo removido');loadVideos()}
+  catch(err){idle(btn);toast(err.status===401?'Sua sessão expirou. Entre de novo pela Área do adm.':'Não deu para remover. Tente de novo.')}
 });
 
 syncAdmin();   // também carrega avaliações e vídeos
