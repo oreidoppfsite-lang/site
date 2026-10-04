@@ -536,6 +536,10 @@ dialog.drawer.on::backdrop{background:rgba(0,0,0,.55)}
 .drawer-ig{display:inline-flex;align-items:center;gap:10px;align-self:flex-start;color:#d9d9d4;font-size:14px;font-weight:500;text-decoration:none}
 .drawer-ig svg{width:18px;height:18px;color:var(--gold-hi)}
 .drawer-info{font-size:12px;color:#6f6f68}
+/* ── "Orçamento" do menu: some enquanto o "Pedir orçamento" do topo está na tela; entra e sai como película ── */
+.nav .nav-cta{clip-path:inset(0 0 0 0);transition:clip-path .5s cubic-bezier(.65,0,.35,1),background-color .16s ease-out,background-position 0s,transform .12s ease-out}
+.nav .nav-cta.hide{clip-path:inset(0 0 0 100%);pointer-events:none}
+.nav .nav-cta.shine{background-position:-60% 0;transition:clip-path .5s cubic-bezier(.65,0,.35,1),background-color .16s ease-out,background-position .8s .25s var(--ease)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}.drawer-sheen{display:none}}
 </style>
 </head>
@@ -554,7 +558,7 @@ dialog.drawer.on::backdrop{background:rgba(0,0,0,.55)}
     <li><a href="#avaliacoes">Avaliações</a></li>
     <li><a href="#historia">Nossa história</a></li>
   </ul>
-  <a class="btn btn-gold" href="#contato">Orçamento</a>
+  <a class="btn btn-gold nav-cta" id="navCta" href="#contato">Orçamento</a>
   <button class="burger" type="button" id="openMenu" aria-label="Abrir menu" aria-controls="menuDlg" aria-expanded="false"><span></span><span></span><span></span></button>
 </nav>
 
@@ -896,6 +900,15 @@ new IntersectionObserver(es=>{topoVisible=es[0].isIntersecting;setPlay()}).obser
 vidBtn.onclick=()=>{wantPlay=!wantPlay;syncBtn();setPlay()};
 portrait.addEventListener('change',()=>{pickVideo();setPlay()});
 syncBtn();setPlay();
+// o "Orçamento" do menu só aparece quando o "Pedir orçamento" do topo já saiu da tela
+const navCta=$('#navCta');let ctaOn=null,shineT;
+function setNavCta(on){
+  if(on===ctaOn)return;ctaOn=on;
+  navCta.classList.toggle('hide',!on);
+  navCta.setAttribute('aria-hidden',on?'false':'true');navCta.tabIndex=on?0:-1;
+  clearTimeout(shineT);navCta.classList.remove('shine');
+  if(on&&!reduce){requestAnimationFrame(()=>navCta.classList.add('shine'));shineT=setTimeout(()=>navCta.classList.remove('shine'),1300)}
+}
 let ticking=false;
 function onScroll(){
   if(ticking)return;ticking=true;
@@ -908,6 +921,7 @@ function onScroll(){
     topo.classList.toggle('rolou',p>.02);topo.classList.toggle('fim',p>.94);
     $('#hintTxt').textContent=p>.02?'Continue rolando':'Role para baixo';
     nav.classList.toggle('solid',r.bottom<=70);
+    setNavCta(!(r.bottom>70&&p<.25));
   });
 }
 addEventListener('scroll',onScroll,{passive:true});
