@@ -292,6 +292,9 @@ footer{background:var(--black);color:#9a9a93;border-top:1px solid #1f1f1f;paddin
 .foot .brand{color:var(--white);margin-bottom:14px}
 .owner{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:16px 32px;background:var(--black);color:var(--white);padding:20px 24px;margin-top:32px;border-left:3px solid var(--gold)}
 .owner[hidden]{display:none}
+.owner-end{background:var(--black)}
+.owner-end .owner{margin:0;padding-block:28px;border-left:0;border-top:3px solid var(--gold)}
+.owner-end:has(.owner[hidden]){display:none}
 .owner b{display:block;font-size:16px;margin-bottom:2px}
 .owner span{color:#bdbdb6;font-size:14px}
 .owner-actions{display:flex;align-items:center;gap:20px}
@@ -503,10 +506,6 @@ footer::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;back
     </div>
     <div class="bar"><div class="chips" id="filters" role="group" aria-label="Filtrar por serviço"></div></div>
     <div class="posts" id="posts"></div>
-    <div class="owner" id="adminBar" hidden>
-      <div><b>Você está logado como adm</b><span id="ownerHint">Publique um trabalho novo ou apague um post pelo botão “Apagar” em cada card.</span></div>
-      <div class="owner-actions"><button class="btn btn-gold" type="button" id="openPublish">Publicar trabalho</button><button class="link" type="button" id="logout">Sair</button></div>
-    </div>
   </div>
 </section>
 
@@ -595,6 +594,14 @@ footer::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;back
     </form>
   </div>
 </section>
+<div class="owner-end">
+  <div class="wrap">
+    <div class="owner" id="adminBar" hidden>
+      <div><b>Você está logado como adm</b><span id="ownerHint">Publique um trabalho novo, ou use os botões “Apagar” nos posts, “Aprovar” nas avaliações e “Adicionar” nos vídeos.</span></div>
+      <div class="owner-actions"><button class="btn btn-gold" type="button" id="openPublish">Publicar trabalho</button><button class="link" type="button" id="logout">Sair</button></div>
+    </div>
+  </div>
+</div>
 </main>
 
 <footer>
@@ -787,7 +794,7 @@ let filter='todos';
 function renderPosts(){
   const list=allPosts().filter(p=>filter==='todos'||p.servico===filter);
   const box=$('#posts');box.innerHTML='';
-  $('#ownerHint').textContent=remote&&remote.length?'Publique um trabalho novo ou apague um post pelo botão “Apagar” em cada card.':'Os posts de exemplo somem quando você publicar o primeiro trabalho.';
+  $('#ownerHint').textContent=remote&&remote.length?'Publique um trabalho novo, ou use os botões “Apagar” nos posts, “Aprovar” nas avaliações e “Adicionar” nos vídeos.':'Os posts de exemplo somem quando você publicar o primeiro trabalho.';
   if(!list.length){box.innerHTML='<p class="empty">Ainda não há trabalhos com esse serviço.</p>';return}
   list.forEach((p,i)=>{
     const feat=i===0&&list.length>2?' featured':'';
