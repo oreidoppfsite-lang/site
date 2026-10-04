@@ -226,6 +226,8 @@ section[id]{scroll-margin-top:64px}
 .reviews-note[hidden],.rev-admin[hidden]{display:none}
 .review{position:relative}
 .review .post-del{top:16px;right:16px}
+.review>img{width:calc(100% + 56px);margin:-28px -28px 0;aspect-ratio:4/3;object-fit:cover;display:block}
+.pend img{width:96px;height:72px;object-fit:cover;flex-shrink:0}
 .rev-admin{margin-top:32px;background:var(--black);color:var(--white);padding:24px;border-left:3px solid var(--gold)}
 .rev-admin>b{display:block;font-size:16px;margin-bottom:4px}
 .rev-admin>span{color:#bdbdb6;font-size:14px}
@@ -643,6 +645,8 @@ footer::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;back
         <div class="field"><label for="r-nome">Seu nome</label><input class="input" id="r-nome" name="nome" autocomplete="name" maxlength="60" placeholder="Ex.: Rafael M.…"></div>
         <div class="field"><label for="r-carro">Seu carro</label><input class="input" id="r-carro" name="carro" autocomplete="off" maxlength="60" placeholder="Ex.: BMW M3 2023…"></div>
         <div class="field full"><label for="r-texto">Como foi o serviço?</label><textarea class="input" id="r-texto" name="texto" autocomplete="off" maxlength="600" placeholder="Conte como ficou o carro e como foi o atendimento…"></textarea></div>
+        <label class="drop" for="r-foto" id="revDrop">Foto do carro (opcional): toque para escolher<input id="r-foto" type="file" accept="image/*"></label>
+        <div class="thumbs" id="revThumb"></div>
         <div class="hp" aria-hidden="true"><label for="r-site">Não preencha</label><input id="r-site" name="site" tabindex="-1" autocomplete="off"></div>
         <div class="actions" style="grid-column:1/-1"><button class="btn btn-dark" type="submit" id="revBtn">Enviar avaliação</button><span id="revErr" role="alert" style="color:#a3121b;font-size:14px"></span></div>
         <p class="small" style="color:var(--muted);text-align:left">Sua avaliação aparece no site depois de aprovada pela equipe.</p>
@@ -866,12 +870,12 @@ function renderReviews(){
   const ok=(reviews||[]).filter(r=>r.aprovada),pend=(reviews||[]).filter(r=>!r.aprovada);
   const box=$('#reviews');
   if(ok.length){
-    box.innerHTML=ok.map(r=>'<figure class="review" data-id="'+esc(r.id)+'"><div class="stars" aria-label="'+r.nota+' de 5 estrelas">'+stars(r.nota)+'</div><blockquote>'+esc(r.texto)+'</blockquote><figcaption><b>'+esc(r.nome)+'</b><span>'+esc(r.carro)+'</span></figcaption>'+(session?'<button class="post-del" type="button" data-del="'+esc(r.id)+'">'+TRASH+'Apagar</button>':'')+'</figure>').join('');
+    box.innerHTML=ok.map(r=>'<figure class="review" data-id="'+esc(r.id)+'">'+(r.foto?'<img src="'+esc(r.foto)+'" alt="Carro de '+esc(r.nome)+'" loading="lazy">':'')+'<div class="stars" aria-label="'+r.nota+' de 5 estrelas">'+stars(r.nota)+'</div><blockquote>'+esc(r.texto)+'</blockquote><figcaption><b>'+esc(r.nome)+'</b><span>'+esc(r.carro)+'</span></figcaption>'+(session?'<button class="post-del" type="button" data-del="'+esc(r.id)+'">'+TRASH+'Apagar</button>':'')+'</figure>').join('');
   }else box.innerHTML=EXEMPLOS;
   $('#reviewsNote').hidden=!!ok.length;
   $('#revAdmin').hidden=!session;
   $('#revAdminHint').textContent=pend.length?'Só aparecem no site depois que você aprovar.':'Nenhuma avaliação esperando aprovação.';
-  $('#pending').innerHTML=pend.map(r=>'<article><div><span class="stars" aria-label="'+r.nota+' de 5 estrelas">'+stars(r.nota)+'</span><p>'+esc(r.texto)+'</p><small>'+esc(r.nome)+(r.carro?' · '+esc(r.carro):'')+' · '+fmt(r.created_at.slice(0,10))+'</small></div><div class="row"><button class="btn btn-gold" type="button" data-ok="'+esc(r.id)+'">Aprovar</button><button class="btn btn-line" type="button" data-del="'+esc(r.id)+'">Apagar</button></div></article>').join('');
+  $('#pending').innerHTML=pend.map(r=>'<article>'+(r.foto?'<img src="'+esc(r.foto)+'" alt="">':'')+'<div><span class="stars" aria-label="'+r.nota+' de 5 estrelas">'+stars(r.nota)+'</span><p>'+esc(r.texto)+'</p><small>'+esc(r.nome)+(r.carro?' · '+esc(r.carro):'')+' · '+fmt(r.created_at.slice(0,10))+'</small></div><div class="row"><button class="btn btn-gold" type="button" data-ok="'+esc(r.id)+'">Aprovar</button><button class="btn btn-line" type="button" data-del="'+esc(r.id)+'">Apagar</button></div></article>').join('');
 }
 document.addEventListener('click',async e=>{
   const ok=e.target.closest('[data-ok]'),del=e.target.closest('#reviews [data-del],#pending [data-del]');
@@ -881,11 +885,17 @@ document.addEventListener('click',async e=>{
   btn.disabled=true;
   try{
     if(ok)await sb('/rest/v1/avaliacoes?id=eq.'+encodeURIComponent(id),{method:'PATCH',auth:true,headers:{'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({aprovada:true})});
-    else await sb('/rest/v1/avaliacoes?id=eq.'+encodeURIComponent(id),{method:'DELETE',auth:true});
+    else{
+      await sb('/rest/v1/avaliacoes?id=eq.'+encodeURIComponent(id),{method:'DELETE',auth:true});
+      const rv=(reviews||[]).find(x=>x.id===id),path=rv&&rv.foto&&rv.foto.split('/object/public/avaliacoes/')[1];
+      if(path)sb('/storage/v1/object/avaliacoes',{method:'DELETE',auth:true,headers:{'Content-Type':'application/json'},body:JSON.stringify({prefixes:[path]})}).catch(()=>{});
+    }
     toast(ok?'Avaliação aprovada':'Avaliação apagada');loadReviews();
   }catch(err){btn.disabled=false;toast(err.status===401?'Sua sessão expirou. Entre de novo pela Área do adm.':'Não deu certo. Tente de novo.')}
 });
+let revFoto=null;
 $('#openReview').onclick=()=>{$('#revErr').textContent='';$('#revDlg').showModal()};
+$('#r-foto').addEventListener('change',async e=>{const f=e.target.files[0];revFoto=null;$('#revThumb').innerHTML='';if(!f||!f.type.startsWith('image/'))return;try{revFoto=await shrink(f);$('#revThumb').innerHTML='<img alt="" src="'+revFoto+'">'}catch(err){$('#revErr').textContent='Não deu para ler essa foto. Tente outra.'}});
 $('#revForm').addEventListener('submit',async e=>{
   e.preventDefault();
   if($('#r-site').value){$('#revDlg').close();return}   // campo escondido: só robô preenche
@@ -895,8 +905,14 @@ $('#revForm').addEventListener('submit',async e=>{
   if(texto.length<10){$('#revErr').textContent='Conte um pouco mais sobre o serviço (pelo menos 10 letras).';$('#r-texto').focus();return}
   const btn=$('#revBtn');btn.disabled=true;btn.textContent='Enviando…';$('#revErr').textContent='';
   try{
-    await sb('/rest/v1/avaliacoes',{method:'POST',headers:{'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({nome,carro,nota,texto})});
-    $('#revForm').reset();$('#revDlg').close();toast('Obrigado! Sua avaliação aparece depois de aprovada');
+    let foto=null;
+    if(revFoto){
+      const path=uid()+'.jpg';
+      await sb('/storage/v1/object/avaliacoes/'+path,{method:'POST',headers:{'Content-Type':'image/jpeg'},body:await (await fetch(revFoto)).blob()});
+      foto=SB+'/storage/v1/object/public/avaliacoes/'+path;
+    }
+    await sb('/rest/v1/avaliacoes',{method:'POST',headers:{'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({nome,carro,nota,texto,foto})});
+    revFoto=null;$('#revThumb').innerHTML='';$('#revForm').reset();$('#revDlg').close();toast('Obrigado! Sua avaliação aparece depois de aprovada');
     if(session)loadReviews();
   }catch(err){$('#revErr').textContent='Não deu para enviar agora. Confira a internet e tente de novo.'}
   finally{btn.disabled=false;btn.textContent='Enviar avaliação'}
