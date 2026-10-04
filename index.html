@@ -365,7 +365,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
 .reel img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s var(--ease)}
 .reel-ph{position:absolute;inset:0;display:grid;place-items:center;background:radial-gradient(70% 50% at 50% 45%,rgba(201,164,50,.2),transparent 70%),linear-gradient(#1b1b1b,#0d0d0d)}
 .reel-ph svg{width:30%;max-width:56px;color:var(--gold)}
-.reel-prev{position:absolute;left:0;top:calc(-56px * var(--s,.4));width:326px;height:calc((100% + 56px * var(--s,.4)) / var(--s,.4));border:0;transform:scale(var(--s,.4));transform-origin:0 0;pointer-events:none;background:transparent}
+.reel-prev{position:absolute;left:var(--x,0px);top:calc(-56px * var(--s,.4));width:326px;height:600px;border:0;transform:scale(var(--s,.4));transform-origin:0 0;pointer-events:none;background:transparent}
 .reel-hit{position:absolute;inset:0;z-index:2;width:100%;height:100%;padding:0;border:0;background:transparent;cursor:pointer}
 .reel-hit:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
 .reel-ico{z-index:3}
@@ -577,7 +577,7 @@ dialog.drawer.on::backdrop{background:rgba(0,0,0,.55)}
     </div>
     <div class="svc-grid">
       <article class="svc">
-        <div class="svc-img"><img src="img/servico-full.jpg" alt="Carro preto com a película em toda a lataria, destacada em dourado" width="1024" height="576" loading="lazy" decoding="async"></div>
+        <div class="svc-img"><img src="img/servico-full.jpg?v=2" alt="Carro preto com a película em toda a lataria, destacada em dourado" width="1024" height="576" loading="lazy" decoding="async"></div>
         <div class="svc-body">
           <span class="tag">Mais pedido</span>
           <h3>Full Body</h3>
@@ -587,7 +587,7 @@ dialog.drawer.on::backdrop{background:rgba(0,0,0,.55)}
         </div>
       </article>
       <article class="svc">
-        <div class="svc-img"><img src="img/servico-parcial.jpg" alt="Carro preto com a película só na frente: capô, para-lamas e para-choque, destacados em dourado" width="1024" height="576" loading="lazy" decoding="async"></div>
+        <div class="svc-img"><img src="img/servico-parcial.jpg?v=2" alt="Carro preto com a película só na frente: capô, para-lamas e para-choque, destacados em dourado" width="1024" height="576" loading="lazy" decoding="async"></div>
         <div class="svc-body">
           <h3>Parcial</h3>
           <p>Capô, para-lamas, para-choque e retrovisores, onde mais bate pedra na estrada.</p>
@@ -596,7 +596,7 @@ dialog.drawer.on::backdrop{background:rgba(0,0,0,.55)}
         </div>
       </article>
       <article class="svc">
-        <div class="svc-img"><img src="img/servico-pontual.jpg" alt="Lateral do carro com a película nas soleiras, na maçaneta e na borda do porta-malas, destacadas em dourado" width="1024" height="576" loading="lazy" decoding="async"></div>
+        <div class="svc-img"><img src="img/servico-pontual.jpg?v=2" alt="Lateral do carro com a película nas soleiras, na maçaneta e na borda do porta-malas, destacadas em dourado" width="1024" height="576" loading="lazy" decoding="async"></div>
         <div class="svc-body">
           <h3>Pontual</h3>
           <p>Soleiras, maçanetas e borda do porta-malas, os pontos que sofrem no uso diário.</p>
@@ -1186,7 +1186,9 @@ function renderReels(){
   $('#vidList').innerHTML=(videos||[]).map(v=>'<article>'+(v.capa?'<img src="'+esc(v.capa)+'" alt="">':'')+'<div><a href="'+esc(v.url)+'" target="_blank" rel="noopener">'+esc(v.url)+'</a></div><div class="row"><label class="btn btn-line">'+(v.capa?'Trocar capa':'Pôr capa')+'<input type="file" accept="image/*" data-vcapa="'+esc(v.id)+'"></label><button class="btn btn-line" type="button" data-vdel="'+esc(v.id)+'">Remover</button></div></article>').join('')||(session?'<small>Nenhum vídeo adicionado ainda: o site mostra os 3 vídeos de exemplo.</small>':'');
 }
 // ajusta a escala da prévia ao tamanho do quadrado (o player do Instagram tem 326px de largura mínima)
-function reelScale(){document.querySelectorAll('#reels .reel').forEach(t=>t.style.setProperty('--s',(t.clientWidth/326).toFixed(4)))}
+// no player do Instagram (326px de largura) a área do vídeo vai de ~56px a ~428px de altura;
+// amplia essa área até cobrir o quadrado inteiro e centraliza na horizontal
+function reelScale(){document.querySelectorAll('#reels .reel').forEach(t=>{const s=Math.max(t.clientWidth/326,t.clientHeight/372);t.style.setProperty('--s',s.toFixed(4));t.style.setProperty('--x',((t.clientWidth-326*s)/2).toFixed(1)+'px')})}
 if('ResizeObserver' in window)new ResizeObserver(reelScale).observe($('#reels'));
 // o player completo só carrega quando a pessoa abre um vídeo
 function openReel(url){
