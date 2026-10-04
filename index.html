@@ -585,8 +585,19 @@ const nav=$('#nav'),topo=$('#topo'),film=$('#film');
 const beats=[...document.querySelectorAll('.beat')];
 
 /* ── Vídeo do topo: toca sozinho, sem som, em loop ── */
-// celular baixa a versão de 480p, menos da metade do peso
-film.src=Math.min(screen.width,screen.height)<700?'video/topo-m.mp4':'video/topo.mp4';
+// celular em pé: versão vertical recortada do Full HD, sem esticar a imagem;
+// tela larga com muitos pixels: 1080p; o resto: 720p
+const portrait=matchMedia('(orientation: portrait)');
+function pickVideo(){
+  const v=portrait.matches?'topo-v':(screen.width*(devicePixelRatio||1)>=1600?'topo-hd':'topo');
+  const src='video/'+v+'.mp4';
+  if(film.getAttribute('src')===src)return;
+  const t=film.currentTime||0;
+  film.poster='video/'+(v==='topo-v'?'topo-v':'topo')+'.jpg';
+  film.src=src;
+  film.addEventListener('loadedmetadata',()=>{try{film.currentTime=t%film.duration}catch(e){}},{once:true});
+}
+pickVideo();
 const PLAY='<svg viewBox="0 0 14 14" fill="currentColor" aria-hidden="true"><path d="M3 1.5l9 5.5-9 5.5z"/></svg>';
 const PAUSE='<svg viewBox="0 0 14 14" fill="currentColor" aria-hidden="true"><path d="M3 1.5h3v11H3zM8 1.5h3v11H8z"/></svg>';
 let wantPlay=!reduce;   // quem pede menos movimento no sistema vê só a imagem parada
@@ -597,6 +608,7 @@ let topoVisible=true;
 // pausa quando o topo sai da tela, para não gastar bateria
 new IntersectionObserver(es=>{topoVisible=es[0].isIntersecting;setPlay()}).observe(topo);
 vidBtn.onclick=()=>{wantPlay=!wantPlay;syncBtn();setPlay()};
+portrait.addEventListener('change',()=>{pickVideo();setPlay()});
 syncBtn();setPlay();
 let ticking=false;
 function onScroll(){
