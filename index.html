@@ -250,7 +250,7 @@ footer{background:var(--black);color:#9a9a93;border-top:1px solid #1f1f1f;paddin
 .foot a{text-decoration:none}
 .foot a:hover{color:var(--white)}
 .foot .brand{color:var(--white);margin-bottom:14px}
-.owner{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:16px 32px;background:var(--black);color:var(--white);padding:20px 24px;margin-bottom:32px;border-left:3px solid var(--gold)}
+.owner{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:16px 32px;background:var(--black);color:var(--white);padding:20px 24px;margin-top:32px;border-left:3px solid var(--gold)}
 .owner[hidden]{display:none}
 .owner b{display:block;font-size:16px;margin-bottom:2px}
 .owner span{color:#bdbdb6;font-size:14px}
@@ -462,12 +462,12 @@ footer::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;back
         <p>Todo carro que sai daqui vira um post com as fotos, o serviço feito e o que o cliente queria.</p>
       </div>
     </div>
+    <div class="bar"><div class="chips" id="filters" role="group" aria-label="Filtrar por serviço"></div></div>
+    <div class="posts" id="posts"></div>
     <div class="owner" id="adminBar" hidden>
       <div><b>Você está logado como adm</b><span id="ownerHint">Publique um trabalho novo ou apague um post pelo botão “Apagar” em cada card.</span></div>
       <div class="owner-actions"><button class="btn btn-gold" type="button" id="openPublish">Publicar trabalho</button><button class="link" type="button" id="logout">Sair</button></div>
     </div>
-    <div class="bar"><div class="chips" id="filters" role="group" aria-label="Filtrar por serviço"></div></div>
-    <div class="posts" id="posts"></div>
   </div>
 </section>
 
@@ -802,11 +802,11 @@ $('#loginForm').addEventListener('submit',async e=>{
   const btn=$('#loginBtn');btn.disabled=true;btn.textContent='Entrando…';$('#loginErr').textContent='';
   try{
     keep(await sb('/auth/v1/token?grant_type=password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:senha})}));
-    $('#loginForm').reset();$('#loginDlg').close();syncAdmin();toast('Pronto, já pode publicar');$('#diario').scrollIntoView({behavior:reduce?'auto':'smooth'});
+    $('#loginForm').reset();$('#loginDlg').close();syncAdmin();toast('Pronto, já pode publicar');$('#adminBar').scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'});
   }catch(err){$('#loginErr').textContent=err.status===400?'E-mail ou senha incorretos.':'Não deu para entrar agora. Confira a internet e tente de novo.'}
   finally{btn.disabled=false;btn.textContent='Entrar'}
 });
-function adminLink(){if(location.hash!=='#admin')return;if(session)$('#diario').scrollIntoView();else openLogin()}
+function adminLink(){if(location.hash!=='#admin')return;if(session)$('#adminBar').scrollIntoView({block:'center'});else openLogin()}
 addEventListener('hashchange',adminLink);adminLink();
 syncAdmin();
 
