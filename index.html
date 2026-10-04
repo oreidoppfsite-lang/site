@@ -410,7 +410,15 @@ dialog.reel-dlg{width:min(420px,calc(100vw - 24px));background:var(--black);colo
 .ig-cta{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px;padding:32px;border-radius:var(--r);border:1px solid transparent;background:linear-gradient(180deg,#171717,#121212) padding-box,linear-gradient(140deg,rgba(227,193,90,.6),rgba(255,255,255,.08) 40%,rgba(227,193,90,.3)) border-box}
 .ig-cta b{font-size:clamp(22px,2.6vw,30px);font-stretch:115%}
 .ig-cta p{color:#bdbdb6;margin-top:6px;max-width:52ch}
-@media (max-width:760px){.reels{gap:3px}.reels-box{margin-inline:calc(-1 * var(--gutter))}.reels-rail{right:4px;z-index:5}}
+/* celular: os vídeos viram uma fileira que arrasta para o lado, igual às avaliações */
+@media (max-width:760px){
+  .reels-box{margin-inline:calc(-1 * var(--gutter))}
+  .reels{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:44%;gap:8px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;padding:0 var(--gutter) 4px;scroll-padding-inline:var(--gutter);scrollbar-width:none}
+  .reels::-webkit-scrollbar{display:none}
+  .reels>*{scroll-snap-align:start}
+  .reels-scroll{max-height:none!important;overflow:visible}
+  .reels-rail,.reels-more,.reels-box::after{display:none}
+}
 /* ── Acabamento: bordas, luz e profundidade ── */
 :root{--r:0;--edge:rgba(0,0,0,.07);--gold-glow:rgba(227,193,90,.55)}
 /* botões com reflexo */
@@ -725,6 +733,7 @@ dialog.drawer{overflow:hidden;transform:translate3d(100%,0,0);transition:transfo
       </div>
       <a class="link ig-link" href="https://www.instagram.com/reido_ppf/" target="_blank" rel="noopener"><svg class="ig" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"/></svg>Seguir @reido_ppf</a>
     </div>
+    <p class="swipe-hint" id="reelsHint" aria-hidden="true" hidden></p>
     <div class="reels-box" id="reelsBox">
       <div class="reels-scroll" id="reelsScroll"><div class="reels" id="reels"></div></div>
       <span class="reels-rail" aria-hidden="true"><i id="reelsThumb"></i></span>
@@ -1046,7 +1055,7 @@ let morePosts=false,moreReviews=false;
 // no celular mostra "1 de 7 · arraste para o lado" e atualiza ao deslizar
 function swipeHint(box,hint){
   const n=box.children.length;hint.hidden=wide.matches||n<2;if(hint.hidden)return;
-  const first=box.children[0],step=first.getBoundingClientRect().width+14;
+  const first=box.children[0],step=first.getBoundingClientRect().width+(parseFloat(getComputedStyle(box).columnGap)||14);
   const i=Math.min(n,Math.round(box.scrollLeft/step)+1);
   hint.textContent=i+' de '+n+' · arraste para o lado →';
 }
@@ -1312,6 +1321,8 @@ function reelsFit(){
   const reelsEl=$('#reels'),sc=$('#reelsScroll');
   const first=reelsEl.querySelector('.reel');if(!first)return;
   const rows=Math.ceil(reelsEl.children.length/3),h=first.offsetHeight,gap=parseFloat(getComputedStyle(reelsEl).rowGap)||0;
+  if(!wide.matches){sc.style.maxHeight='';swipeHint(reelsEl,$('#reelsHint'));reelsState();return}
+  $('#reelsHint').hidden=true;
   sc.style.maxHeight=rows>1?Math.round(h*1.5+gap)+'px':'';
   reelsState();
 }
@@ -1322,6 +1333,7 @@ function reelsState(){
   if(over){const th=ch*ch/sh;reelsThumb.style.setProperty('--th',th+'px');reelsThumb.style.setProperty('--ty',(st/(sh-ch))*(ch-th)+'px')}
 }
 $('#reelsScroll').addEventListener('scroll',reelsState,{passive:true});
+$('#reels').addEventListener('scroll',()=>swipeHint($('#reels'),$('#reelsHint')),{passive:true});
 $('#reelsMore').onclick=()=>{const reelsEl=$('#reelsScroll'),r=reelsEl.querySelector('.reel');reelsEl.scrollBy({top:r?r.offsetHeight:200,behavior:reduce?'auto':'smooth'})};
 if('ResizeObserver' in window)new ResizeObserver(()=>{reelScale();reelsFit()}).observe($('#reelsBox'));
 // o player completo só carrega quando a pessoa abre um vídeo
