@@ -405,6 +405,15 @@ dialog.reel-dlg{width:min(420px,calc(100vw - 24px));background:var(--black);colo
 .vid-capa input{display:none}
 .vid-capa.ok{border-style:solid;border-color:var(--gold);color:var(--gold-hi)}
 .pend .row label.btn{cursor:pointer}
+/* lista de vídeos do adm: miniatura | link | botões, sempre nas mesmas colunas */
+#vidList article{display:grid;grid-template-columns:96px minmax(0,1fr) auto;align-items:center;gap:12px 20px}
+#vidList article>div{flex:none;min-width:0}
+#vidList article a{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#vidList .row{justify-content:flex-end}
+#vidList .row .btn{min-width:150px}
+.vid-noimg{width:96px;height:72px;display:grid;place-items:center;border:1px dashed rgba(255,255,255,.2);color:#77776f;font-size:12px}
+#vidList .row .btn{white-space:nowrap}
+@media (max-width:640px){.vid-form .vid-capa,.vid-form .btn{flex:1 1 100%;justify-content:center}#vidList .row .btn{padding:0 10px;gap:8px}#vidList article{grid-template-columns:72px minmax(0,1fr)}#vidList img,.vid-noimg{width:72px;height:54px}#vidList .row{grid-column:1/-1;justify-content:stretch}#vidList .row .btn{flex:1;min-width:0}}
 .pend .row label.btn input{display:none}
 .ig-cta{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px;padding:32px;border-radius:var(--r);border:1px solid transparent;background:linear-gradient(180deg,#171717,#121212) padding-box,linear-gradient(140deg,rgba(227,193,90,.6),rgba(255,255,255,.08) 40%,rgba(227,193,90,.3)) border-box}
 .ig-cta b{font-size:clamp(22px,2.6vw,30px);font-stretch:115%}
@@ -1302,7 +1311,7 @@ function renderReels(){
   $('#reels').innerHTML=list.slice(0,9).map((v,i)=>'<div class="reel">'+(v.capa?'<img src="'+esc(v.capa)+'" alt="" loading="lazy">':'<span class="reel-ph">'+PLAY_LG+'</span><iframe class="reel-prev" src="'+esc(v.url)+'embed/" loading="lazy" scrolling="no" tabindex="-1" aria-hidden="true" title=""></iframe>')+'<span class="reel-ico">'+PLAY_SM+'</span><span class="reel-cap">'+IG_ICON+'<span>Ver reel</span></span><button type="button" class="reel-hit" data-reel="'+esc(v.url)+'" aria-label="Ver vídeo '+(i+1)+' do Instagram"></button></div>').join('');
   reelScale();reelsFit();
   $('#vidAdmin').hidden=!session;
-  $('#vidList').innerHTML=(videos||[]).map(v=>'<article>'+(v.capa?'<img src="'+esc(v.capa)+'" alt="">':'')+'<div><a href="'+esc(v.url)+'" target="_blank" rel="noopener">'+esc(v.url)+'</a></div><div class="row"><label class="btn btn-line">'+IC.img+(v.capa?'Trocar capa':'Pôr capa')+'<input type="file" accept="image/*" data-vcapa="'+esc(v.id)+'"></label><button class="btn btn-line btn-del" type="button" data-vdel="'+esc(v.id)+'">'+TRASH.replace('<svg','<svg class="i"')+'Remover</button></div></article>').join('')||(session?'<small>Nenhum vídeo adicionado ainda: o site mostra os 3 vídeos de exemplo.</small>':'');
+  $('#vidList').innerHTML=(videos||[]).map(v=>'<article>'+(v.capa?'<img src="'+esc(v.capa)+'" alt="">':'<span class="vid-noimg">sem capa</span>')+'<div><a href="'+esc(v.url)+'" target="_blank" rel="noopener">'+esc(v.url)+'</a></div><div class="row"><label class="btn btn-line">'+IC.img+(v.capa?'Trocar capa':'Pôr capa')+'<input type="file" accept="image/*" data-vcapa="'+esc(v.id)+'"></label><button class="btn btn-line btn-del" type="button" data-vdel="'+esc(v.id)+'">'+TRASH.replace('<svg','<svg class="i"')+'Remover</button></div></article>').join('')||(session?'<small>Nenhum vídeo adicionado ainda: o site mostra os 3 vídeos de exemplo.</small>':'');
 }
 // ajusta a escala da prévia ao tamanho do quadrado (o player do Instagram tem 326px de largura mínima)
 // no player do Instagram (326px de largura) a área do vídeo vai de ~56px a ~428px de altura;
