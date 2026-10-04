@@ -253,6 +253,15 @@ section[id]{scroll-margin-top:64px}
 .pub[hidden]{display:none}
 .sent b{font-size:22px}
 .sent p{color:var(--muted)}
+dialog.confirm{width:min(440px,calc(100vw - 32px))}
+.cf{padding:28px;display:flex;flex-direction:column;gap:12px}
+.cf-ico{width:44px;height:44px;display:grid;place-items:center;background:#fbeaea;color:#a3121b;margin-bottom:4px}
+.cf-ico svg{width:22px;height:22px}
+.cf h3{font-size:22px;line-height:1.2}
+.cf p{color:var(--muted);font-size:15px;overflow-wrap:anywhere}
+.cf .actions{margin-top:8px}
+.btn-danger{background:#a3121b;color:var(--white)}
+@media (hover:hover) and (pointer:fine){.btn-danger:hover{background:#7f0e15}}
 .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 @media (max-width:900px){.reviews{grid-template-columns:minmax(0,1fr)}}
 
@@ -692,6 +701,15 @@ html{scrollbar-width:thin;scrollbar-color:#3a3a36 #0a0a0a}
   </div>
 </dialog>
 
+<dialog id="confirmDlg" class="confirm" aria-labelledby="cfTitle" aria-describedby="cfText">
+  <div class="cf">
+    <span class="cf-ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M2.5 4h11M6 4V2.5h4V4M4 4l.7 9.5h6.6L12 4M6.8 6.5v4.5M9.2 6.5v4.5"/></svg></span>
+    <h3 id="cfTitle"></h3>
+    <p id="cfText"></p>
+    <div class="actions"><button class="btn btn-danger" type="button" id="cfOk">Apagar</button><button class="btn btn-line" type="button" id="cfCancel">Cancelar</button></div>
+  </div>
+</dialog>
+
 <dialog id="loginDlg" aria-labelledby="loginTitle">
   <div class="dlg">
     <div class="dlg-head"><span class="eyebrow" id="loginTitle">Área do adm</span><button class="x" type="button" data-close aria-label="Fechar">×</button></div>
@@ -851,7 +869,7 @@ function renderPosts(){
 const waUrl=t=>'https://wa.me/'+WA+'?text='+encodeURIComponent(t);
 const TRASH='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2.5 4h11M6 4V2.5h4V4M4 4l.7 9.5h6.6L12 4"/></svg>';
 async function deletePost(p,btn){
-  if(!confirm('Apagar o post “'+p.titulo+'”? As fotos também serão apagadas. Não dá para desfazer.'))return;
+  if(!await askConfirm({title:'Apagar este post?',text:'“'+p.titulo+'” e as fotos dele saem do site. Não dá para desfazer.',ok:'Apagar post'}))return;
   const label=btn.innerHTML;btn.disabled=true;btn.textContent='Apagando…';
   try{
     await sb('/rest/v1/posts?id=eq.'+encodeURIComponent(p.id),{method:'DELETE',auth:true});
@@ -860,6 +878,16 @@ async function deletePost(p,btn){
     if($('#postDlg').open)$('#postDlg').close();
     toast('Post apagado');loadPosts();
   }catch(e){btn.disabled=false;btn.innerHTML=label;toast(e.status===401?'Sua sessão expirou. Entre de novo pela Área do adm.':'Não deu para apagar. Tente de novo.')}
+}
+// confirmação no estilo do site (no lugar da caixa padrão do navegador)
+function askConfirm({title,text,ok}){
+  return new Promise(res=>{
+    const d=$('#confirmDlg');let yes=false;
+    $('#cfTitle').textContent=title;$('#cfText').textContent=text||'';$('#cfOk').textContent=ok||'Apagar';
+    $('#cfOk').onclick=()=>{yes=true;d.close()};$('#cfCancel').onclick=()=>d.close();
+    d.addEventListener('close',()=>res(yes),{once:true});
+    d.showModal();$('#cfCancel').focus();
+  });
 }
 function openPost(p){
   $('#postKicker').textContent=SVC[p.servico]+(p.exemplo?' · post de exemplo':'');
@@ -933,7 +961,7 @@ document.addEventListener('click',async e=>{
   const ok=e.target.closest('[data-ok]'),del=e.target.closest('#reviews [data-del],#pending [data-del]');
   if(!ok&&!del)return;
   const btn=ok||del,id=btn.dataset.ok||btn.dataset.del;
-  if(del&&!confirm('Apagar esta avaliação? Não dá para desfazer.'))return;
+  if(del){const rv=(reviews||[]).find(x=>x.id===id);if(!await askConfirm({title:'Apagar esta avaliação?',text:(rv?'A avaliação de '+rv.nome+(rv.foto?', com a foto,':'')+' sai do site. ':'')+'Não dá para desfazer.',ok:'Apagar avaliação'}))return}
   btn.disabled=true;
   try{
     if(ok)await sb('/rest/v1/avaliacoes?id=eq.'+encodeURIComponent(id),{method:'PATCH',auth:true,headers:{'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({aprovada:true})});
@@ -1035,7 +1063,7 @@ $('#vidForm').addEventListener('submit',async e=>{
 });
 document.addEventListener('click',async e=>{
   const btn=e.target.closest('[data-vdel]');if(!btn)return;
-  if(!confirm('Tirar este vídeo do site?'))return;
+  if(!await askConfirm({title:'Tirar este vídeo do site?',text:'Ele continua no Instagram, só deixa de aparecer aqui.',ok:'Remover vídeo'}))return;
   btn.disabled=true;
   try{await sb('/rest/v1/videos?id=eq.'+encodeURIComponent(btn.dataset.vdel),{method:'DELETE',auth:true});toast('Vídeo removido');loadVideos()}
   catch(err){btn.disabled=false;toast(err.status===401?'Sua sessão expirou. Entre de novo pela Área do adm.':'Não deu para remover. Tente de novo.')}
