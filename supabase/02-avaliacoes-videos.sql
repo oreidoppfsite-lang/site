@@ -6,7 +6,8 @@ create table public.avaliacoes (
   carro text not null default '' check (char_length(carro) <= 60),
   nota int not null check (nota between 1 and 5),
   texto text not null check (char_length(texto) between 10 and 600),
-  aprovada boolean not null default false
+  aprovada boolean not null default false,
+  foto text check (foto is null or foto like 'https://vktidxurujnhcnhauqmj.supabase.co/storage/v1/object/public/avaliacoes/%')
 );
 grant select, insert on public.avaliacoes to anon;
 grant select, insert, update, delete on public.avaliacoes to authenticated;
@@ -17,6 +18,13 @@ create policy "adm ve tudo"  on public.avaliacoes for select to authenticated us
 create policy "adm envia"    on public.avaliacoes for insert to authenticated with check (true);
 create policy "adm aprova"   on public.avaliacoes for update to authenticated using (true) with check (true);
 create policy "adm apaga"    on public.avaliacoes for delete to authenticated using (true);
+
+-- Fotos das avaliações (até 3 MB, só imagens): visitante envia, todos veem, adm apaga
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('avaliacoes', 'avaliacoes', true, 3145728, array['image/jpeg','image/png','image/webp']);
+create policy "avaliacoes: todos veem"       on storage.objects for select to anon, authenticated using (bucket_id = 'avaliacoes');
+create policy "avaliacoes: visitante envia"  on storage.objects for insert to anon, authenticated with check (bucket_id = 'avaliacoes');
+create policy "avaliacoes: adm apaga"        on storage.objects for delete to authenticated using (bucket_id = 'avaliacoes');
 
 -- Vídeos do Instagram: o adm cola o link; todos veem
 create table public.videos (
