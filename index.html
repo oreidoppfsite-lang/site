@@ -463,7 +463,7 @@ footer::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;back
       </div>
     </div>
     <div class="owner" id="adminBar" hidden>
-      <div><b>Você está na área do dono</b><span id="ownerHint">Publique um trabalho novo ou apague um post pelo botão “Apagar” em cada card.</span></div>
+      <div><b>Você está logado como adm</b><span id="ownerHint">Publique um trabalho novo ou apague um post pelo botão “Apagar” em cada card.</span></div>
       <div class="owner-actions"><button class="btn btn-gold" type="button" id="openPublish">Publicar trabalho</button><button class="link" type="button" id="logout">Sair</button></div>
     </div>
     <div class="bar"><div class="chips" id="filters" role="group" aria-label="Filtrar por serviço"></div></div>
@@ -557,7 +557,7 @@ footer::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;back
     <div class="foot">
       <div><a class="brand" href="#topo"><svg viewBox="0 0 28 24" aria-hidden="true" style="width:28px;height:24px"><path d="M2 18L3.5 5l6 6L14 2l4.5 9 6-6L26 18z" fill="#c9a432"/><rect x="2" y="20" width="24" height="3" fill="#c9a432"/></svg><b translate="no">O Rei do PPF</b></a><p>Proteção de pintura automotiva. Full body, parcial e pontual.</p></div>
       <div><h4>Site</h4><ul><li><a href="#servicos">Serviços</a></li><li><a href="#diario">Trabalhos</a></li><li><a href="#historia">Nossa história</a></li><li><a href="#contato">Orçamento</a></li></ul></div>
-      <div><h4>Contato</h4><ul><li><a href="https://www.instagram.com/reido_ppf/" target="_blank" rel="noopener">Instagram</a></li><li><a href="#contato">WhatsApp</a></li><li><button class="link" type="button" id="openLogin">Área do dono</button></li></ul></div>
+      <div><h4>Contato</h4><ul><li><a href="https://www.instagram.com/reido_ppf/" target="_blank" rel="noopener">Instagram</a></li><li><a href="#contato">WhatsApp</a></li><li><button class="link" type="button" id="openLogin">Área do adm</button></li></ul></div>
     </div>
     <div class="legal"><span>© 2026 O Rei do PPF · Protótipo</span></div>
   </div>
@@ -592,7 +592,7 @@ footer::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;back
 
 <dialog id="loginDlg" aria-labelledby="loginTitle">
   <div class="dlg">
-    <div class="dlg-head"><span class="eyebrow" id="loginTitle">Área do dono</span><button class="x" type="button" data-close aria-label="Fechar">×</button></div>
+    <div class="dlg-head"><span class="eyebrow" id="loginTitle">Área do adm</span><button class="x" type="button" data-close aria-label="Fechar">×</button></div>
     <div class="dlg-body">
       <form class="pub" id="loginForm" novalidate>
         <div class="field full"><label for="l-email">E-mail</label><input class="input" id="l-email" name="email" type="email" autocomplete="username" spellcheck="false" inputmode="email"></div>
@@ -669,7 +669,7 @@ const SEED=[
   {id:'s7',date:'2026-09-11',carro:'Volkswagen Nivus',servico:'pontual',titulo:'Borda do porta-malas sem marca de mala',texto:'Quem viaja muito arrasta mala na borda do porta-malas. Uma faixa de PPF resolve e ninguém percebe que está ali.'}
 ];
 SEED.forEach(p=>p.exemplo=true);
-/* ── Supabase: os posts ficam no banco e todo visitante vê; só o dono (com login) publica e apaga ── */
+/* ── Supabase: os posts ficam no banco e todo visitante vê; só o adm (com login) publica e apaga ── */
 const SB='https://vktidxurujnhcnhauqmj.supabase.co';
 // chave pública de propósito: quem protege os dados são as regras (RLS) do banco
 const SBKEY='sb_publishable_cG9ok0PIix_s2iqkFG79NA_puTqa8x1';
@@ -741,7 +741,7 @@ async function deletePost(p,btn){
     if(paths.length)sb('/storage/v1/object/fotos',{method:'DELETE',auth:true,headers:{'Content-Type':'application/json'},body:JSON.stringify({prefixes:paths})}).catch(()=>{});
     if($('#postDlg').open)$('#postDlg').close();
     toast('Post apagado');loadPosts();
-  }catch(e){btn.disabled=false;btn.innerHTML=label;toast(e.status===401?'Sua sessão expirou. Entre de novo pela Área do dono.':'Não deu para apagar. Tente de novo.')}
+  }catch(e){btn.disabled=false;btn.innerHTML=label;toast(e.status===401?'Sua sessão expirou. Entre de novo pela Área do adm.':'Não deu para apagar. Tente de novo.')}
 }
 function openPost(p){
   $('#postKicker').textContent=SVC[p.servico]+(p.exemplo?' · post de exemplo':'');
@@ -785,14 +785,14 @@ $('#pubForm').addEventListener('submit',async e=>{
     filter='todos';document.querySelectorAll('#filters .chip').forEach((x,i)=>x.setAttribute('aria-pressed',i===0));
     await loadPosts();toast('Publicado no diário');$('#diario').scrollIntoView({behavior:reduce?'auto':'smooth'});
   }catch(err){
-    $('#pubErr').textContent=err.status===401?'Sua sessão expirou. Entre de novo pela Área do dono.':'Não deu para publicar ('+err.message+'). Confira a internet e tente de novo.';
+    $('#pubErr').textContent=err.status===401?'Sua sessão expirou. Entre de novo pela Área do adm.':'Não deu para publicar ('+err.message+'). Confira a internet e tente de novo.';
   }finally{btn.disabled=false;btn.textContent='Publicar'}
 });
 
-/* ── Área do dono: login ── */
-function syncAdmin(){$('#adminBar').hidden=!session;$('#openLogin').textContent=session?'Sair da área do dono':'Área do dono';renderPosts()}
+/* ── Área do adm: login ── */
+function syncAdmin(){$('#adminBar').hidden=!session;$('#openLogin').textContent=session?'Sair do adm':'Área do adm';renderPosts()}
 function openLogin(){$('#loginErr').textContent='';$('#loginDlg').showModal()}
-function logout(){const t=session&&session.access;saveSession(null);syncAdmin();toast('Você saiu da área do dono');if(t)fetch(SB+'/auth/v1/logout',{method:'POST',headers:{apikey:SBKEY,Authorization:'Bearer '+t}}).catch(()=>{})}
+function logout(){const t=session&&session.access;saveSession(null);syncAdmin();toast('Você saiu do adm');if(t)fetch(SB+'/auth/v1/logout',{method:'POST',headers:{apikey:SBKEY,Authorization:'Bearer '+t}}).catch(()=>{})}
 $('#openLogin').onclick=()=>session?logout():openLogin();
 $('#logout').onclick=logout;
 $('#loginForm').addEventListener('submit',async e=>{

@@ -22,7 +22,7 @@ ffmpeg -ss 5 -i video.mp4 -frames:v 1 -vf "crop=608:1080:(iw-608)/2:0" -q:v 4 vi
 
 ## Diário (Supabase)
 
-Os posts ficam no Supabase (projeto `rei-do-ppf`, plano grátis): tabela `posts` e pasta de fotos `fotos`. Visitantes só leem; para publicar ou apagar, a equipe entra por `site/admin/` (ou "Área do dono" no rodapé) com o login criado em Authentication → Users. O cadastro de novos usuários fica desligado.
+Os posts ficam no Supabase (projeto `rei-do-ppf`, plano grátis): tabela `posts` e pasta de fotos `fotos`. Visitantes só leem; para publicar ou apagar, a equipe entra por `site/admin/` (ou "Área do adm" no rodapé) com o login criado em Authentication → Users. O cadastro de novos usuários fica desligado.
 
 A chave em `index.html` é a *publishable*, pública de propósito; a segurança vem das regras (RLS) do banco. Nunca coloque a `secret`/`service_role` no site.
 
