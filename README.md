@@ -26,7 +26,7 @@ Os posts ficam no Supabase (projeto `rei-do-ppf`, plano grátis): tabela `posts`
 
 A chave em `index.html` é a *publishable*, pública de propósito; a segurança vem das regras (RLS) do banco. Nunca coloque a `secret`/`service_role` no site.
 
-Também ficam no Supabase as **avaliações** (visitante envia pelo botão "Deixar minha avaliação"; só aparecem depois que o adm aprova) e os **vídeos do Instagram** (o adm cola o link do reel). O SQL de cada parte está em `supabase/`.
+Também ficam no Supabase as **avaliações** (visitante envia pelo botão "Deixar minha avaliação"; só aparecem depois que o adm aprova) e os **vídeos do Instagram** (o adm cola o link do reel e, se quiser, um print como capa; o site mostra uma grade como o perfil do Instagram e abre o player ao tocar). O SQL de cada parte está em `supabase/`.
 
 `.github/workflows/manter-supabase.yml` lê o banco a cada 3 dias para o projeto grátis não pausar por falta de uso.
 
