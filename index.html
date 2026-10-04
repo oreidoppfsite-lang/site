@@ -316,7 +316,10 @@ footer .owner{margin:40px 0 0;padding:20px 24px;background:#151515;border-left:3
 @media (hover:hover) and (pointer:fine){.post-del:hover{background:#a3121b;color:var(--white)}}
 .btn:disabled{opacity:.6;cursor:progress}
 .foot button.link{min-height:0;font-size:inherit;font-weight:inherit;color:inherit;text-decoration:none}
-.legal{margin-top:40px;padding-top:24px;border-top:1px solid #1f1f1f;display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;font-size:12px}
+.made-by{color:#6f6f68;text-decoration:none;transition:color .16s ease-out}
+.made-by b{font-weight:600;color:#9a9a90;transition:color .16s ease-out}
+@media (hover:hover) and (pointer:fine){.made-by:hover,.made-by:hover b{color:var(--gold-hi)}}
+.legal{padding-bottom:84px;margin-top:40px;padding-top:24px;border-top:1px solid #1f1f1f;display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;font-size:12px}
 @media (max-width:760px){.foot{grid-template-columns:minmax(0,1fr)}}
 
 .wa{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:40;width:56px;height:56px;border-radius:50%;background:#25D366;display:grid;place-items:center;box-shadow:0 8px 24px rgba(0,0,0,.3);transition:transform .25s}
@@ -854,7 +857,7 @@ dialog.drawer{overflow:hidden;transform:translate3d(100%,0,0);transition:transfo
       <div><b>Você está logado como adm</b><span id="ownerHint">Publique um trabalho novo, ou use os botões “Apagar” nos posts, “Aprovar” nas avaliações e “Adicionar” nos vídeos.</span></div>
       <div class="owner-actions"><button class="btn btn-gold" type="button" id="openPublish">Publicar trabalho</button><button class="link" type="button" id="logout">Sair</button></div>
     </div>
-    <div class="legal"><span>© 2026 O Rei do PPF · Protótipo</span><span>Imagens dos serviços feitas com o modelo 3D “Ferrari 458 Italia” de vicent091036, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a></span></div>
+    <div class="legal"><span>© 2026 O Rei do PPF · Protótipo</span><span>Imagens dos serviços feitas com o modelo 3D “Ferrari 458 Italia” de vicent091036, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a></span><a class="made-by" href="https://portfolio-ronan-pinheiro.vercel.app" target="_blank" rel="noopener">Site por <b>Ronan Pinheiro</b> <span aria-hidden="true">↗</span></a></div>
   </div>
 </footer>
 
