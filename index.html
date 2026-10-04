@@ -448,6 +448,22 @@ html{scrollbar-width:thin;scrollbar-color:#3a3a36 #0a0a0a}
 .fx-on .rise{opacity:0;transform:translateY(18px)}
 .fx-on .rise.in{opacity:1;transform:none;transition:opacity .7s var(--ease),transform .8s var(--ease)}
 
+/* ── Botões cheios: canto chanfrado, fio de luz no topo e seta em bloco próprio ── */
+.btn-gold,.btn-dark,.nav .btn,.btn-danger{--cut:10px;clip-path:polygon(0 0,100% 0,100% calc(100% - var(--cut)),calc(100% - var(--cut)) 100%,0 100%)}
+.nav .btn{--cut:7px}
+.btn-gold{box-shadow:inset 0 1px 0 rgba(255,255,255,.45),inset 0 -2px 0 rgba(0,0,0,.12)}
+.btn-dark{box-shadow:inset 0 1px 0 rgba(255,255,255,.14)}
+.btn-gold:not(.nav .btn),.btn-dark{padding-right:0;gap:18px}
+.btn-gold:not(.nav .btn)::after,.btn-dark::after{align-self:stretch;display:grid;place-items:center;width:48px;margin-left:auto;padding-left:2px;border-left:1px solid rgba(0,0,0,.16);background:rgba(0,0,0,.05);transition:padding-left .25s var(--ease),background-color .2s ease-out}
+.btn-dark::after{border-left-color:rgba(255,255,255,.14);background:rgba(255,255,255,.05)}
+@media (hover:hover) and (pointer:fine){
+  .btn-gold:not(.nav .btn):hover::after,.btn-dark:hover::after{transform:none;padding-left:12px;background:rgba(0,0,0,.12)}
+  .btn-dark:hover::after{background:rgba(255,255,255,.1)}
+}
+/* botão largo: texto à esquerda, seta encostada no canto direito */
+form.quote .btn,.pub .btn{justify-content:flex-start;padding-left:24px}
+/* o chanfro cortaria o contorno de foco de fora: usa um contorno por dentro */
+.btn-gold:focus-visible,.btn-dark:focus-visible,.nav .btn:focus-visible,.btn-danger:focus-visible{outline:none;box-shadow:inset 0 0 0 2px var(--black),inset 0 0 0 4px var(--white)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
 </style>
 </head>
