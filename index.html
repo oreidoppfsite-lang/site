@@ -233,6 +233,7 @@ section[id]{scroll-margin-top:64px}
 .review figcaption{display:flex;flex-direction:column;font-size:14px}
 .review figcaption b{font-weight:700}
 .review figcaption span{color:var(--muted)}
+.rev-date{margin-top:6px;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-ink)}
 .reviews-note{margin-top:20px;font-size:12px;color:var(--muted)}
 /* "hidden" sempre esconde, mesmo em botões (.btn usa display:flex): nada de adm aparece para visitante */
 [hidden]{display:none!important}
@@ -453,6 +454,9 @@ dialog.reel-dlg{width:min(420px,calc(100vw - 24px));background:var(--black);colo
 .rev-wait{display:flex;align-items:center;gap:12px;margin:-24px 0 32px;padding:14px 18px;border-left:3px solid var(--gold);background:rgba(201,164,50,.1);font-size:15px;color:var(--ink);animation:justIn .5s var(--ease)}
 .rev-wait[hidden]{display:none}
 .rev-wait svg{width:20px;height:20px;flex-shrink:0;color:var(--gold-ink)}
+.rev-wait span{flex:1}
+.rev-wait-x{flex-shrink:0;width:32px;height:32px;display:grid;place-items:center;padding:0;background:none;border:0;font-size:20px;line-height:1;color:var(--muted);cursor:pointer}
+@media (hover:hover) and (pointer:fine){.rev-wait-x:hover{color:var(--ink)}}
 .sent-ic{display:grid;place-items:center;width:48px;height:48px;border:2px solid var(--gold);color:var(--gold-ink)}
 .sent-ic svg{width:26px;height:26px;stroke-dasharray:24;stroke-dashoffset:24;animation:okDraw .5s .15s var(--ease) forwards}
 .sent p b{font-size:inherit;color:var(--ink)}
@@ -838,7 +842,7 @@ dialog.drawer{overflow:hidden;transform:translate3d(100%,0,0);transition:transfo
 <section id="avaliacoes" class="block">
   <div class="wrap">
     <div class="head"><div><span class="eyebrow">Avaliações</span><h2 class="wide">Quem protegeu, recomenda</h2></div><button class="btn btn-line rev-add" type="button" id="openReview"><span class="plus-float" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg></span>Deixar minha avaliação</button></div>
-    <p class="rev-wait" id="revWait" role="status" hidden><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="10" cy="10" r="7.5"/><path d="M10 5.5V10l3 2"/></svg><span>Sua avaliação foi enviada e está <b>aguardando aprovação</b> da equipe. Assim que aprovarem, ela aparece aqui.</span></p>
+    <p class="rev-wait" id="revWait" role="status" hidden><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="10" cy="10" r="7.5"/><path d="M10 5.5V10l3 2"/></svg><span>Sua avaliação foi enviada e está <b>aguardando aprovação</b> da equipe. Assim que aprovarem, ela aparece aqui.</span><button type="button" class="rev-wait-x" id="revWaitX" aria-label="Fechar aviso">×</button></p>
     <div class="reels-bar posts-bar rev-bar"><p class="swipe-hint" id="reviewsHint" aria-hidden="true" hidden></p><div class="reels-arrows" id="reviewsArrows" hidden><button type="button" id="reviewsPrev" aria-label="Avaliações anteriores"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M10 3L5 8l5 5"/></svg></button><button type="button" id="reviewsNext" aria-label="Próximas avaliações"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 3l5 5-5 5"/></svg></button></div></div>
     <div class="reviews" id="reviews">
       <figure class="review"><div class="stars">★★★★★</div><blockquote>O PPF ficou completamente invisível. Você não percebe que tem película. Superou o que eu esperava.</blockquote><figcaption><b>Rafael M.</b><span>BMW M3 Competition</span></figcaption></figure>
@@ -1339,7 +1343,7 @@ function renderReviews(){
   const ok=(reviews||[]).filter(r=>r.aprovada),pend=(reviews||[]).filter(r=>!r.aprovada);
   const box=$('#reviews');
   if(ok.length){
-    box.innerHTML=ok.map(r=>'<figure class="review" data-id="'+esc(r.id)+'">'+(r.foto?'<img src="'+esc(r.foto)+'" alt="Carro de '+esc(r.nome)+'" loading="lazy">':'')+'<div class="stars" aria-label="'+r.nota+' de 5 estrelas">'+stars(r.nota)+'</div><blockquote>'+esc(r.texto)+'</blockquote><figcaption><b>'+esc(r.nome)+'</b><span>'+esc(r.carro)+'</span></figcaption>'+(session?'<button class="post-del" type="button" data-del="'+esc(r.id)+'">'+TRASH+'Apagar</button>':'')+'</figure>').join('');
+    box.innerHTML=ok.map(r=>'<figure class="review" data-id="'+esc(r.id)+'">'+(r.foto?'<img src="'+esc(r.foto)+'" alt="Carro de '+esc(r.nome)+'" loading="lazy">':'')+'<div class="stars" aria-label="'+r.nota+' de 5 estrelas">'+stars(r.nota)+'</div><blockquote>'+esc(r.texto)+'</blockquote><figcaption><b>'+esc(r.nome)+'</b><span>'+esc(r.carro)+'</span>'+(r.created_at?'<time class="rev-date" datetime="'+esc(r.created_at.slice(0,10))+'">Avaliado em '+fmt(r.created_at.slice(0,10))+'</time>':'')+'</figcaption>'+(session?'<button class="post-del" type="button" data-del="'+esc(r.id)+'">'+TRASH+'Apagar</button>':'')+'</figure>').join('');
   }else box.innerHTML=EXEMPLOS;
   box.scrollLeft=0;rowNav('reviews');
   fxScan();
@@ -1383,7 +1387,8 @@ $('#reviewsPrev').onclick=()=>rowGo('reviews',-1);$('#reviewsNext').onclick=()=>
 if('ResizeObserver' in window)new ResizeObserver(()=>rowNav('reviews')).observe($('#reviews'));
 wide.addEventListener('change',()=>{renderPosts();renderReviews()});
 let revFoto=null;
-try{if(sessionStorage.getItem('reiPPF.revWait'))$('#revWait').hidden=false}catch(e){}
+try{sessionStorage.removeItem('reiPPF.revWait')}catch(e){}   // o aviso só aparece logo depois de enviar (não fica preso ao recarregar)
+$('#revWaitX').onclick=()=>{$('#revWait').hidden=true};
 $('#openReview').onclick=()=>{$('#revErr').textContent='';$('#revForm').hidden=false;$('#revSent').hidden=true;$('#revDlg').showModal()};
 $('#r-foto').addEventListener('change',async e=>{const f=e.target.files[0];revFoto=null;$('#revThumb').innerHTML='';if(!f||!f.type.startsWith('image/'))return;try{revFoto=await shrink(f);$('#revThumb').innerHTML='<img alt="" src="'+revFoto+'">'}catch(err){$('#revErr').textContent='Não deu para ler essa foto. Tente outra.'}});
 $('#revForm').addEventListener('submit',async e=>{
@@ -1404,7 +1409,7 @@ $('#revForm').addEventListener('submit',async e=>{
     await sb('/rest/v1/avaliacoes',{method:'POST',headers:{'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({nome,carro,nota,texto,foto})});
     $('#revSentTitle').textContent='Obrigado, '+nome.split(' ')[0]+'! Sua avaliação foi para aprovação';
     revFoto=null;$('#revThumb').innerHTML='';$('#revForm').reset();$('#revForm').hidden=true;$('#revSent').hidden=false;
-    $('#revWait').hidden=false;try{sessionStorage.setItem('reiPPF.revWait','1')}catch(e){}toast('Avaliação enviada para aprovação');
+    $('#revWait').hidden=false;toast('Avaliação enviada para aprovação');
     if(session)loadReviews();
   }catch(err){$('#revErr').textContent='Não deu para enviar agora ('+err.message+'). Tente de novo.'}
   finally{btn.disabled=false;btn.textContent='Enviar avaliação'}
