@@ -239,15 +239,20 @@ section[id]{scroll-margin-top:64px}
 .pend .row{display:flex;gap:12px;align-items:center}
 .pend .btn{min-height:40px;padding:0 16px;font-size:14px}
 .pend .btn-line{color:var(--white);border-color:rgba(255,255,255,.3)}
-.rate{border:0;display:flex;flex-direction:row-reverse;justify-content:flex-end;gap:4px}
-.rate legend{font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;width:100%}
+.pub .rate{display:flex;flex-direction:row-reverse;justify-content:flex-end;gap:6px}
+.rate-lbl{font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
 .rate input{position:absolute;opacity:0;width:1px;height:1px}
-.rate label{font-size:30px;line-height:1;color:#d4d4cf;cursor:pointer;transition:color .12s ease-out}
+.rate label{font-size:34px;line-height:1;color:#d4d4cf;cursor:pointer;transition:color .12s ease-out}
 .rate input:checked~label,.rate label:hover,.rate label:hover~label{color:var(--gold)}
 .rate input:focus-visible+label{outline:2px solid var(--gold);outline-offset:2px}
 .vid-form{display:flex;flex-wrap:wrap;gap:12px;margin:16px 0 8px}
 .vid-form .input{flex:1 1 280px;min-width:0}
 .pend a{color:var(--gold-hi);overflow-wrap:anywhere;font-size:14px}
+.sent{display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:8px 0}
+.sent[hidden]{display:none}
+.pub[hidden]{display:none}
+.sent b{font-size:22px}
+.sent p{color:var(--muted)}
 .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 @media (max-width:900px){.reviews{grid-template-columns:minmax(0,1fr)}}
 
@@ -635,13 +640,13 @@ footer::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;back
     <div class="dlg-head"><span class="eyebrow" id="revTitle">Deixar minha avaliação</span><button class="x" type="button" data-close aria-label="Fechar">×</button></div>
     <div class="dlg-body">
       <form class="pub" id="revForm" novalidate>
-        <fieldset class="rate field full"><legend>Nota</legend>
+        <div class="field full"><span class="rate-lbl" id="rateLbl">Nota</span><div class="rate" role="radiogroup" aria-labelledby="rateLbl">
           <input type="radio" name="nota" id="n5" value="5" checked><label for="n5" title="5 estrelas">★</label>
           <input type="radio" name="nota" id="n4" value="4"><label for="n4" title="4 estrelas">★</label>
           <input type="radio" name="nota" id="n3" value="3"><label for="n3" title="3 estrelas">★</label>
           <input type="radio" name="nota" id="n2" value="2"><label for="n2" title="2 estrelas">★</label>
           <input type="radio" name="nota" id="n1" value="1"><label for="n1" title="1 estrela">★</label>
-        </fieldset>
+        </div></div>
         <div class="field"><label for="r-nome">Seu nome</label><input class="input" id="r-nome" name="nome" autocomplete="name" maxlength="60" placeholder="Ex.: Rafael M.…"></div>
         <div class="field"><label for="r-carro">Seu carro</label><input class="input" id="r-carro" name="carro" autocomplete="off" maxlength="60" placeholder="Ex.: BMW M3 2023…"></div>
         <div class="field full"><label for="r-texto">Como foi o serviço?</label><textarea class="input" id="r-texto" name="texto" autocomplete="off" maxlength="600" placeholder="Conte como ficou o carro e como foi o atendimento…"></textarea></div>
@@ -651,6 +656,7 @@ footer::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;back
         <div class="actions" style="grid-column:1/-1"><button class="btn btn-dark" type="submit" id="revBtn">Enviar avaliação</button><span id="revErr" role="alert" style="color:#a3121b;font-size:14px"></span></div>
         <p class="small" style="color:var(--muted);text-align:left">Sua avaliação aparece no site depois de aprovada pela equipe.</p>
       </form>
+      <div class="sent" id="revSent" hidden><b>Recebemos sua avaliação. Obrigado!</b><p>Ela aparece no site depois que a equipe aprovar.</p><button class="btn btn-dark" type="button" data-close>Fechar</button></div>
     </div>
   </div>
 </dialog>
@@ -894,7 +900,7 @@ document.addEventListener('click',async e=>{
   }catch(err){btn.disabled=false;toast(err.status===401?'Sua sessão expirou. Entre de novo pela Área do adm.':'Não deu certo. Tente de novo.')}
 });
 let revFoto=null;
-$('#openReview').onclick=()=>{$('#revErr').textContent='';$('#revDlg').showModal()};
+$('#openReview').onclick=()=>{$('#revErr').textContent='';$('#revForm').hidden=false;$('#revSent').hidden=true;$('#revDlg').showModal()};
 $('#r-foto').addEventListener('change',async e=>{const f=e.target.files[0];revFoto=null;$('#revThumb').innerHTML='';if(!f||!f.type.startsWith('image/'))return;try{revFoto=await shrink(f);$('#revThumb').innerHTML='<img alt="" src="'+revFoto+'">'}catch(err){$('#revErr').textContent='Não deu para ler essa foto. Tente outra.'}});
 $('#revForm').addEventListener('submit',async e=>{
   e.preventDefault();
@@ -912,9 +918,9 @@ $('#revForm').addEventListener('submit',async e=>{
       foto=SB+'/storage/v1/object/public/avaliacoes/'+path;
     }
     await sb('/rest/v1/avaliacoes',{method:'POST',headers:{'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({nome,carro,nota,texto,foto})});
-    revFoto=null;$('#revThumb').innerHTML='';$('#revForm').reset();$('#revDlg').close();toast('Obrigado! Sua avaliação aparece depois de aprovada');
+    revFoto=null;$('#revThumb').innerHTML='';$('#revForm').reset();$('#revForm').hidden=true;$('#revSent').hidden=false;
     if(session)loadReviews();
-  }catch(err){$('#revErr').textContent='Não deu para enviar agora. Confira a internet e tente de novo.'}
+  }catch(err){$('#revErr').textContent='Não deu para enviar agora ('+err.message+'). Tente de novo.'}
   finally{btn.disabled=false;btn.textContent='Enviar avaliação'}
 });
 
