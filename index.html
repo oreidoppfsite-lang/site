@@ -92,9 +92,9 @@ section[id]{scroll-margin-top:64px}
 @media (max-width:860px){.nav ul{display:none}.nav .btn{margin-left:auto}}
 
 /* ── Topo com vídeo preso à rolagem ── */
-/* altura do topo = quanto se rola com o vídeo parado na tela; 4 textos em ~1,6 tela (antes 3,2 telas e parecia travado) */
-#topo{position:relative;height:260vh;background:#000;color:var(--white)}
-@media (max-width:760px){#topo{height:230vh}}
+/* altura do topo = quanto se rola com o vídeo parado na tela; 4 textos em ~1,1 tela (antes 3,2 telas e parecia travado) */
+#topo{position:relative;height:210vh;background:#000;color:var(--white)}
+@media (max-width:760px){#topo{height:185vh}}
 .stage{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;background:#000 url(video/topo.jpg) center/cover no-repeat}
 @media (orientation:portrait){.stage{background-image:url(video/topo-v.jpg)}}
 #film{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:cover;background:transparent;opacity:0;transition:opacity .6s ease-out;transform:scale(calc(1 + var(--p,0) * .1));will-change:transform}
