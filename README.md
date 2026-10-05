@@ -11,12 +11,14 @@ Protótipo do site-blog da O Rei do PPF (película de proteção de pintura).
 Com ffmpeg, a partir do vídeo original em 1920x1080 (sem som; o recorte vertical é para celular em pé):
 
 ```
-ffmpeg -i video.mp4 -an -vf "scale=1280:720,format=yuv420p" -c:v libx264 -preset slow -crf 27 -movflags +faststart video/topo.mp4
-ffmpeg -i video.mp4 -an -vf "format=yuv420p" -c:v libx264 -preset slow -crf 28 -movflags +faststart video/topo-hd.mp4
-ffmpeg -i video.mp4 -an -vf "crop=608:1080:(iw-608)/2:0,format=yuv420p" -c:v libx264 -preset slow -crf 24 -movflags +faststart video/topo-v.mp4
+ffmpeg -i video.mp4 -an -vf "scale=1280:720:flags=lanczos,format=yuv420p" -c:v libx264 -profile:v main -preset slower -crf 28 -maxrate 1100k -bufsize 2200k -g 60 -movflags +faststart video/topo.mp4
+ffmpeg -i video.mp4 -an -vf "format=yuv420p" -c:v libx264 -profile:v high -preset slower -crf 28 -maxrate 1500k -bufsize 3000k -g 60 -movflags +faststart video/topo-hd.mp4
+ffmpeg -i video.mp4 -an -vf "crop=608:1080:(iw-608)/2:0,scale=540:960:flags=lanczos,format=yuv420p" -c:v libx264 -profile:v main -preset slower -crf 28 -maxrate 800k -bufsize 1600k -g 60 -movflags +faststart video/topo-v.mp4
 ffmpeg -ss 5 -i video.mp4 -frames:v 1 -vf scale=1280:720 -q:v 4 video/topo.jpg
 ffmpeg -ss 5 -i video.mp4 -frames:v 1 -vf "crop=608:1080:(iw-608)/2:0" -q:v 4 video/topo-v.jpg
 ```
+
+O `maxrate` limita o peso para o vídeo começar rápido no 4G; `-g 60` põe um quadro-chave a cada 2 s e `+faststart` deixa o vídeo tocar antes de baixar inteiro.
 
 `tools/render_topo.py` é o render 3D usado antes do vídeo, guardado caso volte a ser útil.
 
