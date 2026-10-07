@@ -922,7 +922,7 @@ dialog.drawer{overflow:hidden;transform:translate3d(100%,0,0);transition:transfo
     </div>
     <div class="owner" id="adminBar" hidden>
       <div><b>Você está logado como adm</b><span id="ownerHint">Publique um trabalho novo, ou use os botões “Apagar” nos posts, “Aprovar” nas avaliações e “Adicionar” nos vídeos.</span></div>
-      <div class="owner-actions"><button class="btn btn-gold" type="button" id="openPublish">Publicar trabalho</button><button class="link" type="button" id="logout">Sair</button></div>
+      <div class="owner-actions"><button class="btn btn-gold" type="button" id="openPublish">Publicar trabalho</button><button class="link" type="button" id="changePw">Trocar senha</button><button class="link" type="button" id="logout">Sair</button></div>
     </div>
     <div class="legal"><span>© 2026 O Rei do PPF · Protótipo</span><span>Imagens dos serviços feitas com o modelo 3D “Ferrari 458 Italia” de vicent091036, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a></span><a class="made-by" href="https://portfolio-ronan-pinheiro.vercel.app" target="_blank" rel="noopener">Site por <b>Ronan Pinheiro</b> <span aria-hidden="true">↗</span></a></div>
   </div>
@@ -1006,12 +1006,29 @@ dialog.drawer{overflow:hidden;transform:translate3d(100%,0,0);transition:transfo
       <form class="pub" id="loginForm" novalidate>
         <div class="field full"><label for="l-email">E-mail</label><input class="input" id="l-email" name="email" type="email" autocomplete="username" spellcheck="false" inputmode="email"></div>
         <div class="field full"><label for="l-senha">Senha</label><input class="input" id="l-senha" name="senha" type="password" autocomplete="current-password"></div>
-        <div class="actions" style="grid-column:1/-1"><button class="btn btn-dark" type="submit" id="loginBtn">Entrar</button><span id="loginErr" role="alert" style="color:#a3121b;font-size:14px"></span></div>
+        <div class="actions" style="grid-column:1/-1"><button class="btn btn-dark" type="submit" id="loginBtn">Entrar</button><button class="link" type="button" id="forgotBtn" style="margin-left:12px">Esqueci minha senha</button></div>
+        <p id="loginErr" role="alert" style="grid-column:1/-1;color:#a3121b;font-size:14px;margin:0"></p>
         <p class="small" style="color:var(--muted);text-align:left">Só para a equipe publicar e apagar trabalhos do diário.</p>
       </form>
     </div>
   </div>
 </dialog>
+
+<dialog id="pwDlg" aria-labelledby="pwTitle">
+  <div class="dlg">
+    <div class="dlg-head"><span class="eyebrow" id="pwTitle">Criar nova senha</span><button class="x" type="button" data-close aria-label="Fechar">×</button></div>
+    <div class="dlg-body">
+      <form class="pub" id="pwForm" novalidate>
+        <div class="field full"><label for="pw1">Nova senha</label><input class="input" id="pw1" type="password" autocomplete="new-password" minlength="6"></div>
+        <div class="field full"><label for="pw2">Repita a nova senha</label><input class="input" id="pw2" type="password" autocomplete="new-password" minlength="6"></div>
+        <div class="actions" style="grid-column:1/-1"><button class="btn btn-dark" type="submit" id="pwBtn">Salvar nova senha</button></div>
+        <p id="pwErr" role="alert" style="grid-column:1/-1;color:#a3121b;font-size:14px;margin:0"></p>
+        <p class="small" style="color:var(--muted);text-align:left">Use pelo menos 6 caracteres. Depois de salvar, é essa senha que vale para entrar.</p>
+      </form>
+    </div>
+  </div>
+</dialog>
+
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -1438,7 +1455,7 @@ $('#revForm').addEventListener('submit',async e=>{
 
 /* ── Área do adm: login ── */
 function syncAdmin(){$('#adminBar').hidden=!session;$('#addPost').hidden=$('#addVideo').hidden=!session;if(!session)toggleVidAdmin(false);$('#openLogin').textContent=session?'Sair do adm':'Área do adm';renderPosts();loadReviews();renderReels()}
-function openLogin(){$('#loginErr').textContent='';$('#loginDlg').showModal()}
+function openLogin(){$('#loginErr').textContent='';$('#loginErr').style.color='#a3121b';$('#loginDlg').showModal()}
 function logout(){const t=session&&session.access;saveSession(null);syncAdmin();toast('Você saiu do adm');if(t)fetch(SB+'/auth/v1/logout',{method:'POST',headers:{apikey:SBKEY,Authorization:'Bearer '+t}}).catch(()=>{})}
 $('#openLogin').onclick=()=>session?logout():openLogin();
 $('#logout').onclick=logout;
@@ -1450,7 +1467,7 @@ $('#loginForm').addEventListener('submit',async e=>{
   try{
     keep(await sb('/auth/v1/token?grant_type=password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:senha})}));
     $('#loginForm').reset();$('#loginDlg').close();syncAdmin();toast('Pronto, já pode publicar');$('#adminBar').scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'});
-  }catch(err){$('#loginErr').textContent=err.status===400?'E-mail ou senha incorretos.':'Não deu para entrar agora. Confira a internet e tente de novo.'}
+  }catch(err){$('#loginErr').style.color='#a3121b';$('#loginErr').textContent=err.status===400?'E-mail ou senha incorretos.':'Não deu para entrar agora. Confira a internet e tente de novo.'}
   finally{btn.disabled=false;btn.textContent='Entrar'}
 });
 /* ── Menu do celular ── */
@@ -1568,6 +1585,43 @@ document.addEventListener('click',async e=>{
 
 syncAdmin();   // também carrega avaliações e vídeos
 loadPosts();loadVideos();
+
+/* ── Senha do adm: "Esqueci minha senha" (link por e-mail) e "Trocar senha" ── */
+function openPw(title){$('#pwForm').reset();$('#pwErr').textContent='';$('#pwTitle').textContent=title||'Criar nova senha';$('#pwDlg').showModal()}
+$('#changePw').onclick=()=>openPw('Trocar senha');
+$('#forgotBtn').onclick=async()=>{
+  const email=$('#l-email').value.trim(),err=$('#loginErr'),btn=$('#forgotBtn');
+  if(!/^\S+@\S+\.\S+$/.test(email)){err.style.color='#a3121b';err.textContent='Digite o seu e-mail no campo acima e toque de novo em “Esqueci minha senha”.';$('#l-email').focus();return}
+  btn.disabled=true;btn.textContent='Enviando…';
+  try{
+    await sb('/auth/v1/recover?redirect_to='+encodeURIComponent(location.origin+location.pathname),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});
+    err.style.color='var(--ink)';err.textContent='Pronto! Se esse e-mail for de um adm, chega em alguns minutos um link para criar uma nova senha. Confira também a caixa de spam.';
+  }catch(e){err.style.color='#a3121b';err.textContent=e.status===429?'Muitas tentativas seguidas. Espere alguns minutos e tente de novo.':'Não deu para enviar agora. Confira a internet e tente de novo.'}
+  finally{btn.disabled=false;btn.textContent='Esqueci minha senha'}
+};
+$('#pwForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const a=$('#pw1').value,b=$('#pw2').value,err=$('#pwErr');
+  if(a.length<6){err.textContent='A senha precisa ter pelo menos 6 caracteres.';$('#pw1').focus();return}
+  if(a!==b){err.textContent='As duas senhas não estão iguais.';$('#pw2').focus();return}
+  const btn=$('#pwBtn');busy(btn,'Salvando…');err.textContent='';
+  try{
+    await sb('/auth/v1/user',{method:'PUT',auth:true,headers:{'Content-Type':'application/json'},body:JSON.stringify({password:a})});
+    await done(btn,'Senha salva');$('#pwDlg').close();toast('Senha alterada. Use a nova senha da próxima vez.');
+  }catch(e2){err.textContent=e2.status===401?'O link expirou. Peça um novo em “Esqueci minha senha”.':e2.status===422?'A nova senha precisa ser diferente da atual.':'Não deu para salvar agora ('+e2.message+'). Tente de novo.'}
+  finally{idle(btn)}
+});
+// volta do link do e-mail: o Supabase manda para o site com #access_token=…&type=recovery
+(function(){
+  if(!/access_token=|error_description=/.test(location.hash))return;
+  const h=new URLSearchParams(location.hash.slice(1));
+  history.replaceState(null,'',location.pathname+location.search);
+  if(h.get('error_description')){toast('O link de nova senha expirou ou já foi usado. Peça outro em “Esqueci minha senha”.');return}
+  if(h.get('access_token')){
+    keep({access_token:h.get('access_token'),refresh_token:h.get('refresh_token'),expires_in:+h.get('expires_in')||3600});syncAdmin();
+    if(h.get('type')==='recovery')openPw('Criar nova senha');
+  }
+})();
 addEventListener('hashchange',adminLink);adminLink();
 })();
 </script>
